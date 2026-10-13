@@ -71,6 +71,9 @@ class DispositivoLuzAdaptador:
             if t.tipo == frame.TIPO_DATA and t.dst == self.direccion:
                 self._transmitir(frame.Trama(frame.TIPO_ACK, t.src, self.direccion, t.seq))
             return t
+        
+
+        
 """class MedioGPIO(Medio):
     def enviar(self, medios):   # prende y apaga el LED según los bits
     def recibir(self, timeout): # lee el LDR """
