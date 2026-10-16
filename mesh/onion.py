@@ -66,19 +66,14 @@ def _desempaquetar(plaintext: bytes):
 def construir_cebolla(destino_pubkey: PublicKey, saltos: list, mensaje: bytes) -> bytes:
     """Construye una cebolla de N saltos.
 
-    destino_pubkey: PublicKey del destinatario final.
-    saltos: lista de tuplas (pubkey_del_relay, canal_hacia_siguiente,
-            direccion_6B_del_siguiente), en orden de llegada.
-            El primer elemento es el primer relay que recibe la celda.
-    mensaje: bytes del contenido para el destinatario.
-
-    Devuelve la celda mas externa (la que se envia al primer relay).
+    Marca: 0x00 = capa del destino, 0x01 = capa de relay.
     """
-    # Capa del destino: solo el mensaje, cerrado con SealedBox.
-    cell = SealedBox(destino_pubkey).encrypt(mensaje)
+    # Capa del destino.
+    contenido_destino = b"\x00" + mensaje
+    cell = SealedBox(destino_pubkey).encrypt(contenido_destino)
     # Capas de los relays, de adentro hacia afuera.
     for pubkey, canal, direccion in reversed(saltos):
-        plaintext = _empaquetar(canal, direccion, cell)
+        plaintext = b"\x01" + _empaquetar(canal, direccion, cell)
         cell = SealedBox(pubkey).encrypt(plaintext)
     return cell
 
@@ -88,13 +83,18 @@ def abrir_como_relay(cell: bytes, mi_privkey: PrivateKey):
     try:
         plaintext = SealedBox(mi_privkey).decrypt(cell)
     except Exception as e:
-        raise OnionError(f"no se pudo abrir la capa: {e}")
-    return _desempaquetar(plaintext)
+        raise OnionError(f"no se pudo descifrar: {e}")
+    if not plaintext or plaintext[0] != 0x01:
+        raise OnionError("no es una capa de relay")
+    return _desempaquetar(plaintext[1:])
 
 
 def abrir_como_destino(cell: bytes, mi_privkey: PrivateKey) -> bytes:
     """El destinatario abre la capa final. Devuelve el mensaje."""
     try:
-        return SealedBox(mi_privkey).decrypt(cell)
+        plaintext = SealedBox(mi_privkey).decrypt(cell)
     except Exception as e:
-        raise OnionError(f"no se pudo abrir el mensaje final: {e}")
+        raise OnionError(f"no se pudo descifrar: {e}")
+    if not plaintext or plaintext[0] != 0x00:
+        raise OnionError("no es un mensaje para mi")
+    return plaintext[1:]
