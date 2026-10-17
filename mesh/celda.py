@@ -15,7 +15,7 @@ padding. El padding es aleatorio para que no se pueda distinguir de datos.
 import os
 import struct
 
-TAMANO_CELDA = 512
+TAMANO_CELDA = 1024
 LARGO_PREFIJO = 2                       # 2 bytes para el largo
 MAX_CONTENIDO = TAMANO_CELDA - LARGO_PREFIJO  # 510 bytes
 FORMATO_LARGO = ">H"

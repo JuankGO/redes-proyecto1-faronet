@@ -35,8 +35,8 @@ def test_contenido_muy_grande_se_rechaza():
 
 
 def test_celda_de_tamano_incorrecto_se_rechaza():
-    with pytest.raises(CeldaError, match="512"):
-        desempaquetar_celda(b"x" * 100)
+    with pytest.raises(CeldaError, match="1024"):
+         desempaquetar_celda(b"x" * 100)
 
 
 def test_fragmentar_y_reensamblar():

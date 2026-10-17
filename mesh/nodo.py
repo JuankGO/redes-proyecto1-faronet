@@ -244,7 +244,8 @@ class Nodo:
         try:
             texto = abrir_como_destino(onion_cell, self.cifrado)
             self.recibidos.append(texto)
-            print(f"[{self.mi_id[:6]}] DESTINO: {texto.decode(errors='replace')}")
+            # Quitamos el print crudo que escupia bytes binarios
+            print(f"\n[{self.mi_id[:6]}] Celda entregada al destino.")
             return
         except OnionError:
             print(f"[{self.mi_id[:6]}] celda no descifrable")
@@ -269,25 +270,41 @@ class Nodo:
     # ----- API publica -----
 
     def mandar_a(self, destino_id: str, mensaje: bytes) -> list:
-        """Arma una cebolla de 3 saltos y la manda al destino.
+        """Arma una cebolla y la manda al destino.
 
-        Devuelve la lista de ids de los relays elegidos (para depuracion).
+        Si hay suficientes nodos, usa 3 relays.
+        Si no (ej. pruebas locales con 2 nodos), manda directo (0 relays).
+        Devuelve la lista de ids de los relays elegidos.
         """
         entrada_destino = self.directorio.get(destino_id)
         if entrada_destino is None:
             raise RuntimeError(f"no conozco al destino {destino_id[:8]}")
+            
         lista = [e for e, _ in self.directorio.values()]
-        saltos_entradas = elegir_saltos(lista, self.mi_id, destino_id, cantidad=3)
+        candidatos = [e for e in lista if e["id"] != self.mi_id and e["id"] != destino_id]
+
+        if len(candidatos) >= 3:
+            saltos_entradas = elegir_saltos(lista, self.mi_id, destino_id, cantidad=3)
+        else:
+            # Modo prueba local: si no hay 3 relays, mandamos directo.
+            saltos_entradas = []
+
         ids_cadena = [e["id"] for e in saltos_entradas] + [destino_id]
         saltos = []
         for i, entrada in enumerate(saltos_entradas):
             pub = PublicKey(bytes.fromhex(entrada["cifrado"]))
             dir_sig = self._direccion_de(ids_cadena[i + 1])
             saltos.append((pub, CANAL_UDP, dir_sig))
+            
         destino_pub = PublicKey(bytes.fromhex(entrada_destino[0]["cifrado"]))
         onion_cell = construir_cebolla(destino_pub, saltos, mensaje)
-        # Enviar al primer relay.
-        dir_primero = self._direccion_de(saltos_entradas[0]["id"])
+
+        # Si hay relays, mandamos al primero. Si no, mandamos directo al destino.
+        if saltos_entradas:
+            dir_primero = self._direccion_de(saltos_entradas[0]["id"])
+        else:
+            dir_primero = self._direccion_de(destino_id)
+
         self._enviar_al_siguiente(CANAL_UDP, dir_primero, onion_cell)
         return [e["id"] for e in saltos_entradas]
 
