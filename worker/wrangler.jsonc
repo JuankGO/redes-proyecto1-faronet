@@ -1,0 +1,31 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "faronet-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-03-20",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "faronet-db",
+      "database_id": "060ad8ec-ee39-46d5-8623-0833e1d87051"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "SALA",
+        "class_name": "Sala"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["Sala"]
+    }
+  ]
+}
