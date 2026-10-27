@@ -1,14 +1,16 @@
-"""Cebolla de N saltos: capas con SealedBox y cabecera de siguiente salto.
+"""Cebolla de N saltos: capas con SealedBox y cabecera de siguiente salto (RFC 3.6).
 
-Diseno v1 (Parte 7C):
-- Capa del destino: SealedBox directo del mensaje (sin cabecera).
-- Capa de cada relay: SealedBox(cabecera(9B) + capa_interna).
-- Cada capa agrega 48B del sobre + 9B de cabecera = 57B.
+- Capa del destino: SealedBox(0x00 || mensaje).
+- Capa de cada relay: SealedBox(0x01 || cabecera(9B) || capa_interna).
+- Cada capa de relay agrega 1 + 9 + 48 = 58 bytes.
 
-Pendiente para la Parte 8 (mesh):
-- Relleno a 512B despues de quitar cada capa.
-- Fragmentacion para el enlace del Faro (tramas de 114B).
-- Circuitos virtuales (claves simetricas por salto) para abaratar.
+La cabecera dice por que canal y a que direccion va la capa interna:
+    CANAL 1B (0 = UDP, 1 = Faro) | SIGUIENTE 6B | LARGO 2B
+SIGUIENTE es IPv4 (4B) + puerto (2B) para UDP, o direccion fisica (4B) +
+0x0000 para Faro.
+
+El relleno a 1024 bytes despues de quitar cada capa lo hace mesh/celda.py
+y la fragmentacion para el Faro, mesh/enlace_faro.py.
 """
 import struct
 
@@ -31,8 +33,38 @@ def direccion_udp(ip: str, puerto: int) -> bytes:
     partes = ip.split(".")
     if len(partes) != 4:
         raise OnionError(f"IP invalida: {ip}")
-    ip_bytes = bytes(int(p) for p in partes)
+    try:
+        ip_bytes = bytes(int(p) for p in partes)
+    except ValueError:
+        raise OnionError(f"IP invalida: {ip}")
     return ip_bytes + struct.pack(">H", puerto)
+
+
+def direccion_faro(mac: bytes) -> bytes:
+    """Empaqueta una direccion fisica de 4 bytes en los 6 de la cabecera."""
+    if len(mac) != 4:
+        raise OnionError("la direccion fisica debe medir 4 bytes")
+    return mac + b"\x00\x00"
+
+
+def direccion_de_entrada(canal: str, direccion: str):
+    """Convierte (canal, direccion) del directorio en (CANAL, 6 bytes)."""
+    if canal == "udp":
+        ip, puerto = direccion.rsplit(":", 1)
+        return CANAL_UDP, direccion_udp(ip, int(puerto))
+    if canal == "faro":
+        return CANAL_FARO, direccion_faro(bytes.fromhex(direccion))
+    raise OnionError(f"canal desconocido: {canal}")
+
+
+def direccion_a_texto(canal: int, dirs_6B: bytes):
+    """Inverso de direccion_de_entrada: devuelve ('udp'|'faro', texto)."""
+    if canal == CANAL_UDP:
+        ip, puerto = leer_direccion_udp(dirs_6B)
+        return "udp", f"{ip}:{puerto}"
+    if canal == CANAL_FARO:
+        return "faro", dirs_6B[:4].hex()
+    raise OnionError(f"canal desconocido: {canal}")
 
 
 def leer_direccion_udp(dirs_6B: bytes):

@@ -13,7 +13,7 @@ from mesh.celda import (
 )
 
 
-def test_celda_siempre_mide_512():
+def test_celda_siempre_mide_1024():
     for n in (0, 1, 100, 400, MAX_CONTENIDO):
         celda = empaquetar_celda(b"x" * n)
         assert len(celda) == TAMANO_CELDA

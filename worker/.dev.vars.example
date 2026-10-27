@@ -1,0 +1,3 @@
+# Copiar a .dev.vars (no se sube al repo) para `npx wrangler dev`.
+# Llave publica Ed25519 del gateway, 64 hex. La imprime: python3 -m gateway.gateway --worker ...
+GATEWAY_PUB=PEGAR_AQUI_64_HEX

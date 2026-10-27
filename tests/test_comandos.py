@@ -99,3 +99,29 @@ def test_tema_con_nombre_muy_largo_se_rechaza():
     nombre = "x" * 33
     with pytest.raises(ComandoError, match="1-32"):
         parsear_comando(f"/tema {nombre} hola")
+
+def test_unirse_valido():
+    cmd = parsear_comando("/unirse amigos una frase larga y secreta")
+    assert cmd.tipo == "unirse"
+    assert cmd.argumentos == {"tema": "amigos", "frase": "una frase larga y secreta"}
+
+
+def test_unirse_frase_corta_se_rechaza():
+    with pytest.raises(ComandoError, match="frase"):
+        parsear_comando("/unirse amigos corta")
+
+
+def test_nodos_y_panico():
+    assert parsear_comando("/nodos").tipo == "nodos"
+    assert parsear_comando("/panico").tipo == "panico"
+    with pytest.raises(ComandoError):
+        parsear_comando("/panico ya")
+
+
+def test_argumentos_del_programa():
+    from app.comandos import parsear_argumentos_programa
+    a = parsear_argumentos_programa(["--nodo", "10.0.0.5:7001", "--alias", "ana",
+                                     "--semilla", "10.0.0.6:7002", "--semilla", "10.0.0.7:7003"])
+    assert a.semilla == ["10.0.0.6:7002", "10.0.0.7:7003"]
+    with pytest.raises(SystemExit):
+        parsear_argumentos_programa(["--nodo", "10.0.0.5:99999", "--alias", "ana"])

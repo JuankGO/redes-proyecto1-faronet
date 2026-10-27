@@ -1,4 +1,4 @@
-"""Demo: celda de 512B, padding aleatorio, fragmentacion para el Faro.
+"""Demo: celda de 1024B, padding aleatorio, fragmentacion para el Faro.
 
 Uso:
     python -m mesh.demo_celda

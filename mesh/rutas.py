@@ -9,9 +9,11 @@ Infinito = 16 (como en RIP). Una ruta con costo >= 16 se considera
 inutilizable. Las rutas que no se renuevan se olvidan.
 
 Nota v1: no usamos split horizon ni poison reverse. Eso puede causar
-"contar hasta infinito" si un enlace se cae. Es una simplificacion
-consciente para la primera version; la anotamos para el RFC como
-mejora pendiente.
+"contar hasta infinito" si un enlace se cae; lo limitan INFINITO = 16 y el
+vencimiento de TIMEOUT_RUTA (RFC, seccion 3.4).
+
+Los anuncios llegan de la red: actualizar_desde() ignora entradas con
+tipos incorrectos o costos fuera de rango en vez de fallar.
 """
 import time
 
@@ -64,7 +66,14 @@ class TablaRutas:
         if ahora is None:
             ahora = time.time()
         cambios = []
+        if not isinstance(anuncio, dict):
+            return cambios
         for destino, saltos_vecino in anuncio.items():
+            if not isinstance(destino, str) or not destino:
+                continue
+            if (not isinstance(saltos_vecino, int) or isinstance(saltos_vecino, bool)
+                    or not (0 <= saltos_vecino <= INFINITO)):
+                continue
             if destino == self.mi_id:
                 continue
             if destino == vecino_id:
@@ -94,6 +103,16 @@ class TablaRutas:
                 "actualizado": ahora,
             }
         return cambios
+
+    def olvidar_via(self, vecino_id: str) -> list:
+        """Borra las rutas que pasan por un vecino que se perdio."""
+        caidas = [d for d, info in self._rutas.items() if info["siguiente"] == vecino_id]
+        for d in caidas:
+            del self._rutas[d]
+        return caidas
+
+    def limpiar(self) -> None:
+        self._rutas.clear()
 
     def ruta_hacia(self, destino_id: str):
         """Devuelve {'siguiente', 'saltos', 'actualizado'} o None."""

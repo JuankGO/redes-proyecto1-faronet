@@ -1,9 +1,16 @@
-"""Identidad criptografica de un nodo: par de firma (Ed25519) y par de cifrado (Curve25519)."""
+"""Identidad criptografica de un nodo: par de firma (Ed25519) y par de cifrado (X25519).
+
+Las llaves se guardan en la memoria no volatil del Faro (la microSD de la
+Raspberry), en la carpeta del nodo, con permisos 0600. El boton de panico
+las sobrescribe con ceros y las borra (faro/panico.py).
+"""
 import os
 from pathlib import Path
 
 from nacl.public import PrivateKey
 from nacl.signing import SigningKey
+
+from faro.panico import panico
 
 CARPETA = Path.home() / ".faronet"
 RUTA_FIRMA = CARPETA / "firma.key"
@@ -20,14 +27,17 @@ def _escribir_privado(ruta: Path, datos: bytes) -> None:
         os.fsync(f.fileno())
 
 
-def _leer_privado(ruta: Path) -> bytes:
-    return ruta.read_bytes()
+def _leer_llave(ruta: Path) -> bytes:
+    datos = ruta.read_bytes()
+    if len(datos) != 32:
+        raise ValueError(f"llave danada en {ruta}: mide {len(datos)} bytes")
+    return datos
 
 
 def cargar_o_crear_firma(ruta: Path = RUTA_FIRMA) -> SigningKey:
     """Devuelve la llave de firma del nodo, creandola si no existe."""
     if ruta.exists():
-        return SigningKey(_leer_privado(ruta))
+        return SigningKey(_leer_llave(ruta))
     clave = SigningKey.generate()
     _escribir_privado(ruta, bytes(clave))
     return clave
@@ -36,21 +46,19 @@ def cargar_o_crear_firma(ruta: Path = RUTA_FIRMA) -> SigningKey:
 def cargar_o_crear_cifrado(ruta: Path = RUTA_CIFRADO) -> PrivateKey:
     """Devuelve la llave de cifrado del nodo, creandola si no existe."""
     if ruta.exists():
-        return PrivateKey(_leer_privado(ruta))
+        return PrivateKey(_leer_llave(ruta))
     clave = PrivateKey.generate()
     _escribir_privado(ruta, bytes(clave))
     return clave
 
 
-def borrar_todo(carpeta: Path = CARPETA) -> None:
+def cargar_o_crear(carpeta: Path = CARPETA):
+    """Devuelve (llave_firma, llave_cifrado) de la carpeta del nodo."""
+    carpeta = Path(carpeta)
+    return (cargar_o_crear_firma(carpeta / "firma.key"),
+            cargar_o_crear_cifrado(carpeta / "cifrado.key"))
+
+
+def borrar_todo(carpeta: Path = CARPETA) -> list:
     """Sobrescribe con ceros y borra todos los archivos de llaves. Parte del panico."""
-    if not carpeta.exists():
-        return
-    for archivo in carpeta.glob("*"):
-        if archivo.is_file():
-            largo = archivo.stat().st_size
-            with open(archivo, "r+b") as f:
-                f.write(b"\x00" * largo)
-                f.flush()
-                os.fsync(f.fileno())
-            archivo.unlink()
+    return panico(Path(carpeta))

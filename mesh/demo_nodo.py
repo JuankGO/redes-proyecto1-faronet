@@ -3,7 +3,7 @@
 Uso:
     python -m mesh.demo_nodo
 
-Notas de la version con fix:
+Notas:
 - Se espera a que TODOS los nodos abran su socket antes de forzar el primer
   anuncio (enviar_ahora). Sin esto, el primer HELLO/DIR/RUTA se pierde
   porque los demas nodos todavia no estaban escuchando.
@@ -59,7 +59,13 @@ def main():
     print()
 
     # Esperar a que el mensaje recorra la cadena de relays.
-    time.sleep(3)
+    limite = time.time() + 5
+    while time.time() < limite and not h.recibidos:
+        time.sleep(0.1)
+    if h.recibidos:
+        print(f"H recibio: {h.recibidos[0]!r}")
+    else:
+        print("ERROR: H no recibio el mensaje")
 
     for n in nodos.values():
         n.detener()
