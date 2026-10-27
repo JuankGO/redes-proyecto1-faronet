@@ -60,7 +60,7 @@ def decodificar(crudo: bytes) -> Trama:
         raise TramaError("trama demasiado larga")
     version, tipo, dst, src, seq, largo = struct.unpack(
         FORMATO_CABECERA, crudo[:LARGO_CABECERA])
-    if version > VERSION:
+    if version < 1 or version > VERSION:
         raise TramaError(f"version {version} no soportada")
     if len(crudo) != LARGO_CABECERA + largo + LARGO_CRC:
         raise TramaError("el largo declarado no coincide")

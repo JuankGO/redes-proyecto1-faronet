@@ -1,4 +1,8 @@
-"""Direccion fisica de 4 bytes: se guarda en un archivo, se puede rotar y borrar."""
+"""Direccion fisica de 4 bytes (RFC, seccion 2.7).
+
+Se guarda en la memoria no volatil del Faro (archivo en la microSD), se
+rota en cada arranque y bajo demanda, y el panico la borra con ceros.
+"""
 import os
 import secrets
 from pathlib import Path
@@ -17,16 +21,25 @@ def _escribir(ruta: Path, valor: bytes) -> None:
 
 def cargar_o_crear(ruta: Path = RUTA) -> bytes:
     if ruta.exists():
-        return ruta.read_bytes()
+        valor = ruta.read_bytes()
+        if len(valor) == 4 and valor not in (b"\xff" * 4, b"\x00" * 4):
+            return valor
     return rotar(ruta)
 
 
+def nueva() -> bytes:
+    """Genera una direccion aleatoria valida (sin guardarla)."""
+    valor = secrets.token_bytes(4)
+    while valor in (b"\xff\xff\xff\xff", b"\x00\x00\x00\x00"):
+        valor = secrets.token_bytes(4)
+    return valor
+
+
 def rotar(ruta: Path = RUTA) -> bytes:
-    nueva = secrets.token_bytes(4)
-    while nueva in (b"\xff\xff\xff\xff", b"\x00\x00\x00\x00"):
-        nueva = secrets.token_bytes(4)
-    _escribir(ruta, nueva)
-    return nueva
+    """Genera una direccion nueva y la guarda sobrescribiendo la anterior."""
+    valor = nueva()
+    _escribir(ruta, valor)
+    return valor
 
 
 def borrar_seguro(ruta: Path = RUTA) -> None:

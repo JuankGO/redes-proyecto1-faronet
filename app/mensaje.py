@@ -8,8 +8,14 @@ Formato (256 bytes):
     | VER 1B | VISIBILIDAD 1B | TEMA 8B | HORA 4B | LARGO 2B | TEXTO ... | RELLENO |
 
 Los mensajes viven poco: al recibirse se comprueba que no hayan vencido
-segun TTL_POR_DEFECTO. Se guardan solo en memoria.
+segun TTL_POR_DEFECTO (y que no vengan del futuro). Se guardan solo en
+memoria.
+
+Mensajes publicos (VIS = 1, RFC seccion 4.4): el TEXTO empieza con el
+nombre del tema, porque el gateway lo necesita para publicarlo:
+    | N 1B | NOMBRE N bytes | texto |
 """
+import re
 import hashlib
 import os
 import struct
@@ -24,6 +30,10 @@ PRIVADO = 0
 PUBLICO = 1
 
 TTL_POR_DEFECTO = 3600       # 1 hora
+TOLERANCIA_RELOJ = 300       # segundos que se acepta HORA en el futuro
+MAX_NOMBRE_TEMA = 32
+# Igual que el Worker: letras, numeros, _ y -, hasta 32 bytes (RFC 4.4).
+_NOMBRE_TEMA = re.compile(r"[\w-]+")
 FORMATO_CABECERA = ">BB8sIH"  # ver, visibilidad, tema, hora, largo
 
 
@@ -75,6 +85,8 @@ def desempaquetar_mensaje(datos: bytes, ahora: float = None) -> dict:
         ahora = time.time()
     if (ahora - hora) >= TTL_POR_DEFECTO:
         raise MensajeError("mensaje vencido")
+    if hora > ahora + TOLERANCIA_RELOJ:
+        raise MensajeError("mensaje con hora en el futuro")
     texto = datos[LARGO_CABECERA:LARGO_CABECERA + largo]
     return {
         "v": ver,
@@ -84,3 +96,46 @@ def desempaquetar_mensaje(datos: bytes, ahora: float = None) -> dict:
         "largo": largo,
         "texto": texto,
     }
+
+def nombre_tema_valido(nombre) -> bool:
+    """Nombre de tema publico aceptable para la mesh y para el Worker."""
+    return (isinstance(nombre, str) and 1 <= len(nombre.encode("utf-8")) <= MAX_NOMBRE_TEMA
+            and _NOMBRE_TEMA.fullmatch(nombre) is not None)
+
+
+def empaquetar_publico(nombre: str, texto: str, hora: int = None) -> bytes:
+    """Arma un mensaje publico: TEXTO = N | NOMBRE | texto."""
+    if not nombre_tema_valido(nombre):
+        raise MensajeError(f"el nombre del tema debe tener 1-{MAX_NOMBRE_TEMA} bytes "
+                           "de letras, numeros, _ o -")
+    nombre_b = nombre.encode("utf-8")
+    texto_b = texto.encode("utf-8")
+    cuerpo = bytes([len(nombre_b)]) + nombre_b + texto_b
+    if len(cuerpo) > MAX_TEXTO:
+        raise MensajeError(f"texto demasiado largo: maximo {MAX_TEXTO - 1 - len(nombre_b)} bytes")
+    return empaquetar_mensaje(PUBLICO, hash_tema(nombre), cuerpo, hora)
+
+
+def leer_publico(d: dict):
+    """Devuelve (nombre, texto) de un mensaje publico ya desempaquetado.
+
+    Verifica que TEMA sea el hash del nombre. Lanza MensajeError si no.
+    """
+    if d.get("visibilidad") != PUBLICO:
+        raise MensajeError("no es un mensaje publico")
+    cuerpo = d["texto"]
+    if not cuerpo:
+        raise MensajeError("mensaje publico vacio")
+    n = cuerpo[0]
+    if not (1 <= n <= MAX_NOMBRE_TEMA) or len(cuerpo) < 1 + n:
+        raise MensajeError("nombre de tema invalido")
+    try:
+        nombre = cuerpo[1:1 + n].decode("utf-8")
+        texto = cuerpo[1 + n:].decode("utf-8")
+    except UnicodeDecodeError:
+        raise MensajeError("el mensaje publico no es UTF-8")
+    if not nombre_tema_valido(nombre):
+        raise MensajeError("nombre de tema invalido")
+    if hash_tema(nombre) != d["tema"]:
+        raise MensajeError("el TEMA no corresponde al nombre")
+    return nombre, texto

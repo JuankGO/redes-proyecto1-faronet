@@ -3,7 +3,7 @@
 **Autor:** [Jimmy Castillo, Juan Carlos Gomez]
 **Curso:** Redes de Computadoras — Proyecto 1
 **Fecha:** [12/10/2026]
-**Versión:** 1.0
+**Versión:** 1.1 (ajustada al código final)
 
 ## 1. Propósito
 
@@ -47,7 +47,7 @@ el relay que recibe nuestra celda.
 | --- | --- |
 | **Qué puede ver** | Quién le pasó la celda, a quién debe pasársela, la hora y el tamaño del mensaje. |
 | **Qué NO puede ver** | El contenido del mensaje. El origen y el destino final **a la vez**, salvo que los tres nodos del circuito sean suyos. |
-| **Defensa** | Cebolla de 3 saltos: cada relay abre solo su capa y ve únicamente el siguiente salto. Cifrado con claves públicas. Celdas de tamaño fijo (512 bytes) para que el tamaño no delate cuánto se dijo. Relleno con bytes aleatorios después de quitar cada capa. |
+| **Defensa** | Cebolla de 3 saltos: cada relay abre solo su capa y ve únicamente el siguiente salto. Cifrado con claves públicas. Celdas de tamaño fijo (1024 bytes) para que el tamaño no delate cuánto se dijo: cada relay vuelve a rellenar la celda con bytes aleatorios hasta 1024 antes de reenviarla. Solo se arma la cebolla si hay al menos 5 candidatos a relay (si no, `SaltosError`). Paquetes mal formados se descartan sin tumbar el nodo. |
 
 ### 3.2 Observador del medio físico
 
@@ -58,7 +58,7 @@ punto cercano. Está fuera de la red, solo mira el canal.
 | --- | --- |
 | **Qué puede ver** | Que hay una transmisión, cuándo ocurre y cuánto dura. Las direcciones físicas de las tramas (van en la cabecera, sin cifrar). |
 | **Qué NO puede ver** | El contenido de los mensajes, porque viajan cifrados en capas. |
-| **Defensa** | Cifrado de la celda completa antes de partirla en tramas. Direcciones físicas **rotables** con `direccion.rotar()`: no son permanentes. Padding en las celdas. |
+| **Defensa** | Cifrado de la celda completa antes de partirla en tramas. Direcciones físicas **rotables** con `direccion.rotar()` (el nodo avisa con un BEACON): no son permanentes. Celdas de 1024 bytes partidas siempre en los mismos 10 fragmentos, así todos los mensajes producen la misma ráfaga sin importar cuánto texto llevan. |
 
 ### 3.3 Operador del gateway
 
@@ -67,9 +67,9 @@ el Worker de Cloudflare. Es el eslabón más peligroso porque ve ambos mundos.
 
 | | |
 | --- | --- |
-| **Qué puede ver** | Los mensajes marcados como **públicos** que salen a internet. Que existe tráfico hacia el Worker, y aproximadamente cuánto. |
+| **Qué puede ver** | Los mensajes marcados como **públicos** que salen a internet (es el destino final de esa cebolla, así que los lee en claro). Que existe tráfico hacia el Worker, y aproximadamente cuánto. |
 | **Qué NO puede ver** | Quién originó el mensaje (la cebolla se descifra solo al final). Los mensajes **privados**, que nunca cruzan el gateway. |
-| **Defensa** | Solo los mensajes marcados con `VISIBILIDAD = público` se envían al Worker. La cebolla se mantiene hasta el destino, no hasta el gateway: el gateway solo reenvía el sobre final. |
+| **Defensa** | `gateway/gateway.py` solo reenvía mensajes con `VISIBILIDAD = público` y con el TEMA que corresponde al nombre; lo demás lo descarta y lo cuenta en `ignorados`. El emisor llega al gateway por 3 relays, así que el gateway no sabe quién escribió. El chat elige un gateway al azar entre los que se anuncian con `rol: gateway` en el directorio. |
 
 ### 3.4 Proveedor del edge (Cloudflare)
 
@@ -78,9 +78,9 @@ poderoso porque ve el tráfico a nivel de red.
 
 | | |
 | --- | --- |
-| **Qué puede ver** | La IP del gateway, la hora de las peticiones, los tamaños, y los mensajes **públicos** (porque son públicos). |
-| **Qué NO puede ver** | El contenido del buzón muerto: los blobs llegan cifrados de extremo a extremo. Quién escribió cada mensaje: el Worker no guarda identidad ni IP. |
-| **Defensa** | El Worker **no guarda** `CF-Connecting-IP` ni `User-Agent`. Los blobs del buzón tienen TTL y se borran en la misma operación en que se leen (`DELETE ... RETURNING`). El código no hace `console.log` de encabezados. La observabilidad del Worker está apagada. La autenticación del gateway usa firma Ed25519 con nonce y ventana temporal de ±60 s, así que no se puede atribuir una petición a un usuario concreto a partir del cuerpo. |
+| **Qué puede ver** | La IP del gateway, la hora de las peticiones, los tamaños, los mensajes **públicos** (porque son públicos) y el directorio público de nodos, que incluye la IP:puerto de cada nodo UDP. |
+| **Qué NO puede ver** | El contenido del buzón muerto, siempre que quien deposita suba una celda ya cifrada (el Worker solo exige 1024 bytes y un ID de 64 hex; no puede comprobar que esté cifrada). Quién escribió cada mensaje: el Worker no guarda identidad ni IP. |
+| **Defensa** | El Worker **no guarda** `CF-Connecting-IP` ni `User-Agent`: la IP solo se usa en memoria como llave del límite de peticiones y ninguna tabla de D1 tiene columnas de IP (hay una prueba que lo verifica). Los blobs del buzón tienen TTL y se borran en la misma operación en que se leen (`DELETE ... RETURNING`). El código no hace `console.log` de encabezados. La observabilidad del Worker está apagada. La autenticación del gateway usa firma Ed25519 sobre método, ruta, hora, nonce y SHA-256 del cuerpo, con ventana de ±60 s y nonces de un solo uso: nadie más puede publicar ni repetir una petición vieja. Las entradas del directorio se verifican con la firma de cada nodo antes de guardarse. Los mensajes públicos vencen a los 7 días y un cron borra todo lo vencido cada hora. |
 
 ## 4. Qué NO protegemos
 
@@ -95,9 +95,12 @@ debilidades, el documento no sirve.
   sí las ve en su propia infraestructura antes de que el código las reciba.
   El usuario debe asumir que el proveedor del edge conoce la IP del gateway.
 - **Robo físico del Faro.** Si alguien se lleva una Raspberry, puede leer las
-  llaves guardadas en disco. El botón de pánico (borrado seguro con
-  sobrescritura de ceros) solo ayuda si el dueño lo activa **antes** de
-  perder el control del dispositivo. No hay cifrado a nivel de disco.
+  llaves guardadas en disco. El botón de pánico (GPIO17 o `/panico`) sobrescribe
+  con ceros y borra las llaves, crea una identidad y una dirección nuevas y
+  vacía las tablas en memoria, pero solo ayuda si el dueño lo activa **antes**
+  de perder el control del dispositivo. Además, en una microSD la
+  sobrescritura no garantiza que el dato viejo desaparezca (la tarjeta reparte
+  las escrituras entre celdas distintas). No hay cifrado a nivel de disco.
 - **Compromiso del sistema operativo.** Si el atacante tiene acceso root a
   una de las Raspberry, puede leer las llaves en memoria y suplantar al
   nodo. Asumimos que el sistema operativo no está comprometido.
@@ -107,6 +110,15 @@ debilidades, el documento no sirve.
 - **Correlación por horario de escritura.** Si dos usuarios se escriben
   siempre a la misma hora, un observador puede inferir la relación. No lo
   ocultamos.
+- **El emisor de un privado no está autenticado.** El campo TEMA de un
+  mensaje directo lleva una pista del emisor (`dm:` + su ID), pero no va
+  firmada: cualquiera puede poner la pista de otro. Por eso el chat la muestra
+  como "posible emisor, no verificado".
+- **Frases de tema débiles.** La llave de un tema sale de su frase con
+  Argon2id; una frase corta o común se puede adivinar sin conexión. El chat
+  exige al menos 8 caracteres, pero la fuerza real depende del grupo.
+- **El directorio público revela IPs de la mesh.** Quien lea `/directorio`
+  ve la IP:puerto de los nodos UDP (no la de los nodos que solo usan el Faro).
 - **Metadatos en el feed público.** Los mensajes públicos son, por
   definición, públicos: cualquiera puede leerlos y correlacionarlos con
   otros mensajes públicos del mismo tema.

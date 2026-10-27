@@ -1,13 +1,13 @@
-"""Celdas de tamano fijo (512 bytes) con padding, y fragmentacion para el Faro.
+"""Celdas de tamano fijo (1024 bytes) con padding, y fragmentacion (RFC 3.5).
 
-Una celda es la unidad que viaja por la red. Todas miden igual (512 bytes)
+Una celda es la unidad que viaja por la red. Todas miden igual (1024 bytes)
 para que el tamano no delate en que salto va una celda ni cuanto se dijo.
 
 Cuando la celda cruza un enlace del Faro (tramas de 128B con 114B de
 payload), se fragmenta en varias tramas y el receptor la reensambla.
 
 Formato de una celda:
-    | LARGO 2B | CONTENIDO ... | PADDING aleatorio hasta 512B |
+    | LARGO 2B | CONTENIDO ... | PADDING aleatorio hasta 1024B |
 
 LARGO dice cuantos bytes del contenido son reales. El receptor ignora el
 padding. El padding es aleatorio para que no se pueda distinguir de datos.
@@ -17,7 +17,7 @@ import struct
 
 TAMANO_CELDA = 1024
 LARGO_PREFIJO = 2                       # 2 bytes para el largo
-MAX_CONTENIDO = TAMANO_CELDA - LARGO_PREFIJO  # 510 bytes
+MAX_CONTENIDO = TAMANO_CELDA - LARGO_PREFIJO  # 1022 bytes
 FORMATO_LARGO = ">H"
 
 # Para fragmentacion en el Faro:
@@ -30,7 +30,7 @@ class CeldaError(Exception):
 
 
 def empaquetar_celda(contenido: bytes) -> bytes:
-    """Mete el contenido en una celda de 512B con padding aleatorio."""
+    """Mete el contenido en una celda de 1024B con padding aleatorio."""
     if len(contenido) > MAX_CONTENIDO:
         raise CeldaError(
             f"contenido de {len(contenido)} bytes; maximo {MAX_CONTENIDO}"
@@ -85,6 +85,8 @@ def reensamblar(fragmentos: list) -> bytes:
         if len(frag) < 4:
             raise CeldaError("fragmento demasiado corto")
         indice, t = struct.unpack(">HH", frag[:4])
+        if t == 0 or indice >= t:
+            raise CeldaError("indice de fragmento fuera de rango")
         if total is None:
             total = t
         elif t != total:

@@ -4,18 +4,24 @@ Un vecino es un nodo que esta a un salto de distancia. No confundir con el
 directorio (que lista toda la red) ni con la tabla de rutas (que dice como
 llegar a cualquier nodo pasando por vecinos).
 
-Formato del HELLO (JSON canonico, sin firmar en v1):
+Formato del HELLO (JSON canonico, sin firmar en v1; RFC seccion 3.2):
     t     tipo del mensaje ('hello')
+    v     version (1; si falta se asume 1)
     id    id del emisor (hex, 64 chars)
     canal 'udp' o 'faro'
     dir   direccion de contacto del emisor
     ts    timestamp de envio (int)
 
-En la Parte 8C agregaremos firma al HELLO para que nadie pueda suplantar
-a un vecino. Aqui nos concentramos en la deteccion y el olvido.
+El HELLO no va firmado en la version 1 (RFC, seccion 8.3): un atacante en
+la red local podria anunciar un vecino falso, pero no leer ni alterar las
+celdas, que van cifradas y autenticadas.
 """
 import json
 import time
+
+from mesh.directorio import direccion_valida, es_hex64
+
+VERSION = 1
 
 INTERVALO_HELLO = 10.0      # segundos entre HELLO
 TIMEOUT_VECINO = 30.0       # segundos sin senal para olvidar
@@ -31,6 +37,7 @@ def crear_hello(mi_id_hex: str, canal: str, direccion: str) -> bytes:
         raise VecinoError(f"canal invalido: {canal}")
     mensaje = {
         "t": "hello",
+        "v": VERSION,
         "id": mi_id_hex,
         "canal": canal,
         "dir": direccion,
@@ -45,6 +52,11 @@ def parsear_hello(datos: bytes) -> dict:
         mensaje = json.loads(datos.decode("utf-8"))
     except (json.JSONDecodeError, UnicodeDecodeError) as e:
         raise VecinoError(f"no es JSON valido: {e}")
+    return validar_hello(mensaje)
+
+
+def validar_hello(mensaje) -> dict:
+    """Valida un HELLO ya decodificado. Lanza VecinoError si no es valido."""
     if not isinstance(mensaje, dict):
         raise VecinoError("el HELLO debe ser un objeto JSON")
     for campo in ("t", "id", "canal", "dir", "ts"):
@@ -54,8 +66,15 @@ def parsear_hello(datos: bytes) -> dict:
         raise VecinoError(f"tipo inesperado: {mensaje['t']}")
     if mensaje["canal"] not in ("udp", "faro"):
         raise VecinoError("canal invalido")
-    if not isinstance(mensaje["id"], str) or len(mensaje["id"]) != 64:
+    if not es_hex64(mensaje["id"]):
         raise VecinoError("id debe ser hex de 64 chars")
+    v = mensaje.get("v", VERSION)
+    if not isinstance(v, int) or isinstance(v, bool) or not (1 <= v <= VERSION):
+        raise VecinoError("version no soportada")
+    if not direccion_valida(mensaje["canal"], mensaje["dir"]):
+        raise VecinoError("direccion invalida para el canal")
+    if not isinstance(mensaje["ts"], int) or isinstance(mensaje["ts"], bool):
+        raise VecinoError("ts debe ser entero")
     return mensaje
 
 
@@ -101,6 +120,9 @@ class TablaVecinos:
     def obtener(self, id_hex: str):
         """Devuelve {'canal', 'dir', 'visto'} o None si no es vecino."""
         return self._tabla.get(id_hex)
+
+    def limpiar(self) -> None:
+        self._tabla.clear()
 
     def __len__(self):
         return len(self._tabla)

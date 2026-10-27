@@ -90,3 +90,13 @@ def test_hash_tema_es_estable():
 def test_hash_tema_vacio_se_rechaza():
     with pytest.raises(MensajeError):
         hash_tema("")
+
+def test_nombre_de_tema_publico_igual_que_el_worker():
+    import pytest
+    from app.mensaje import MensajeError, empaquetar_publico, nombre_tema_valido
+    for bueno in ["noticias", "fútbol", "tema_1-2", "ñ" * 16]:
+        assert nombre_tema_valido(bueno)
+    for malo in ["", "mi tema", "a/b", "<script>", "x" * 33, "ñ" * 17, "ok\n"]:
+        assert not nombre_tema_valido(malo)
+    with pytest.raises(MensajeError):
+        empaquetar_publico("mi tema", "hola")
