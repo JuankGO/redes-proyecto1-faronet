@@ -3,6 +3,10 @@
 Se corre en los dos Faros a la vez: uno con 'recibir' y el otro con
 'enviar' (BER) o 'tasa' (tasa efectiva con ACK).
 
+Con un solo Faro, 'loopback' manda tramas y las lee de vuelta por el mismo
+UART (el LED IR apuntando a su propio fototransistor):
+    python3 -m faro.medir loopback --uart /dev/ttyAMA0 --tramas 20
+
 Ejemplos en la Raspberry (UART real):
     python3 -m faro.medir recibir --uart /dev/ttyAMA0 --baudios 9600 --tramas 200
     python3 -m faro.medir enviar  --uart /dev/ttyAMA0 --baudios 9600 --tramas 200
@@ -131,10 +135,50 @@ def cmd_eco(a):
     medio.cerrar()
 
 
+def cmd_loopback(a):
+    """Un solo Faro: manda cada trama y la lee de vuelta por su propio receptor."""
+    medio = crear_medio(a)
+    ser = getattr(medio, "ser", None)
+    largo = len(trama_esperada(0))
+    errores, recibidas = 0, 0
+    inicio = time.monotonic()
+    for i in range(a.tramas):
+        seq = i % 256
+        if ser is not None:
+            ser.reset_input_buffer()          # descarta basura vieja
+        medio.enviar(linea.armar_senal(trama_esperada(seq)))
+        medios = medio.recibir(a.espera_ack)
+        try:
+            crudo = linea.extraer_trama(medios) if medios else None
+        except linea.LineaError:
+            crudo = None
+        if crudo is None:
+            errores += largo * 8
+            print(f"Trama {seq}: no llego")
+            continue
+        malos = bits_distintos(crudo, trama_esperada(seq))
+        errores += malos
+        recibidas += 1
+        try:
+            frame.decodificar(crudo)
+            estado = "OK" if malos == 0 else f"{malos} bits malos"
+        except Exception:
+            estado = f"CRC malo ({malos} bits malos)"
+        print(f"Trama {seq}: {estado}")
+        time.sleep(a.pausa)
+    duracion = time.monotonic() - inicio
+    total_bits = a.tramas * largo * 8
+    print(f"Recibidas: {recibidas}/{a.tramas} en {duracion:.2f} s")
+    print(f"Bits erroneos: {errores}/{total_bits}")
+    print(f"BER: {errores / total_bits if total_bits else 0.0:.2e}")
+    medio.cerrar()
+    return recibidas, errores
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="faro.medir", description=__doc__.split("\n")[0])
-    p.add_argument("modo", choices=["enviar", "recibir", "tasa", "eco"],
-                   help="enviar/recibir: BER. tasa/eco: tasa efectiva con ACK")
+    p.add_argument("modo", choices=["enviar", "recibir", "tasa", "eco", "loopback"],
+                   help="enviar/recibir: BER. tasa/eco: tasa efectiva con ACK. loopback: un solo Faro")
     p.add_argument("--uart", help="puerto serie, por ejemplo /dev/ttyAMA0")
     p.add_argument("--baudios", type=int, default=9600)
     p.add_argument("--udp", type=int, help="puerto UDP local (simulacion)")
@@ -147,7 +191,8 @@ def main(argv=None):
     p.add_argument("--espera-ack", type=float, default=1.0)
     p.add_argument("--distancia", default="sin indicar", help="solo para el reporte")
     a = p.parse_args(argv)
-    {"enviar": cmd_enviar, "recibir": cmd_recibir, "tasa": cmd_tasa, "eco": cmd_eco}[a.modo](a)
+    {"enviar": cmd_enviar, "recibir": cmd_recibir, "tasa": cmd_tasa, "eco": cmd_eco,
+     "loopback": cmd_loopback}[a.modo](a)
 
 
 if __name__ == "__main__":

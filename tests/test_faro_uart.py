@@ -146,3 +146,39 @@ def test_bits_distintos_y_trama_esperada():
     mal = bytearray(t); mal[20] ^= 0b101
     assert bits_distintos(t, bytes(mal)) == 2
     assert frame.decodificar(t).seq == 7
+
+
+class _SerieEspejo:
+    """Puerto serie falso donde lo que se escribe vuelve al mismo puerto (loopback)."""
+
+    def __init__(self):
+        self.buf = bytearray()
+
+    @property
+    def in_waiting(self):
+        return len(self.buf)
+
+    def read(self, n):
+        datos, self.buf = bytes(self.buf[:n]), self.buf[n:]
+        return datos
+
+    def write(self, datos):
+        self.buf += datos
+
+    def flush(self):
+        pass
+
+    def reset_input_buffer(self):
+        self.buf = bytearray()
+
+    def close(self):
+        pass
+
+
+def test_loopback_de_un_solo_faro(monkeypatch):
+    from faro import medir
+    from faro.medio import MedioUART
+    monkeypatch.setattr(medir, "crear_medio", lambda a: MedioUART(serial_obj=_SerieEspejo()))
+    a = type("A", (), {"tramas": 3, "espera_ack": 0.5, "pausa": 0.0})()
+    recibidas, errores = medir.cmd_loopback(a)
+    assert recibidas == 3 and errores == 0
