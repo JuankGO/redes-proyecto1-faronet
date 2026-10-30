@@ -19,15 +19,19 @@ La especificación completa está en `docs/rfc/rfc-faronet.txt` y el modelo de a
 
 ## Pines de la Raspberry Pi 2
 
-| Señal | Pin físico | GPIO |
-| --- | --- | --- |
-| TX hacia el LED IR (por el 2N2222A) | 8 | GPIO14 |
-| RX desde el comparador LM311 | 10 | GPIO15 |
-| LED TX (verde) | 16 | GPIO23 |
-| LED RX (rojo) | 18 | GPIO24 |
-| Botón de pánico (a GND, pull-up interno) | 11 | GPIO17 |
+El Faro es la versión simplificada: LED IR, fototransistor, un 2N2222A, cinco resistencias, dos LEDs y el botón, todo a 3.3 V. Son 7 cables:
 
-Todo lo que llega a un GPIO va a 3.3 V, nunca a 5 V. El circuito está en `docs/hardware/circuito-faro.html` y las mediciones en `docs/hardware/bitacora-pruebas-multimetro.md`.
+| J1 | Señal | Pin físico | GPIO |
+| --- | --- | --- | --- |
+| 1 | 3V3 (alimenta todo el Faro) | 1 | — |
+| 2 | GND | 6 | — |
+| 3 | TX hacia el LED IR (por el 2N2222A) | 8 | GPIO14 |
+| 4 | RX desde el fototransistor (emisor, con R3 a GND) | 10 | GPIO15 |
+| 5 | LED TX (verde) | 16 | GPIO23 |
+| 6 | LED RX (rojo) | 18 | GPIO24 |
+| 7 | Botón de pánico (a GND, pull-up interno) | 11 | GPIO17 |
+
+J1-1 va al pin 1 (3.3V), nunca al 2 ni al 4 (5V). El circuito está en `docs/hardware/circuito-faro.html` y las mediciones en `docs/hardware/bitacora-pruebas-multimetro.md`.
 
 ## 1. Preparar cada Raspberry (una vez)
 
@@ -71,17 +75,17 @@ Prueba rápida de texto. La Pi B imprime su dirección física y la Pi A le mand
 1. `python3 -m faro.demo_recibir --uart /dev/ttyAMA0`
 2. `python3 -m faro.demo_enviar --uart /dev/ttyAMA0 --destino DIRECCION_DE_B --mensaje "hola faro"`
 
-Tasa de error de bit (BER) a 0.5 m, 1 m y 2 m (en la Pi B y luego en la Pi A):
+Tasa de error de bit (BER) a 25 cm, 50 cm y 1 m (en la Pi B y luego en la Pi A):
 
-1. `python3 -m faro.medir recibir --uart /dev/ttyAMA0 --tramas 200 --distancia 1.0`
+1. `python3 -m faro.medir recibir --uart /dev/ttyAMA0 --tramas 200 --distancia 0.5`
 2. `python3 -m faro.medir enviar --uart /dev/ttyAMA0 --tramas 200`
 
 Tasa efectiva con ACK (en la Pi B y luego en la Pi A):
 
 1. `python3 -m faro.medir eco --uart /dev/ttyAMA0`
-2. `python3 -m faro.medir tasa --uart /dev/ttyAMA0 --tramas 100 --distancia 1.0`
+2. `python3 -m faro.medir tasa --uart /dev/ttyAMA0 --tramas 100 --distancia 0.5`
 
-Los resultados van en el Apéndice B del RFC. Para probar otra velocidad se agrega `--baudios 19200` en los dos lados.
+Los resultados van en el Apéndice B del RFC. Para cambiar la velocidad se agrega `--baudios` en los dos lados: sin comparador, si hay muchos errores a 9600 se prueba `--baudios 4800` o `--baudios 2400`, y si va bien se prueba `--baudios 19200`. La sensibilidad se ajusta cambiando R3 (ver la pestaña "Montaje y ajustes" del circuito).
 
 Sin hardware se usa `--udp PUERTO --vecino 127.0.0.1:OTRO` en lugar de `--uart`.
 

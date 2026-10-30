@@ -37,22 +37,22 @@ Tabla de contenidos
       1.1.  Terminologia  . . . . . . . . . . . . . . . . . . . . . .  3
    2.  Capa 1: Protocolo del Faro . . . . . . . . . . . . . . . . . .  4
       2.1.  Medio fisico  . . . . . . . . . . . . . . . . . . . . . .  4
-      2.2.  Codificacion de linea . . . . . . . . . . . . . . . . . .  4
+      2.2.  Codificacion de linea . . . . . . . . . . . . . . . . . .  5
       2.3.  Formato de la trama . . . . . . . . . . . . . . . . . . .  5
-      2.4.  Campos de la trama  . . . . . . . . . . . . . . . . . . .  5
-      2.5.  Verificacion de integridad  . . . . . . . . . . . . . . .  6
-      2.6.  Tipos de trama  . . . . . . . . . . . . . . . . . . . . .  6
+      2.4.  Campos de la trama  . . . . . . . . . . . . . . . . . . .  6
+      2.5.  Verificacion de integridad  . . . . . . . . . . . . . . .  7
+      2.6.  Tipos de trama  . . . . . . . . . . . . . . . . . . . . .  7
       2.7.  Direccion fisica  . . . . . . . . . . . . . . . . . . . .  7
-      2.8.  Acceso al medio y confiabilidad . . . . . . . . . . . . .  7
+      2.8.  Acceso al medio y confiabilidad . . . . . . . . . . . . .  8
       2.9.  Versionado  . . . . . . . . . . . . . . . . . . . . . . .  8
       2.10.  Tramas creadas fuera del Faro  . . . . . . . . . . . . .  8
-      2.11.  Interfaz DispositivoLuzAdaptador . . . . . . . . . . . .  8
+      2.11.  Interfaz DispositivoLuzAdaptador . . . . . . . . . . . .  9
       2.12.  Medicion de desempeno  . . . . . . . . . . . . . . . . .  9
-   3.  Capas 2 y 3: Red mesh FaroNet  . . . . . . . . . . . . . . . .  9
-      3.1.  Canales y transporte  . . . . . . . . . . . . . . . . . .  9
+   3.  Capas 2 y 3: Red mesh FaroNet  . . . . . . . . . . . . . . . . 10
+      3.1.  Canales y transporte  . . . . . . . . . . . . . . . . . . 10
       3.2.  HELLO: descubrimiento de vecinos  . . . . . . . . . . . . 10
-      3.3.  DIR: directorio de nodos  . . . . . . . . . . . . . . . . 10
-      3.4.  RUTA: enrutamiento por vector de distancias . . . . . . . 11
+      3.3.  DIR: directorio de nodos  . . . . . . . . . . . . . . . . 11
+      3.4.  RUTA: enrutamiento por vector de distancias . . . . . . . 12
 
 
 Castillo Guzman & Gomez        Experimental                   [Pagina 1]
@@ -61,50 +61,50 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
 
 
       3.5.  Celdas de tamano fijo . . . . . . . . . . . . . . . . . . 12
-      3.6.  Formato de la cebolla . . . . . . . . . . . . . . . . . . 12
-      3.7.  Seleccion del circuito  . . . . . . . . . . . . . . . . . 13
+      3.6.  Formato de la cebolla . . . . . . . . . . . . . . . . . . 13
+      3.7.  Seleccion del circuito  . . . . . . . . . . . . . . . . . 14
       3.8.  Reenvio de celdas . . . . . . . . . . . . . . . . . . . . 14
-      3.9.  Mensajes FaroNet sobre el enlace Faro . . . . . . . . . . 14
+      3.9.  Mensajes FaroNet sobre el enlace Faro . . . . . . . . . . 15
       3.10.  Gateways entre comunidades . . . . . . . . . . . . . . . 15
    4.  Capa 7: Aplicacion anonima . . . . . . . . . . . . . . . . . . 15
-      4.1.  Formato del mensaje . . . . . . . . . . . . . . . . . . . 15
+      4.1.  Formato del mensaje . . . . . . . . . . . . . . . . . . . 16
       4.2.  Mensajes privados . . . . . . . . . . . . . . . . . . . . 16
       4.3.  Temas privados  . . . . . . . . . . . . . . . . . . . . . 16
-      4.4.  Mensajes publicos . . . . . . . . . . . . . . . . . . . . 16
+      4.4.  Mensajes publicos . . . . . . . . . . . . . . . . . . . . 17
    5.  Interfaz con el edge . . . . . . . . . . . . . . . . . . . . . 17
       5.1.  Generalidades . . . . . . . . . . . . . . . . . . . . . . 17
-      5.2.  Autenticacion del gateway . . . . . . . . . . . . . . . . 17
+      5.2.  Autenticacion del gateway . . . . . . . . . . . . . . . . 18
       5.3.  Salas publicas  . . . . . . . . . . . . . . . . . . . . . 18
-      5.4.  Feed de temas . . . . . . . . . . . . . . . . . . . . . . 18
-      5.5.  Buzon muerto  . . . . . . . . . . . . . . . . . . . . . . 18
+      5.4.  Feed de temas . . . . . . . . . . . . . . . . . . . . . . 19
+      5.5.  Buzon muerto  . . . . . . . . . . . . . . . . . . . . . . 19
       5.6.  Directorio publico  . . . . . . . . . . . . . . . . . . . 19
       5.7.  Limite de peticiones  . . . . . . . . . . . . . . . . . . 19
-      5.8.  Politica de no registro . . . . . . . . . . . . . . . . . 19
-   6.  Boton de panico  . . . . . . . . . . . . . . . . . . . . . . . 19
+      5.8.  Politica de no registro . . . . . . . . . . . . . . . . . 20
+   6.  Boton de panico  . . . . . . . . . . . . . . . . . . . . . . . 20
    7.  Consideraciones de privacidad  . . . . . . . . . . . . . . . . 20
       7.1.  Modelo de amenazas  . . . . . . . . . . . . . . . . . . . 20
-      7.2.  Vigilancia y correlacion  . . . . . . . . . . . . . . . . 20
-      7.3.  Identificacion  . . . . . . . . . . . . . . . . . . . . . 20
+      7.2.  Vigilancia y correlacion  . . . . . . . . . . . . . . . . 21
+      7.3.  Identificacion  . . . . . . . . . . . . . . . . . . . . . 21
       7.4.  Almacenamiento y retencion  . . . . . . . . . . . . . . . 21
-      7.5.  Lo que ve el proveedor del edge . . . . . . . . . . . . . 21
-      7.6.  Divulgacion secundaria  . . . . . . . . . . . . . . . . . 21
-   8.  Consideraciones de seguridad . . . . . . . . . . . . . . . . . 21
-      8.1.  Criptografia  . . . . . . . . . . . . . . . . . . . . . . 21
-      8.2.  Integridad del enlace . . . . . . . . . . . . . . . . . . 21
-      8.3.  Suplantacion de vecinos . . . . . . . . . . . . . . . . . 21
+      7.5.  Lo que ve el proveedor del edge . . . . . . . . . . . . . 22
+      7.6.  Divulgacion secundaria  . . . . . . . . . . . . . . . . . 22
+   8.  Consideraciones de seguridad . . . . . . . . . . . . . . . . . 22
+      8.1.  Criptografia  . . . . . . . . . . . . . . . . . . . . . . 22
+      8.2.  Integridad del enlace . . . . . . . . . . . . . . . . . . 22
+      8.3.  Suplantacion de vecinos . . . . . . . . . . . . . . . . . 22
       8.4.  Denegacion de servicio  . . . . . . . . . . . . . . . . . 22
-      8.5.  Ataques de Sybil  . . . . . . . . . . . . . . . . . . . . 22
-      8.6.  Repeticion  . . . . . . . . . . . . . . . . . . . . . . . 22
-      8.7.  Robo del dispositivo  . . . . . . . . . . . . . . . . . . 22
-      8.8.  Seguridad del cableado  . . . . . . . . . . . . . . . . . 22
-   9.  Consideraciones IANA . . . . . . . . . . . . . . . . . . . . . 22
-   10.  Referencias . . . . . . . . . . . . . . . . . . . . . . . . . 22
-      10.1.  Referencias normativas . . . . . . . . . . . . . . . . . 22
-      10.2.  Referencias informativas . . . . . . . . . . . . . . . . 23
-   Apendice A.  Vectores de prueba  . . . . . . . . . . . . . . . . . 23
-   Apendice B.  Mediciones de desempeno . . . . . . . . . . . . . . . 24
-   Agradecimientos  . . . . . . . . . . . . . . . . . . . . . . . . . 24
-   Direcciones de los autores . . . . . . . . . . . . . . . . . . . . 24
+      8.5.  Ataques de Sybil  . . . . . . . . . . . . . . . . . . . . 23
+      8.6.  Repeticion  . . . . . . . . . . . . . . . . . . . . . . . 23
+      8.7.  Robo del dispositivo  . . . . . . . . . . . . . . . . . . 23
+      8.8.  Seguridad del cableado  . . . . . . . . . . . . . . . . . 23
+   9.  Consideraciones IANA . . . . . . . . . . . . . . . . . . . . . 23
+   10.  Referencias . . . . . . . . . . . . . . . . . . . . . . . . . 23
+      10.1.  Referencias normativas . . . . . . . . . . . . . . . . . 23
+      10.2.  Referencias informativas . . . . . . . . . . . . . . . . 24
+   Apendice A.  Vectores de prueba  . . . . . . . . . . . . . . . . . 24
+   Apendice B.  Mediciones de desempeno . . . . . . . . . . . . . . . 25
+   Agradecimientos  . . . . . . . . . . . . . . . . . . . . . . . . . 25
+   Direcciones de los autores . . . . . . . . . . . . . . . . . . . . 25
 
 
 
@@ -196,10 +196,25 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
 
 2.1.  Medio fisico
 
-   El emisor es un LED infrarrojo de 940 nm manejado por un transistor
-   NPN.  El receptor es un fototransistor de 940 nm cuya salida pasa
-   por un comparador (LM311) con umbral ajustable, que entrega un nivel
-   digital de 3.3 V al pin de recepcion de la UART.
+   El Faro se alimenta solo con los 3.3 V de la Raspberry Pi.  El
+   emisor es un LED infrarrojo de 940 nm con una resistencia de 100
+   ohmios, manejado por un transistor NPN (2N2222A) cuya base va al
+   pin TXD por una resistencia de 1 kiloohmio; conduce unos 18 mA.
+
+   El receptor es un fototransistor de 940 nm en colector comun: el
+   colector va a 3.3 V y el emisor va al pin RXD y a tierra por una
+   resistencia de carga R3 (10 kiloohmios por defecto).  Con luz, la
+   corriente del fototransistor sube el voltaje de RXD; a oscuras, R3
+   lo baja a 0 V.  No hay comparador: el umbral lo pone la entrada del
+   GPIO, que lee 0 por debajo de 0.9 V y 1 por encima de 1.6 V.  El
+   enlace DEBERIA ajustarse (con R3 y la distancia) para que RXD quede
+   en 0.5 V o menos a oscuras y en 2 V o mas con luz.  RXD nunca supera
+   3.3 V porque no hay otra alimentacion en la placa.
+
+   El emisor y el receptor de un mismo Faro DEBEN estar aislados
+   opticamente (separacion y barrera opaca): como el LED pasa encendido
+   en reposo, si su luz llega a su propio fototransistor el receptor
+   queda fijo en 1.
 
    La modulacion es on-off keying (OOK): LED encendido representa un
    nivel logico 1 y LED apagado un nivel logico 0.  El enlace usa la
@@ -211,7 +226,16 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    La velocidad de la UART es configurable.  El valor por defecto es
    9600 baudios.  Las dos puntas de un enlace DEBEN usar la misma
    velocidad.  Un enlace PUEDE operar a mayor velocidad si la tasa de
-   error medida (Seccion 2.12) lo permite.
+   error medida (Seccion 2.12) lo permite, o DEBERIA bajar a 4800 o
+   2400 baudios si los bordes lentos del fototransistor producen
+   errores.
+
+
+
+Castillo Guzman & Gomez        Experimental                   [Pagina 4]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
    Justificacion: la UART aporta sincronizacion por byte con bits de
    inicio y parada, de modo que el software no necesita temporizacion
@@ -229,13 +253,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
 
    Los bits se recorren del mas significativo al menos significativo
    de cada byte.
-
-
-
-Castillo Guzman & Gomez        Experimental                   [Pagina 4]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
 
    El preambulo son 4 bytes 0xAA y el delimitador de inicio de trama
    (SFD) es 0xD5:
@@ -261,6 +278,23 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    byte (aproximadamente 21 ms a 9600 baudios).
 
 2.3.  Formato de la trama
+
+
+
+
+
+
+
+
+
+
+
+
+
+Castillo Guzman & Gomez        Experimental                   [Pagina 5]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -289,13 +323,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
 
    TIPO (1 byte):  tipo de trama (Seccion 2.6).
 
-
-
-Castillo Guzman & Gomez        Experimental                   [Pagina 5]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
    DST (4 bytes):  direccion fisica del destino, o 0xFFFFFFFF para
       difusion.
 
@@ -321,6 +348,12 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    o  el largo total no es igual a 12 + LEN + 2;
 
    o  el CRC no coincide.
+
+
+Castillo Guzman & Gomez        Experimental                   [Pagina 6]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
    Un receptor DEBE descartar tramas cuyo DST no sea su direccion
    fisica ni la direccion de difusion.
@@ -349,12 +382,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    |      |        | difusion.  No se confirma.                      |
    +------+--------+-------------------------------------------------+
 
-
-Castillo Guzman & Gomez        Experimental                   [Pagina 6]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
    Los valores 0 y 4 a 255 estan reservados.  Un receptor DEBE ignorar
    tramas de tipo desconocido.
 
@@ -380,6 +407,13 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
       vecino actualice su tabla.
 
    Con 4 bytes aleatorios, la probabilidad de colision entre dos Faros
+
+
+Castillo Guzman & Gomez        Experimental                   [Pagina 7]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
+
    de un mismo enlace es despreciable (1 en 2^32).  Un Faro DEBE
    ignorar las tramas cuyo SRC sea su propia direccion: en un enlace
    optico casi siempre son reflejos de su propia luz.
@@ -407,13 +441,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    o  Si no llega, retransmite la misma trama con el mismo SEQ, hasta
       3 veces.  Si se agotan, informa el fallo a la capa superior.
 
-
-
-Castillo Guzman & Gomez        Experimental                   [Pagina 7]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
    o  El receptor DEBE enviar un ACK por cada DATA dirigida a el,
       incluso si es una retransmision, y DEBE hacerlo apenas la recibe,
       aunque el mismo este esperando el ACK de una trama propia.
@@ -438,6 +465,13 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    y transmitirla sin modificarla, siempre que cumpla el formato de la
    Seccion 2.3.  La biblioteca DEBE validar largo, version y CRC antes
    de transmitirla y DEBE rechazarla si no los cumple.
+
+
+
+Castillo Guzman & Gomez        Experimental                   [Pagina 8]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
 2.11.  Interfaz DispositivoLuzAdaptador
 
@@ -466,13 +500,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    hardware).  La biblioteca no es segura para varios hilos: el nodo
    la usa desde un solo hilo dedicado al enlace.
 
-
-
-Castillo Guzman & Gomez        Experimental                   [Pagina 8]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
    Mientras transmite, el nodo DEBE encender el LED TX (GPIO23).  Al
    recibir una trama con CRC valido, el nodo DEBE encender el LED RX
    (GPIO24) durante al menos 50 ms.
@@ -481,7 +508,7 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
 
    Para cada enlace se DEBEN medir la tasa de transferencia efectiva y
    la tasa de error de bit (BER) a al menos tres distancias distintas
-   (por ejemplo 0.5 m, 1 m y 2 m) bajo luz ambiental normal:
+   (por ejemplo 25 cm, 50 cm y 1 m) bajo luz ambiental normal:
 
    o  Tasa efectiva = bytes de PAYLOAD entregados y confirmados /
       tiempo total, incluyendo preambulo, ACKs y retransmisiones.
@@ -498,6 +525,12 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    ACK.  La implementacion de referencia incluye la herramienta
    "python3 -m faro.medir" (modos enviar, recibir, tasa y eco) que
    calcula ambas medidas.  Los resultados se reportan en el Apendice B.
+
+
+Castillo Guzman & Gomez        Experimental                   [Pagina 9]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
 3.  Capas 2 y 3: Red mesh FaroNet
 
@@ -525,13 +558,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    Un receptor DEBE descartar en silencio cualquier mensaje mal
    formado: JSON invalido, campos ausentes, tipos de dato incorrectos o
    valores fuera de rango.  Un mensaje mal formado NO DEBE interrumpir
-
-
-Castillo Guzman & Gomez        Experimental                   [Pagina 9]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
    el procesamiento de los mensajes siguientes.
 
 3.2.  HELLO: descubrimiento de vecinos
@@ -558,6 +584,13 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
 
    Un nodo NO DEBE registrar como vecino directo a un nodo del que solo
    conoce la entrada de directorio: un vecino es solo quien envio un
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 10]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
+
    HELLO directamente.
 
 3.3.  DIR: directorio de nodos
@@ -583,13 +616,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    UTF-8.  La firma es Ed25519 [RFC8032] sobre la forma canonica, con
    la llave privada correspondiente al campo id, y se transmite en
    hexadecimal (128 caracteres).
-
-
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 10]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
 
    El mensaje DIR transporta una o mas entradas:
 
@@ -618,6 +644,12 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
 
    o  tenga creado mas de 300 segundos en el futuro.
 
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 11]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
+
    Propagacion: cada nodo DEBE reenviar a sus vecinos, cada 10
    segundos, todas las entradas validas y vigentes que conoce, no solo
    la propia.  Por el enlace Faro, que es mucho mas lento, el
@@ -643,13 +675,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    costo c hacia D, el nodo acepta la ruta "D por V con costo c + 1" si
    no tenia ruta a D, si la nueva es mas corta o si su ruta actual ya
    pasa por V.  Las rutas que no se refrescan en 40 segundos se
-
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 11]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
    olvidan.
 
    Un receptor DEBE descartar anuncios cuyo costo no sea un entero
@@ -677,6 +702,13 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    criptografico para que no se distinga de datos cifrados.
 
    Cada relay, despues de quitar su capa, DEBE volver a rellenar el
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 12]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
+
    contenido interno a 1024 bytes.  Asi, para un observador todas las
    celdas miden lo mismo en todos los saltos y no se puede deducir la
    posicion en el circuito ni el largo del mensaje.
@@ -702,12 +734,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    bytes.
 
    Capa del destino:
-
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 12]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
 
       sobre_destino = Sellar(llave_destino, 0x00 || MENSAJE)
 
@@ -736,6 +762,12 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
 
    LARGO (2 bytes):  largo de la capa interna.
 
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 13]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
+
    El primer byte del texto descifrado identifica la capa: 0x00 para
    la capa del destino y 0x01 para una capa de relay.  Los demas
    valores estan reservados.
@@ -760,13 +792,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    insuficiente.  Enviar sin relays solo PUEDE hacerse en pruebas, con
    una opcion explicita (en la implementacion de referencia,
    --permitir-directo), desactivada por defecto.
-
-
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 13]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
 
    Con tres relays:
 
@@ -795,6 +820,13 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
       cebolla (Seccion 3.6);
 
    o  si no, lo reenvia sin cambios: directo si "hacia" es vecino;
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 14]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
+
       si no, al siguiente salto de su tabla de rutas; y si tampoco hay
       ruta pero el directorio tiene una entrada UDP de "hacia", por UDP
       a esa direccion.  Si nada de esto es posible, descarta el
@@ -820,13 +852,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    El emisor DEBE enviar todos los fragmentos de un mensaje, en orden,
    antes de empezar el siguiente.  El receptor reinicia el reensamblado
    cuando recibe un fragmento con INDICE 0 y DEBE descartar un mensaje
-
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 14]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
    incompleto si pasan 10 segundos sin recibir el siguiente fragmento.
 
    Los mensajes HELLO por el Faro usan canal "faro" y en "dir" la
@@ -850,6 +875,16 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    su gateway.
 
 4.  Capa 7: Aplicacion anonima
+
+
+
+
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 15]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
 4.1.  Formato del mensaje
 
@@ -879,13 +914,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    El mensaje tiene un tiempo de vida de 3600 segundos.  Un receptor
    DEBE descartar mensajes con HORA vencida o con HORA mas de 300
    segundos en el futuro.  Los mensajes recibidos se guardan solo en
-
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 15]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
    memoria y se borran al vencer.
 
 4.2.  Mensajes privados
@@ -910,6 +938,13 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    derivarse de una frase secreta con Argon2id (crypto_pwhash) usando
    como sal los 16 primeros bytes de BLAKE2b("faronet-tema:" || nombre).
    La llave NO DEBE derivarse solo del nombre del tema, porque
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 16]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
+
    cualquiera que adivine el nombre podria leer los mensajes.  La
    implementacion de referencia usa Argon2id con los limites
    "interactive" de libsodium y exige frases de al menos 8 caracteres.
@@ -937,14 +972,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    Si el Worker no responde o responde 429 o 5xx, el gateway reintenta
    con espera creciente; si responde otro 4xx, descarta el mensaje.
 
-
-
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 16]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
 5.  Interfaz con el edge
 
 5.1.  Generalidades
@@ -967,6 +994,15 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    | PUT    | /buzon/{id}          | No          | Depositar blob    |
    | GET    | /buzon/{id}          | No          | Retirar blob      |
    +--------+----------------------+-------------+-------------------+
+
+
+
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 17]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
 5.2.  Autenticacion del gateway
 
@@ -996,14 +1032,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
 
    Esto impide que un atacante repita una peticion capturada.
 
-
-
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 17]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
 5.3.  Salas publicas
 
    Cada tema publico es una sala implementada con un Durable Object
@@ -1026,6 +1054,14 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    politica de seguridad de contenido (CSP) restrictiva.
    Los WebSocket de navegadores son solo de lectura: el Durable Object
    DEBE ignorar los mensajes que envien.  Solo el gateway publica.
+
+
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 18]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
 5.4.  Feed de temas
 
@@ -1056,13 +1092,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    o  El blob vive 24 horas.
 
    o  GET devuelve el blob y lo borra en la misma operacion.  Una
-
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 18]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
       segunda lectura devuelve 404.
 
    El Worker nunca recibe la clave ni el contenido en claro.
@@ -1085,6 +1114,13 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    hace en memoria con el servicio de limite de peticiones de
    Cloudflare; la clave de conteo NO DEBE guardarse en almacenamiento
    persistente.
+
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 19]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
 5.8.  Politica de no registro
 
@@ -1115,13 +1151,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    /panico.
 
    El nodo PUEDE volver a la red con una identidad nueva.  Ningun dato
-
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 19]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
    anterior permite vincular la identidad nueva con la vieja.
 
 7.  Consideraciones de privacidad
@@ -1129,6 +1158,28 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    Esta seccion sigue la estructura de [RFC6973].
 
 7.1.  Modelo de amenazas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 20]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
    +-------------------+-------------------------+---------------------+
    | Adversario        | Que puede ver           | Que no puede ver    |
@@ -1173,14 +1224,6 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    rastreado dentro de la mesh por su id; un usuario que quiera evitarlo
    DEBERIA regenerar su identidad (boton de panico).
 
-
-
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 20]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
 7.4.  Almacenamiento y retencion
 
    Ningun componente guarda bitacoras con direcciones IP, direcciones
@@ -1189,6 +1232,13 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    tiempos de vida son: mensajes de la app, 1 hora; entradas del
    directorio, hasta 24 horas; blobs del buzon, 24 horas; mensajes
    publicos en el edge, 7 dias; nonces, 120 segundos.
+
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 21]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
 7.5.  Lo que ve el proveedor del edge
 
@@ -1234,18 +1284,20 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    No puede leer ni alterar las celdas.  Una version futura DEBERIA
    firmar HELLO y RUTA con la llave del nodo.
 
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 21]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
 8.4.  Denegacion de servicio
 
    Un atacante puede saturar el medio fisico (luz) o la red UDP.  Los
    nodos DEBEN descartar mensajes mal formados sin detenerse.  El Worker
    limita las peticiones (Seccion 5.7) y el tamano de los blobs
    (Seccion 5.5).
+
+
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 22]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
 8.5.  Ataques de Sybil
 
@@ -1272,9 +1324,10 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
 
 8.8.  Seguridad del cableado
 
-   Los pines GPIO de la Raspberry Pi toleran 3.3 V.  Los pull-up del
-   receptor y de la salida del comparador DEBEN conectarse a 3.3 V.
-   Aplicar 5 V a un GPIO puede danar la placa.
+   Los pines GPIO de la Raspberry Pi toleran 3.3 V.  El Faro DEBE
+   alimentarse del pin de 3.3 V y NO DEBE conectarse a los pines de
+   5 V: con 5 V en el colector del fototransistor, RXD podria superar
+   3.3 V y danar el GPIO.
 
 9.  Consideraciones IANA
 
@@ -1293,17 +1346,18 @@ RFC 9999                  FaroNet version 1                 Octubre 2026
    [RFC8032]  Josefsson, S. and I. Liusvaara, "Edwards-Curve Digital
               Signature Algorithm (EdDSA)", RFC 8032, January 2017.
 
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 22]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
    [RFC8259]  Bray, T., Ed., "The JavaScript Object Notation (JSON)
               Data Interchange Format", STD 90, RFC 8259, December
               2017.
 
    [RFC4287]  Nottingham, M., Ed. and R. Sayre, Ed., "The Atom
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 23]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
+
               Syndication Format", RFC 4287, December 2005.
 
 10.2.  Referencias informativas
@@ -1351,17 +1405,17 @@ Apendice A.  Vectores de prueba
 
       01100110 01100110 01100110 01100110
 
-
-
-Castillo Guzman & Gomez        Experimental                  [Pagina 23]
-
-RFC 9999                  FaroNet version 1                 Octubre 2026
-
-
    La trama DATA de 18 bytes produce (5 + 18) x 16 = 368 medios bits.
 
    Una celda de 1024 bytes se divide en 10 fragmentos: 9 de 114 bytes
    y 1 de 38 bytes.
+
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 24]
+
+RFC 9999                  FaroNet version 1                 Octubre 2026
+
 
    Un mensaje de 256 bytes en una cebolla de 3 relays mide 479 bytes.
 
@@ -1371,15 +1425,15 @@ Apendice B.  Mediciones de desempeno
 
    Condiciones: luz ambiental normal, interior, [completar: hora y
    tipo de iluminacion].  Velocidad de UART: [completar] baudios.
-   Tramas enviadas por distancia: [completar].
+   Tramas enviadas por distancia: [completar].  R3: [completar].
 
    +-----------+------------------+-----------------+---------------+
    | Distancia | Tasa efectiva    | Bits erroneos / | BER           |
    |           | (bytes/s)        | bits enviados   |               |
    +-----------+------------------+-----------------+---------------+
-   | 0.5 m     |                  |                 |               |
-   | 1.0 m     |                  |                 |               |
-   | 2.0 m     |                  |                 |               |
+   | 25 cm     |                  |                 |               |
+   | 50 cm     |                  |                 |               |
+   | 1 m       |                  |                 |               |
    +-----------+------------------+-----------------+---------------+
 
 Agradecimientos
@@ -1412,4 +1466,9 @@ Direcciones de los autores
 
 
 
-Castillo Guzman & Gomez        Experimental                  [Pagina 24]
+
+
+
+
+
+Castillo Guzman & Gomez        Experimental                  [Pagina 25]

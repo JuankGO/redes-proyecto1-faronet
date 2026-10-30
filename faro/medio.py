@@ -3,7 +3,7 @@
 Un Medio mueve listas de medios bits (0/1) entre dos Faros. Hay dos:
 
 - MedioUART: el Faro real. Usa la UART de hardware de la Raspberry Pi
-  (GPIO14 TXD -> LED IR, GPIO15 RXD <- comparador). Los medios bits se
+  (GPIO14 TXD -> LED IR, GPIO15 RXD <- fototransistor). Los medios bits se
   empaquetan de 8 en 8 en bytes y viajan como 8N1.
 - MedioSimUDP: simulacion por UDP para probar sin hardware.
 """

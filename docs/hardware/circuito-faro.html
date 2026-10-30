@@ -8,19 +8,22 @@
   :root {
     --bg: #ffffff; --fg: #111111; --muted: #555555; --line: #d0d0d0;
     --panel: #f6f6f6; --wire: #222222; --hl: #d4380d; --hl-soft: rgba(212,56,13,.14);
-    --tp: #0958d9; --led-ir: #8c3b9e; --led-g: #1a9e3a; --led-r: #d4282f; --off: #bbbbbb;
+    --tp: #0958d9; --led-ir: #8c3b9e; --led-g: #1a9e3a; --led-r: #d4282f;
+    --z0: rgba(9,88,217,.14); --z1: rgba(140,140,140,.22); --z2: rgba(26,158,58,.16);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #141414; --fg: #ececec; --muted: #a8a8a8; --line: #3a3a3a;
       --panel: #1e1e1e; --wire: #e4e4e4; --hl: #ff7a45; --hl-soft: rgba(255,122,69,.18);
-      --tp: #69b1ff; --led-ir: #c983db; --led-g: #49d36b; --led-r: #ff5c5c; --off: #555555;
+      --tp: #69b1ff; --led-ir: #c983db; --led-g: #49d36b; --led-r: #ff5c5c;
+      --z0: rgba(105,177,255,.18); --z1: rgba(160,160,160,.20); --z2: rgba(73,211,107,.18);
     }
   }
   :root[data-theme="dark"] {
     --bg: #141414; --fg: #ececec; --muted: #a8a8a8; --line: #3a3a3a;
     --panel: #1e1e1e; --wire: #e4e4e4; --hl: #ff7a45; --hl-soft: rgba(255,122,69,.18);
-    --tp: #69b1ff; --led-ir: #c983db; --led-g: #49d36b; --led-r: #ff5c5c; --off: #555555;
+    --tp: #69b1ff; --led-ir: #c983db; --led-g: #49d36b; --led-r: #ff5c5c;
+    --z0: rgba(105,177,255,.18); --z1: rgba(160,160,160,.20); --z2: rgba(73,211,107,.18);
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--fg);
@@ -38,6 +41,7 @@
   .ctrl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
   .ctrl button[aria-pressed="true"] { border-color: var(--hl); background: var(--hl-soft); font-weight: 700; }
   .ctrl .sep { width: 1px; height: 24px; background: var(--line); margin: 0 4px; }
+  .ctrl .k { color: var(--muted); font-size: 13px; }
   .grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
   @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
   .board { border: 1px solid var(--line); border-radius: 8px; padding: 6px; overflow-x: auto; background: var(--bg); }
@@ -47,11 +51,13 @@
   .info .k { color: var(--muted); font-size: 13px; }
   .info table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
   .info td { padding: 4px 0; border-top: 1px solid var(--line); vertical-align: top; }
-  .info td:first-child { color: var(--muted); width: 42%; padding-right: 8px; }
+  .info td:first-child { color: var(--muted); width: 38%; padding-right: 8px; }
   table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
   table.t th, table.t td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
   table.t th { background: var(--panel); }
+  .tscroll { overflow-x: auto; }
   .note { border-left: 3px solid var(--hl); padding: 6px 10px; background: var(--panel); margin: 10px 0; }
+  .small { color: var(--muted); font-size: 13px; }
   /* SVG */
   .w { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .sym { fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
@@ -73,11 +79,10 @@
   .show-tp .tp { display: inline; }
   .tp circle { fill: var(--tp); }
   .tp text { fill: var(--tp); font-size: 12px; font-weight: 700; }
-  .tp rect { fill: var(--bg); stroke: var(--tp); }
-  .glow { transition: fill .2s, opacity .2s; }
+  .glow { transition: opacity .2s; }
   .ray { stroke-width: 2; fill: none; transition: opacity .2s; }
-  /* header */
-  .pin { cursor: default; }
+  .z0 { fill: var(--z0); } .z1 { fill: var(--z1); } .z2 { fill: var(--z2); }
+  #meter-mk { transition: transform .3s; }
   .pin rect { stroke: var(--line); fill: var(--panel); }
   .pin.used rect { fill: var(--hl-soft); stroke: var(--hl); }
   .pin text { font-size: 10px; fill: var(--fg); }
@@ -87,27 +92,34 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Circuito del Faro (FaroNet)</h1>
-  <p class="sub">Un Faro por Raspberry Pi 2. Se arman dos iguales (Faro A y Faro B). Tocá un componente o un cable para ver su detalle; usá los botones para simular los estados.</p>
+  <h1>Circuito del Faro (versión simplificada)</h1>
+  <p class="sub">Un Faro por Raspberry Pi 2; se arman dos iguales (A y B). Solo LED IR, fototransistor, un 2N2222A, cinco resistencias, dos LEDs y el botón. Todo va a 3.3 V y son 7 cables a la Raspberry. Toca un componente o un cable para ver su detalle y usa los botones para simular estados.</p>
 
   <div class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-tab="esq">Esquemático</button>
     <button role="tab" aria-selected="false" data-tab="rpi">Conexión a la Raspberry</button>
-    <button role="tab" aria-selected="false" data-tab="bom">Componentes</button>
+    <button role="tab" aria-selected="false" data-tab="bom">Materiales</button>
+    <button role="tab" aria-selected="false" data-tab="aju">Montaje y ajustes</button>
   </div>
 
   <!-- ================= ESQUEMATICO ================= -->
   <section id="tab-esq">
     <div class="ctrl" aria-label="Simulación">
-      <button id="b-tx" aria-pressed="true">TX: emitiendo luz</button>
-      <button id="b-rx" aria-pressed="false">RX: recibe luz IR</button>
-      <button id="b-sw" aria-pressed="false">Botón de pánico presionado</button>
+      <button id="b-tx" aria-pressed="true">TX: LED IR encendido</button>
+      <button id="b-rx" aria-pressed="false">RX: le llega luz del otro Faro</button>
+      <button id="b-sw" aria-pressed="false">Botón suelto</button>
       <span class="sep"></span>
-      <button id="b-tp" aria-pressed="true">Mostrar puntos de prueba</button>
+      <button id="b-tp" aria-pressed="true">Puntos de prueba</button>
+      <span class="sep"></span>
+      <span class="k">R3:</span>
+      <button class="r3" data-r="4700">4.7 kΩ</button>
+      <button class="r3" data-r="10000" aria-pressed="true">10 kΩ</button>
+      <button class="r3" data-r="22000">22 kΩ</button>
+      <button class="r3" data-r="47000">47 kΩ</button>
     </div>
     <div class="grid">
       <div class="board" id="board">
-<svg id="esq" viewBox="0 0 1120 700" role="img" aria-label="Esquemático del Faro">
+<svg id="esq" viewBox="0 0 1120 700" role="img" aria-label="Esquemático del Faro simplificado">
   <defs>
     <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
@@ -119,28 +131,24 @@
   <rect class="blk" x="20" y="20" width="370" height="380" rx="8"/>
   <text class="blk-t" x="34" y="42">EMISOR (TX)</text>
   <rect class="blk" x="410" y="20" width="690" height="380" rx="8"/>
-  <text class="blk-t" x="424" y="42">RECEPTOR Y COMPARADOR (RX)</text>
+  <text class="blk-t" x="424" y="42">RECEPTOR (RX) Y LO QUE LEE EL GPIO</text>
   <rect class="blk" x="20" y="420" width="370" height="260" rx="8"/>
   <text class="blk-t" x="34" y="442">CONECTOR J1 → RASPBERRY PI 2</text>
   <rect class="blk" x="410" y="420" width="690" height="260" rx="8"/>
   <text class="blk-t" x="424" y="442">INDICADORES Y BOTÓN DE PÁNICO</text>
 
   <!-- ============ EMISOR ============ -->
-  <!-- 5V flag -->
-  <g data-net="5V"><path class="w" d="M290,74 h20 M300,74 v16"/><path class="hit" d="M300,74 v16"/><text class="net-tag" x="286" y="68">5V</text></g>
-  <!-- R1 -->
+  <g data-net="3V3"><path class="w" d="M290,74 h20 M300,74 v16"/><path class="hit" d="M300,74 v16"/><text class="net-tag" x="284" y="68">3V3</text></g>
   <g class="comp" data-comp="R1">
     <rect class="box" x="280" y="88" width="90" height="66"/>
     <path class="sym" d="M300,90 v8 l-8,4 l16,6 l-16,6 l16,6 l-16,6 l16,6 l-8,4 v8"/>
     <text class="lbl b" x="318" y="116">R1</text><text class="lbl" x="318" y="132">100 Ω</text>
   </g>
   <g data-net="LED_A"><path class="w" d="M300,150 v22"/><path class="hit" d="M300,150 v22"/></g>
-  <!-- D1 IR LED -->
   <g class="comp" data-comp="D1">
     <rect class="box" x="270" y="170" width="110" height="44"/>
-    <path class="sym" d="M286,174 h28 l-14,24 z" id="d1-tri"/>
     <path class="glow" id="d1-fill" d="M288,175 h24 l-12,21 z" fill="var(--led-ir)"/>
-    <path class="sym" d="M286,198 h28"/>
+    <path class="sym" d="M286,174 h28 l-14,24 z M286,198 h28"/>
     <g id="d1-rays" style="color:var(--led-ir)">
       <path class="ray" stroke="currentColor" d="M318,182 l14,-8" marker-end="url(#arr)"/>
       <path class="ray" stroke="currentColor" d="M318,192 l14,-8" marker-end="url(#arr)"/>
@@ -148,7 +156,6 @@
     <text class="lbl b" x="340" y="188">D1</text><text class="lbl s" x="340" y="202">IR 940 nm</text>
   </g>
   <g data-net="Q1C"><path class="w" d="M300,198 v74"/><path class="hit" d="M300,198 v74"/></g>
-  <!-- Q1 NPN -->
   <g class="comp" data-comp="Q1">
     <rect class="box" x="255" y="262" width="120" height="58"/>
     <circle class="sym" cx="290" cy="290" r="24"/>
@@ -157,7 +164,6 @@
     <text class="lbl b" x="322" y="288">Q1</text><text class="lbl s" x="322" y="302">2N2222A</text>
   </g>
   <g data-net="GND"><path class="w" d="M300,308 v26"/><path class="hit" d="M300,308 v26"/><use href="#gnd" x="300" y="334"/></g>
-  <!-- base -->
   <g data-net="BASE"><path class="w" d="M230,290 h52"/><path class="hit" d="M230,290 h52"/></g>
   <g class="comp" data-comp="R2">
     <rect class="box" x="166" y="270" width="68" height="44"/>
@@ -166,109 +172,78 @@
   </g>
   <g data-net="TXD"><path class="w" d="M96,290 h74"/><path class="hit" d="M96,290 h74"/><text class="net-tag" x="40" y="294">TXD ▸</text><text class="lbl s" x="40" y="310">GPIO14</text></g>
 
-  <!-- TPs emisor -->
-  <g class="tp" data-tp="TP4"><circle cx="252" cy="290" r="5"/><text x="240" y="262">TP4</text></g>
-  <g class="tp" data-tp="TP5"><circle cx="300" cy="236" r="5"/><text x="232" y="240">TP5</text></g>
-  <g class="tp" data-tp="TP1"><circle cx="300" cy="82" r="5"/><text x="232" y="86">TP1</text></g>
-  <text class="lbl s" x="34" y="380">LED IR encendido = bit 1 (UART en reposo = luz encendida)</text>
+  <g class="tp" data-tp="TP1"><circle cx="300" cy="82" r="5"/><text x="246" y="86">TP1</text></g>
+  <g class="tp" data-tp="TP3"><circle cx="252" cy="290" r="5"/><text x="240" y="262">TP3</text></g>
+  <g class="tp" data-tp="TP4"><circle cx="300" cy="236" r="5"/><text x="246" y="240">TP4</text></g>
+  <g class="tp" data-tp="TP2"><circle cx="300" cy="322" r="5"/><text x="246" y="326">TP2</text></g>
+  <text class="lbl s" x="34" y="372">TXD en 1 = LED IR encendido. La UART en reposo</text>
+  <text class="lbl s" x="34" y="386">queda en 1, así que el LED pasa encendido.</text>
 
   <!-- ============ RECEPTOR ============ -->
-  <g data-net="3V3"><path class="w" d="M550,74 h20 M560,74 v16"/><path class="hit" d="M560,74 v16"/><text class="net-tag" x="542" y="68">3V3</text></g>
-  <g class="comp" data-comp="R3">
-    <rect class="box" x="540" y="88" width="90" height="66"/>
-    <path class="sym" d="M560,90 v8 l-8,4 l16,6 l-16,6 l16,6 l-16,6 l16,6 l-8,4 v8"/>
-    <text class="lbl b" x="578" y="116">R3</text><text class="lbl" x="578" y="132">10 kΩ</text>
-  </g>
-  <!-- RX_A node -->
-  <g data-net="RX_A">
-    <path class="w" d="M560,150 v62 M560,172 h80 v8 h40"/><path class="hit" d="M560,150 v62 M560,172 h80 v8 h40"/>
-    <circle class="fillc" cx="560" cy="172" r="3.5"/>
-  </g>
-  <!-- Q2 phototransistor -->
+  <g data-net="3V3"><path class="w" d="M550,74 h20 M560,74 v48"/><path class="hit" d="M560,74 v48"/><text class="net-tag" x="544" y="68">3V3</text></g>
   <g class="comp" data-comp="Q2">
-    <rect class="box" x="490" y="204" width="130" height="64"/>
-    <circle class="sym" cx="550" cy="236" r="24"/>
-    <path class="sym" d="M542,222 v28 M542,230 l18,-12 M542,242 l18,12"/>
-    <path class="fillc" d="M560,254 l-9,-1 l4,-7 z"/>
+    <rect class="box" x="490" y="112" width="140" height="60"/>
+    <circle class="sym" cx="550" cy="140" r="24"/>
+    <path class="sym" d="M542,126 v28 M542,134 l18,-12 M542,146 l18,12"/>
+    <path class="fillc" d="M560,158 l-9,-1 l4,-7 z"/>
     <g id="q2-rays" style="color:var(--led-ir)">
-      <path class="ray" stroke="currentColor" d="M504,214 l18,12" marker-end="url(#arr)"/>
-      <path class="ray" stroke="currentColor" d="M500,228 l18,12" marker-end="url(#arr)"/>
+      <path class="ray" stroke="currentColor" d="M500,116 l18,12" marker-end="url(#arr)"/>
+      <path class="ray" stroke="currentColor" d="M496,132 l18,12" marker-end="url(#arr)"/>
     </g>
-    <text class="lbl b" x="580" y="238">Q2</text><text class="lbl s" x="580" y="252">fototransistor</text>
-  </g>
-  <g data-net="GND"><path class="w" d="M560,254 v26"/><path class="hit" d="M560,254 v26"/><use href="#gnd" x="560" y="280"/></g>
-
-  <!-- U1 LM311 -->
-  <g class="comp" data-comp="U1">
-    <rect class="box" x="676" y="140" width="110" height="120"/>
-    <path class="sym" d="M680,150 v100 l100,-50 z"/>
-    <text class="lbl b" x="686" y="186">−</text><text class="lbl b" x="686" y="226">+</text>
-    <text class="lbl b" x="712" y="205">U1</text>
-    <text class="lbl s" x="704" y="276">LM311</text>
-    <text class="lbl s" x="666" y="176">3</text><text class="lbl s" x="666" y="216">2</text>
-    <text class="lbl s" x="726" y="160">8</text><text class="lbl s" x="726" y="248">4,1</text><text class="lbl s" x="782" y="194">7</text>
-  </g>
-  <!-- pin 8 a 5V -->
-  <g data-net="5V"><path class="w" d="M720,170 v-60 M710,110 h20"/><path class="hit" d="M720,170 v-60"/><text class="net-tag" x="712" y="104">5V</text></g>
-  <!-- pin 4 y 1 a GND -->
-  <g data-net="GND"><path class="w" d="M720,230 v40"/><path class="hit" d="M720,230 v40"/><use href="#gnd" x="720" y="270"/></g>
-
-  <!-- RV1 trimpot -->
-  <g data-net="3V3"><path class="w" d="M590,300 h20 M600,300 v10"/><path class="hit" d="M600,300 v10"/><text class="net-tag" x="586" y="293">3V3</text></g>
-  <g class="comp" data-comp="RV1">
-    <rect class="box" x="572" y="308" width="80" height="66"/>
-    <path class="sym" d="M600,310 v8 l-8,4 l16,6 l-16,6 l16,6 l-16,6 l16,6 l-8,4 v8"/>
-    <path class="sym" d="M628,341 h-16" marker-end="url(#arr)"/>
-    <text class="lbl b" x="548" y="346" text-anchor="end">RV1</text><text class="lbl s" x="548" y="360" text-anchor="end">10 kΩ</text>
-  </g>
-  <g data-net="GND"><path class="w" d="M600,370 v6"/><use href="#gnd" x="600" y="376"/></g>
-  <g data-net="VREF"><path class="w" d="M628,341 h32 v-121 h20"/><path class="hit" d="M628,341 h32 v-121 h20"/></g>
-
-  <!-- salida + pull-up -->
-  <g data-net="3V3"><path class="w" d="M850,74 h20 M860,74 v16"/><path class="hit" d="M860,74 v16"/><text class="net-tag" x="842" y="68">3V3</text></g>
-  <g class="comp" data-comp="R4">
-    <rect class="box" x="840" y="88" width="90" height="66"/>
-    <path class="sym" d="M860,90 v8 l-8,4 l16,6 l-16,6 l16,6 l-16,6 l16,6 l-8,4 v8"/>
-    <text class="lbl b" x="878" y="116">R4</text><text class="lbl" x="878" y="132">1 kΩ</text>
+    <text class="lbl b" x="586" y="136">Q2</text><text class="lbl s" x="586" y="150">fototransistor</text>
+    <text class="lbl s" x="566" y="104">C</text><text class="lbl s" x="566" y="176">E</text>
   </g>
   <g data-net="RXD">
-    <path class="w" d="M780,200 h170 M860,150 v50"/><path class="hit" d="M780,200 h170 M860,150 v50"/>
-    <circle class="fillc" cx="860" cy="200" r="3.5"/>
-    <text class="net-tag" x="956" y="204">◂ RXD</text><text class="lbl s" x="962" y="220">GPIO15</text>
+    <path class="w" d="M560,158 v38 M560,186 h150"/><path class="hit" d="M560,158 v38 M560,186 h150"/>
+    <circle class="fillc" cx="560" cy="186" r="3.5"/>
+    <text class="net-tag" x="716" y="190">◂ RXD</text><text class="lbl s" x="716" y="206">GPIO15</text>
   </g>
-
-  <!-- C1 -->
-  <g data-net="5V"><path class="w" d="M810,300 h20 M820,300 v20"/><path class="hit" d="M820,300 v20"/><text class="net-tag" x="782" y="304">5V</text></g>
-  <g class="comp" data-comp="C1">
-    <rect class="box" x="800" y="316" width="110" height="24"/>
-    <path class="sym" d="M806,322 h28 M806,332 h28"/>
-    <text class="lbl b" x="844" y="326">C1</text><text class="lbl s" x="844" y="340">0.1 µF</text>
+  <g class="comp" data-comp="R3">
+    <rect class="box" x="540" y="194" width="100" height="66"/>
+    <path class="sym" d="M560,196 v8 l-8,4 l16,6 l-16,6 l16,6 l-16,6 l16,6 l-8,4 v8"/>
+    <text class="lbl b" x="578" y="224">R3</text><text class="lbl" x="578" y="240" id="r3-lbl">10 kΩ</text>
   </g>
-  <g data-net="GND"><path class="w" d="M820,332 v22"/><use href="#gnd" x="820" y="354"/></g>
-  <text class="lbl s" x="880" y="372">C1 lo más cerca posible</text>
-  <text class="lbl s" x="880" y="386">de los pines 8 y 4 de U1</text>
+  <g data-net="GND"><path class="w" d="M560,256 v24"/><path class="hit" d="M560,256 v24"/><use href="#gnd" x="560" y="280"/></g>
+  <g class="tp" data-tp="TP5"><circle cx="640" cy="186" r="5"/><text x="628" y="176">TP5</text></g>
+  <text class="lbl s" x="424" y="334">Colector común: con luz, Q2 conduce y la corriente que</text>
+  <text class="lbl s" x="424" y="348">pasa por R3 sube el voltaje de RXD. A oscuras, R3 lo</text>
+  <text class="lbl s" x="424" y="362">baja a 0 V. RXD nunca pasa de 3.3 V: no hay 5 V en la placa.</text>
 
-  <!-- TPs receptor -->
-  <g class="tp" data-tp="TP2"><circle cx="560" cy="82" r="5"/><text x="494" y="86">TP2</text></g>
-  <g class="tp" data-tp="TP6"><circle cx="610" cy="172" r="5"/><text x="596" y="162">TP6</text></g>
-  <g class="tp" data-tp="TP7"><circle cx="660" cy="290" r="5"/><text x="668" y="294">TP7</text></g>
-  <g class="tp" data-tp="TP8"><circle cx="910" cy="200" r="5"/><text x="898" y="190">TP8</text></g>
+  <!-- medidor de lo que lee el GPIO -->
+  <g id="meter">
+    <text class="lbl b" x="830" y="66">Lo que lee GPIO15</text>
+    <rect class="z2" x="860" y="84" width="34" height="144"/>
+    <rect class="z1" x="860" y="228" width="34" height="61"/>
+    <rect class="z0" x="860" y="289" width="34" height="79"/>
+    <rect x="860" y="84" width="34" height="284" fill="none" stroke="var(--line)"/>
+    <text class="lbl s" x="852" y="88" text-anchor="end">3.3 V</text>
+    <text class="lbl s" x="852" y="232" text-anchor="end">1.6 V</text>
+    <text class="lbl s" x="852" y="293" text-anchor="end">0.9 V</text>
+    <text class="lbl s" x="852" y="372" text-anchor="end">0 V</text>
+    <text class="lbl s" x="1030" y="160">lee 1</text>
+    <text class="lbl s" x="1030" y="262">indefinido</text>
+    <text class="lbl s" x="1030" y="332">lee 0</text>
+    <g id="meter-mk" style="color:var(--hl)">
+      <path class="fillc" d="M896,0 l12,-7 v14 z"/>
+      <text id="meter-v" class="lbl b" x="912" y="4" style="fill:var(--hl)">0.2 V</text>
+    </g>
+    <text class="lbl s" x="830" y="390">Ejemplo ilustrativo (ver nota abajo)</text>
+  </g>
 
   <!-- ============ J1 ============ -->
   <g class="comp" data-comp="J1">
-    <rect class="box" x="40" y="452" width="120" height="216"/>
-    <rect class="sym" x="120" y="456" width="26" height="208" rx="3"/>
-    <text class="lbl b" x="122" y="682">J1</text>
+    <rect class="box" x="40" y="452" width="120" height="200"/>
+    <rect class="sym" x="120" y="456" width="26" height="184" rx="3"/>
+    <text class="lbl b" x="122" y="658">J1</text>
   </g>
   <g id="j1pins"></g>
 
   <!-- ============ INDICADORES ============ -->
-  <!-- LED TX -->
   <g data-net="LED_TX"><path class="w" d="M500,470 v22"/><path class="hit" d="M500,470 v22"/><text class="net-tag" x="470" y="464">LED_TX</text><text class="lbl s" x="530" y="464">GPIO23</text></g>
-  <g class="comp" data-comp="R5">
+  <g class="comp" data-comp="R4">
     <rect class="box" x="480" y="490" width="90" height="66"/>
     <path class="sym" d="M500,492 v8 l-8,4 l16,6 l-16,6 l16,6 l-16,6 l16,6 l-8,4 v8"/>
-    <text class="lbl b" x="518" y="518">R5</text><text class="lbl" x="518" y="534">330 Ω</text>
+    <text class="lbl b" x="518" y="518">R4</text><text class="lbl" x="518" y="534">330 Ω</text>
   </g>
   <g data-net="LTX_A"><path class="w" d="M500,552 v14"/></g>
   <g class="comp" data-comp="D2">
@@ -279,12 +254,11 @@
   </g>
   <g data-net="GND"><path class="w" d="M500,590 v26"/><use href="#gnd" x="500" y="616"/></g>
 
-  <!-- LED RX -->
   <g data-net="LED_RX"><path class="w" d="M680,470 v22"/><path class="hit" d="M680,470 v22"/><text class="net-tag" x="650" y="464">LED_RX</text><text class="lbl s" x="710" y="464">GPIO24</text></g>
-  <g class="comp" data-comp="R6">
+  <g class="comp" data-comp="R5">
     <rect class="box" x="660" y="490" width="90" height="66"/>
     <path class="sym" d="M680,492 v8 l-8,4 l16,6 l-16,6 l16,6 l-16,6 l16,6 l-8,4 v8"/>
-    <text class="lbl b" x="698" y="518">R6</text><text class="lbl" x="698" y="534">330 Ω</text>
+    <text class="lbl b" x="698" y="518">R5</text><text class="lbl" x="698" y="534">330 Ω</text>
   </g>
   <g data-net="LRX_A"><path class="w" d="M680,552 v14"/></g>
   <g class="comp" data-comp="D3">
@@ -295,7 +269,6 @@
   </g>
   <g data-net="GND"><path class="w" d="M680,590 v26"/><use href="#gnd" x="680" y="616"/></g>
 
-  <!-- PANICO -->
   <g data-net="PANICO"><path class="w" d="M880,470 v52"/><path class="hit" d="M880,470 v52"/><text class="net-tag" x="850" y="464">PANICO</text><text class="lbl s" x="910" y="464">GPIO17</text></g>
   <g class="comp" data-comp="SW1">
     <rect class="box" x="850" y="518" width="130" height="64"/>
@@ -306,17 +279,15 @@
   <g data-net="GND"><path class="w" d="M880,575 v41"/><use href="#gnd" x="880" y="616"/></g>
   <text class="lbl s" x="910" y="610">Sin resistencia: usa el</text>
   <text class="lbl s" x="910" y="624">pull-up interno del GPIO</text>
-
-  <g class="tp" data-tp="TP9"><circle cx="880" cy="496" r="5"/><text x="892" y="500">TP9</text></g>
-  <g class="tp" data-tp="TP3"><circle cx="300" cy="322" r="5"/><text x="232" y="326">TP3</text></g>
+  <g class="tp" data-tp="TP6"><circle cx="880" cy="496" r="5"/><text x="892" y="500">TP6</text></g>
 </svg>
       </div>
       <aside class="info" id="info" aria-live="polite"></aside>
     </div>
 
     <h2>Voltajes esperados en este estado</h2>
-    <table class="t" id="tp-table"><thead><tr><th>Punto</th><th>Dónde medir (punta roja)</th><th>Esperado</th></tr></thead><tbody></tbody></table>
-    <p class="k" style="color:var(--muted);font-size:13px">Punta negra siempre en GND (TP3). Valores aproximados: dependen del LED, del fototransistor y de la luz ambiente.</p>
+    <div class="tscroll"><table class="t" id="tp-table"><thead><tr><th>Punto</th><th>Dónde medir (punta roja)</th><th>Esperado</th></tr></thead><tbody></tbody></table></div>
+    <p class="small">Punta negra siempre en GND (TP2). Los rangos son los de la bitácora. El medidor de la derecha es un ejemplo con corrientes supuestas del fototransistor (0.25 mA con el otro Faro de frente, 0.02 mA de luz ambiente) para ver cómo cambia la lectura con R3.</p>
   </section>
 
   <!-- ================= RASPBERRY ================= -->
@@ -327,27 +298,62 @@
       </div>
       <aside class="info">
         <h3>Cómo se conecta</h3>
-        <p>En la placa perforada va soldada una tira de header macho de 8 pines (J1). De ahí salen 8 cables dupont hembra-hembra al header de la Raspberry. Así la placa se quita sin desoldar nada.</p>
-        <div class="note">Los pines GPIO aguantan solo 3.3 V. Nada que llegue a un GPIO puede venir de 5 V. Por eso R3 y R4 van a 3V3.</div>
-        <p>El LED IR se alimenta de 5 V a través de Q1. El GPIO solo maneja la base con 2.6 mA.</p>
+        <p>En la placa va soldada una tira de header macho de 7 pines (J1). De ahí salen 7 cables dupont hembra-hembra al header de la Raspberry, así la placa se quita sin desoldar nada.</p>
+        <div class="note">Todo el Faro va a 3.3 V. J1-1 va al pin 1 (3.3V), nunca al 2 ni al 4 (5V): con 5 V, RXD podría pasar de 3.3 V y dañar el GPIO15.</div>
+        <p>El pin de 3.3 V de la Pi da para todo: ≈ 18 mA del LED IR más ≈ 4 mA por cada LED indicador.</p>
       </aside>
     </div>
     <h2>Tabla de cables J1 → Raspberry Pi 2</h2>
-    <table class="t" id="map-table"><thead><tr><th>J1</th><th>Señal</th><th>Pin físico RPi</th><th>Nombre en la RPi</th><th>Uso en el código</th></tr></thead><tbody></tbody></table>
-    <h2>Configurar el UART en la Raspberry Pi 2</h2>
-    <p>En la Pi 2 el UART de hardware (PL011, <kbd>/dev/ttyAMA0</kbd>) está en GPIO14 y GPIO15 y no lo usa el Bluetooth (la Pi 2 no tiene). Hay que quitarle la consola serie:</p>
+    <div class="tscroll"><table class="t" id="map-table"><thead><tr><th>J1</th><th>Señal</th><th>Pin físico RPi</th><th>Nombre en la RPi</th><th>Uso en el código</th></tr></thead><tbody></tbody></table></div>
+    <h2>Configurar la UART en la Raspberry Pi 2</h2>
+    <p>En la Pi 2 la UART de hardware (<kbd>/dev/ttyAMA0</kbd>) está en GPIO14 y GPIO15. Hay que quitarle la consola serie:</p>
     <ol>
-      <li>Ejecutar <kbd>sudo raspi-config</kbd>, entrar a Interface Options, luego Serial Port.</li>
-      <li>A "login shell over serial" responder No.</li>
-      <li>A "serial port hardware enabled" responder Sí.</li>
-      <li>Reiniciar con <kbd>sudo reboot</kbd>.</li>
+      <li><kbd>sudo raspi-config nonint do_serial_hw 0</kbd></li>
+      <li><kbd>sudo raspi-config nonint do_serial_cons 1</kbd></li>
+      <li><kbd>sudo usermod -aG dialout,gpio $USER</kbd></li>
+      <li><kbd>sudo reboot</kbd></li>
     </ol>
+    <p class="small">Si tu versión de raspi-config no tiene esas opciones: <kbd>sudo raspi-config</kbd> → Interface Options → Serial Port, consola "No", hardware "Sí".</p>
   </section>
 
   <!-- ================= BOM ================= -->
   <section id="tab-bom" class="hidden">
-    <h2>Lista de componentes (por Faro)</h2>
-    <table class="t" id="bom-table"><thead><tr><th>Ref.</th><th>Componente</th><th>Valor</th><th>Notas de montaje</th></tr></thead><tbody></tbody></table>
+    <h2>Materiales por Faro</h2>
+    <div class="tscroll"><table class="t" id="bom-table"><thead><tr><th>Ref.</th><th>Componente</th><th>Valor</th><th>Cant.</th><th>Costo aprox. (₡)</th><th>Notas</th></tr></thead><tbody></tbody></table></div>
+    <p class="small">Precios estimados para comparar, no cotizaciones; verifícalos en la tienda. No incluye la Raspberry Pi. Para los dos Faros se duplica todo.</p>
+    <h2>Lo que se quitó del diseño anterior</h2>
+    <ul>
+      <li>Comparador LM311 y su socket DIP-8</li>
+      <li>Trimpot de 10 kΩ del umbral</li>
+      <li>Capacitor de 0.1 µF</li>
+      <li>Resistencia pull-up de la salida del comparador</li>
+      <li>La línea de 5 V: el emisor y el receptor ahora usan 3V3</li>
+    </ul>
+    <p>El umbral lo pone ahora la entrada del GPIO15 (lee 0 por debajo de 0.9 V y 1 por encima de 1.6 V) y la sensibilidad se ajusta cambiando R3. El código no cambia.</p>
+  </section>
+
+  <!-- ================= AJUSTES ================= -->
+  <section id="tab-aju" class="hidden">
+    <h2>Montaje</h2>
+    <ul>
+      <li>Suelda D1 y Q2 al borde de la placa, mirando de frente al otro Faro. Si son de vista lateral, la cara que emite o recibe es el costado, no la punta.</li>
+      <li><b>Aísla D1 de Q2.</b> El LED propio pasa encendido (la UART en reposo queda en 1); si su luz le llega a Q2, RXD queda pegado en 1 y el Faro no oye al otro. Sepáralos al menos 2 cm y pon una barrera opaca entre ellos (cinta negra o un pedazo de cartón).</li>
+      <li>Un tubito negro (pajilla o termoencogible) alrededor de Q2 corta la luz ambiente y mejora mucho la señal.</li>
+      <li>Q2: colector a 3V3, emisor a R3 y a RXD. Si RXD no sube al iluminarlo, está al revés: dale vuelta.</li>
+      <li>Confirma con la cámara del celular que D1 se ve morado cuando emite.</li>
+    </ul>
+    <h2>Sensibilidad (R3)</h2>
+    <div class="tscroll"><table class="t">
+      <thead><tr><th>Síntoma</th><th>Qué hacer</th></tr></thead>
+      <tbody>
+        <tr><td>RXD nunca llega a 2 V con el otro Faro de frente</td><td>Sube R3 a 22 kΩ o 47 kΩ, o acerca los Faros.</td></tr>
+        <tr><td>RXD queda en 1 solo con la luz ambiente (otro Faro apagado)</td><td>Baja R3 a 4.7 kΩ y tapa Q2 con el tubito negro.</td></tr>
+        <tr><td>RXD queda en 1 aunque el otro Faro esté apagado y la sala oscura</td><td>Le llega luz de su propio D1: sepáralos y pon la barrera.</td></tr>
+        <tr><td>Llegan los datos pero con errores (BER alta)</td><td>Baja la velocidad (<kbd>--baudios 4800</kbd> o <kbd>2400</kbd> en los dos lados) o baja R3.</td></tr>
+      </tbody>
+    </table></div>
+    <h2>Velocidad</h2>
+    <p>Sin comparador, los bordes del fototransistor son lentos y la Pi solo tiene la pequeña histéresis de sus pines. R3 más alto da más sensibilidad pero bordes más lentos. Empieza a 9600 baudios y sube de a poco midiendo con <kbd>python3 -m faro.medir</kbd>; quédate con la velocidad más alta en la que la BER siga baja.</p>
   </section>
 </div>
 
@@ -355,139 +361,125 @@
 (function () {
   "use strict";
 
-  // ---------- Datos de componentes ----------
   var COMP = {
-    R1: { t: "R1 · resistencia limitadora del LED IR", v: "100 Ω, 1/4 W",
+    R1: { t: "R1 · limitadora del LED IR", v: "100 Ω, 1/4 W",
       rows: [["Función", "Limita la corriente del LED IR cuando Q1 conduce."],
-             ["Cálculo", "I = (5 − 1.3 − 0.2) / 100 ≈ 35 mA (el LED aguanta 50 mA)."],
-             ["Potencia", "0.035² × 100 ≈ 0.12 W, menor a 1/4 W."],
-             ["Prueba", "Con el LED encendido, entre sus patas caen ≈ 3.5 V."]] },
+             ["Cálculo", "I = (3.3 − 1.3 − 0.2) / 100 ≈ 18 mA."],
+             ["Potencia", "0.018² × 100 ≈ 0.03 W, muy por debajo de 1/4 W."],
+             ["Prueba", "Con TX en 1 caen ≈ 1.8 V en R1 (equivale a ≈ 18 mA)."]] },
     R2: { t: "R2 · resistencia de base", v: "1 kΩ",
       rows: [["Función", "Limita la corriente que sale del GPIO14 hacia la base de Q1."],
-             ["Cálculo", "Ib = (3.3 − 0.7) / 1000 ≈ 2.6 mA, de sobra para saturar Q1."],
-             ["Prueba", "TP4 ≈ 0.7 V con TX en 1; 0 V con TX en 0."]] },
-    D1: { t: "D1 · LED emisor infrarrojo", v: "940 nm (punto rojo)",
+             ["Cálculo", "Ib = (3.3 − 0.7) / 1000 ≈ 2.6 mA. Para 18 mA de colector basta y sobra: Q1 queda saturado."],
+             ["Prueba", "TP3 ≈ 0.7 V con TX en 1; 0 V con TX en 0."]] },
+    D1: { t: "D1 · LED emisor infrarrojo", v: "940 nm (LTE-302, LTE-4206, IR26-21C o el del par IR)",
       rows: [["Función", "Emite la luz que lleva los bits hacia el otro Faro."],
-             ["Polaridad", "Pata larga (ánodo) hacia R1; pata corta (cátodo) hacia el colector de Q1."],
-             ["Ojo", "El IR no se ve a simple vista. Mirala con la cámara del celular: se ve morado."],
-             ["Del par IR", "El emisor es el del punto rojo; el detector es el del punto transparente."]] },
+             ["Polaridad", "Ánodo hacia R1, cátodo hacia el colector de Q1. En modo diodo, con la roja en el ánodo marca ≈ 1.0–1.2 V."],
+             ["Ver", "El IR no se ve a simple vista. Con la cámara del celular se ve morado."],
+             ["Montaje", "Al borde de la placa, de frente al otro Faro y separado de Q2."]] },
     Q1: { t: "Q1 · transistor driver", v: "2N2222A (NPN, TO-92)",
-      rows: [["Función", "Interruptor: el GPIO enciende el LED IR sin dar los 35 mA él mismo."],
-             ["Patas", "P2N2222A: C-B-E con la cara plana hacia vos. Confirmalo con el multímetro en modo diodo (base-emisor y base-colector ≈ 0.6–0.7 V)."],
-             ["Prueba", "TP5 ≈ 0.1–0.2 V cuando conduce."]] },
-    R3: { t: "R3 · pull-up del fototransistor", v: "10 kΩ",
-      rows: [["Función", "Convierte la corriente del fototransistor en voltaje (TP6)."],
-             ["Ojo", "Va a 3V3, nunca a 5V: TP6 llega al comparador y no conviene pasarse del rango de entrada."],
-             ["Velocidad", "Si los bits salen deformados a alta velocidad, bajala a 4.7 kΩ o 2.2 kΩ (responde más rápido pero con menos sensibilidad)."]] },
-    Q2: { t: "Q2 · fototransistor receptor", v: "940 nm (punto transparente)",
-      rows: [["Función", "Conduce cuando le llega luz IR. Con luz, TP6 baja casi a 0 V."],
-             ["Polaridad", "Colector hacia R3, emisor a GND. Si TP6 no baja al iluminarlo, está al revés: dale vuelta."],
-             ["Montaje", "Apuntalo de frente al LED del otro Faro. Un tubito negro (pajilla o termoencogible) alrededor bloquea luz ambiente."]] },
-    U1: { t: "U1 · comparador", v: "LM311 (DIP-8, en socket)",
-      rows: [["Función", "Compara TP6 con el umbral TP7 y entrega 0 o 1 limpio al GPIO15. La Raspberry no tiene entradas analógicas."],
-             ["Pines", "1 GND, 2 IN+ (umbral), 3 IN− (fototransistor), 4 GND, 7 salida, 8 V+ (5 V). Pines 5 y 6 sin conectar."],
-             ["Lógica", "Con luz: TP6 < TP7, la salida se libera y R4 la sube a 3.3 V = 1. A oscuras: salida a 0 V."],
-             ["Socket", "Va en el socket DIP-8 soldado; el chip se pone después de las pruebas de corto. La muesca marca el pin 1."]] },
-    RV1: { t: "RV1 · ajuste del umbral", v: "Trimpot 10 kΩ",
-      rows: [["Función", "Fija el voltaje de comparación (TP7)."],
-             ["Cómo calibrar", "Medí TP6 con luz ambiente y con el otro LED encendido. Girá RV1 hasta que TP7 quede justo en el medio de esos dos valores."],
-             ["Inicio", "Empezá con TP7 ≈ 1.6 V."]] },
-    R4: { t: "R4 · pull-up de la salida", v: "1 kΩ",
-      rows: [["Función", "La salida del LM311 es de colector abierto: sin R4 nunca daría un 1."],
-             ["Ojo", "Va a 3V3 para que GPIO15 nunca vea 5 V."]] },
-    C1: { t: "C1 · desacople", v: "0.1 µF cerámico",
-      rows: [["Función", "Filtra el ruido de la alimentación del comparador."],
-             ["Montaje", "Soldalo pegado a los pines 8 y 4 del socket de U1."]] },
-    R5: { t: "R5 · resistencia del LED TX", v: "330 Ω",
-      rows: [["Cálculo", "I = (3.3 − 2.0) / 330 ≈ 4 mA. Suficiente para verlo, seguro para el GPIO."]] },
+      rows: [["Función", "Interruptor: el GPIO enciende el LED IR sin dar él los 18 mA."],
+             ["Patas", "Con la cara plana hacia ti suele ser C-B-E (P2N2222A). Confírmalo con el multímetro en modo diodo: base-emisor y base-colector ≈ 0.6–0.7 V."],
+             ["Prueba", "TP4 ≈ 0.1–0.2 V cuando conduce."]] },
+    Q2: { t: "Q2 · fototransistor receptor", v: "940 nm (LTR-301, LTR-4206 o el del par IR)",
+      rows: [["Función", "Conduce cuando le llega luz IR. La corriente que deja pasar sube el voltaje en R3."],
+             ["Conexión", "Colector común: colector a 3V3, emisor a R3 y a RXD. Con luz, RXD sube; a oscuras, baja a 0 V."],
+             ["Polaridad", "Si RXD no sube al iluminarlo, está al revés: dale vuelta."],
+             ["Montaje", "Al borde, de frente al otro Faro, con un tubito negro y separado de D1 por una barrera opaca."]] },
+    R3: { t: "R3 · resistencia de carga del receptor", v: "10 kΩ (probar 4.7 k, 22 k o 47 k)",
+      rows: [["Función", "Convierte la corriente de Q2 en el voltaje que lee el GPIO15. Reemplaza al comparador."],
+             ["Sensibilidad", "Más alta: más voltaje con poca luz, pero también más ruido de luz ambiente y bordes más lentos."],
+             ["Cuándo cambiarla", "Si RXD no llega a 2 V con luz, súbela. Si con solo luz ambiente pasa de 0.5 V, bájala."],
+             ["Prueba", "Usa los botones R3 de arriba para ver el efecto."]] },
+    R4: { t: "R4 · resistencia del LED TX", v: "330 Ω",
+      rows: [["Cálculo", "I = (3.3 − 2.0) / 330 ≈ 4 mA. Se ve bien y es seguro para el GPIO."]] },
     D2: { t: "D2 · LED indicador TX", v: "Verde 5 mm",
-      rows: [["Función", "Se enciende mientras el Faro transmite una trama (lo controla el software por GPIO23)."],
-             ["Pánico", "Al presionar el botón, D2 y D3 parpadean juntos para indicar el borrado."]] },
-    R6: { t: "R6 · resistencia del LED RX", v: "330 Ω",
-      rows: [["Cálculo", "I = (3.3 − 2.0) / 330 ≈ 4 mA."]] },
+      rows: [["Función", "Se enciende mientras el Faro transmite una trama (GPIO23, lo maneja el software)."],
+             ["Pánico", "Con el botón, D2 y D3 parpadean juntos 5 veces."],
+             ["Polaridad", "Pata larga hacia R4."]] },
+    R5: { t: "R5 · resistencia del LED RX", v: "330 Ω",
+      rows: [["Cálculo", "I = (3.3 − 1.8) / 330 ≈ 4.5 mA."]] },
     D3: { t: "D3 · LED indicador RX", v: "Rojo 5 mm",
-      rows: [["Función", "Se enciende cuando llega una trama válida (CRC correcto), por GPIO24."]] },
-    SW1: { t: "SW1 · botón de pánico", v: "Pulsador",
-      rows: [["Función", "Al presionarlo, el software borra llaves y dirección física (zeroize) y hace parpadear D2 y D3."],
-             ["Conexión", "Entre GPIO17 y GND. Sin resistencia: se activa el pull-up interno en el código."],
-             ["Prueba", "TP9 = 3.3 V suelto, 0 V presionado."]] },
-    J1: { t: "J1 · conector a la Raspberry", v: "Header macho 1×8, 2.54 mm",
-      rows: [["Función", "Une la placa con la Raspberry por cables dupont. La placa se retira sin desoldar."],
-             ["Ver", "Pestaña \"Conexión a la Raspberry\" para el pin exacto de cada cable."]] }
+      rows: [["Función", "Se enciende cuando llega una trama con CRC válido (GPIO24)."],
+             ["Polaridad", "Pata larga hacia R5."]] },
+    SW1: { t: "SW1 · botón de pánico", v: "Pulsador de 4 patas",
+      rows: [["Función", "Borra llaves y dirección física, genera una identidad nueva y hace parpadear D2 y D3."],
+             ["Conexión", "Entre GPIO17 y GND, sin resistencia: el código activa el pull-up interno."],
+             ["4 patas", "Las patas vienen unidas de a dos por dentro. Usa dos patas en diagonal: así siempre queda bien."],
+             ["Prueba", "TP6 = 3.3 V suelto, 0 V presionado."]] },
+    J1: { t: "J1 · conector a la Raspberry", v: "Header macho 1×7, 2.54 mm",
+      rows: [["Función", "Une la placa con la Raspberry por 7 cables dupont. Se retira sin desoldar."],
+             ["Ver", "Pestaña \"Conexión a la Raspberry\" para el pin de cada cable."]] }
   };
 
   var NET = {
-    "5V":   { t: "5V", d: "Alimentación de 5 V desde el pin 2 de la Raspberry. Alimenta el LED IR y el LM311." },
-    "3V3":  { t: "3V3", d: "Alimentación de 3.3 V desde el pin 1. Todo lo que llega a un GPIO se sube a este riel." },
+    "3V3":  { t: "3V3", d: "Única alimentación del Faro, desde el pin 1 de la Raspberry. Alimenta el LED IR (por R1) y el colector de Q2." },
     "GND":  { t: "GND", d: "Tierra común. Pin 6 de la Raspberry." },
-    "TXD":  { t: "TXD (GPIO14)", d: "Salida del UART. En 1, Q1 conduce y el LED IR enciende." },
-    "BASE": { t: "Base de Q1", d: "Entre R2 y la base de Q1." },
+    "TXD":  { t: "TXD (GPIO14)", d: "Salida de la UART. En 1, Q1 conduce y el LED IR enciende." },
+    "BASE": { t: "Base de Q1 (TP3)", d: "Entre R2 y la base de Q1." },
     "LED_A":{ t: "R1 → ánodo de D1", d: "Unión entre R1 y el ánodo del LED IR." },
-    "Q1C":  { t: "Cátodo de D1 → colector de Q1", d: "Cuando Q1 conduce, este punto baja casi a 0 V." },
-    "RX_A": { t: "Señal analógica del receptor (TP6)", d: "Colector de Q2. Va a la entrada − del LM311." },
-    "VREF": { t: "Umbral (TP7)", d: "Cursor del trimpot. Va a la entrada + del LM311." },
-    "RXD":  { t: "RXD (GPIO15)", d: "Salida digital del comparador hacia el UART de la Raspberry." },
+    "Q1C":  { t: "Cátodo de D1 → colector de Q1 (TP4)", d: "Cuando Q1 conduce, este punto baja casi a 0 V." },
+    "RXD":  { t: "RXD (GPIO15, TP5)", d: "Emisor de Q2 y parte de arriba de R3. Es la entrada de la UART: con luz ≥ 2 V (lee 1), a oscuras ≤ 0.5 V (lee 0)." },
     "LED_TX":{ t: "LED_TX (GPIO23)", d: "Salida que enciende el LED verde." },
     "LED_RX":{ t: "LED_RX (GPIO24)", d: "Salida que enciende el LED rojo." },
-    "LTX_A":{ t: "R5 → D2", d: "Unión entre R5 y el ánodo del LED verde." },
-    "LRX_A":{ t: "R6 → D3", d: "Unión entre R6 y el ánodo del LED rojo." },
-    "PANICO":{ t: "PANICO (GPIO17)", d: "Entrada con pull-up interno. Lee 0 al presionar." }
+    "LTX_A":{ t: "R4 → D2", d: "Unión entre R4 y el ánodo del LED verde." },
+    "LRX_A":{ t: "R5 → D3", d: "Unión entre R5 y el ánodo del LED rojo." },
+    "PANICO":{ t: "PANICO (GPIO17, TP6)", d: "Entrada con pull-up interno. Lee 0 al presionar." }
   };
 
   var J1 = [
-    ["1", "5V",     "2",  "5V",            "Alimenta LED IR y LM311"],
-    ["2", "3V3",    "1",  "3.3V",          "Pull-ups R3 y R4, trimpot"],
-    ["3", "GND",    "6",  "GND",           "Tierra común"],
-    ["4", "TXD",    "8",  "GPIO14 (TXD)",  "/dev/ttyAMA0 TX → MedioUART.enviar()"],
-    ["5", "RXD",    "10", "GPIO15 (RXD)",  "/dev/ttyAMA0 RX → MedioUART.recibir()"],
-    ["6", "LED_TX", "16", "GPIO23",        "LED verde mientras transmite"],
-    ["7", "LED_RX", "18", "GPIO24",        "LED rojo al recibir trama válida"],
-    ["8", "PANICO", "11", "GPIO17",        "Botón de pánico (pull-up interno)"]
+    ["1", "3V3",    "1",  "3.3V",          "Alimenta LED IR (R1) y colector de Q2"],
+    ["2", "GND",    "6",  "GND",           "Tierra común"],
+    ["3", "TXD",    "8",  "GPIO14 (TXD)",  "/dev/ttyAMA0 TX → MedioUART.enviar()"],
+    ["4", "RXD",    "10", "GPIO15 (RXD)",  "/dev/ttyAMA0 RX → MedioUART.recibir()"],
+    ["5", "LED_TX", "16", "GPIO23",        "LED verde mientras transmite"],
+    ["6", "LED_RX", "18", "GPIO24",        "LED rojo al recibir trama válida"],
+    ["7", "PANICO", "11", "GPIO17",        "Botón de pánico (pull-up interno)"]
   ];
 
   var BOM = [
-    ["J1", "Header macho 2.54 mm", "1×8", "Se corta de la tira de 40 del kit."],
-    ["R1", "Resistencia", "100 Ω", "Del kit."],
-    ["R2", "Resistencia", "1 kΩ", "Del kit."],
-    ["R3", "Resistencia", "10 kΩ", "Del kit."],
-    ["R4", "Resistencia", "1 kΩ", "Del kit."],
-    ["R5, R6", "Resistencia", "330 Ω", "Del kit."],
-    ["RV1", "Trimpot / potenciómetro", "10 kΩ", "El de 10K del kit o el trimmer azul."],
-    ["C1", "Capacitor cerámico", "0.1 µF", "Pegado a U1."],
-    ["Q1", "Transistor NPN", "2N2222A", "Cara plana: C-B-E (verificar)."],
-    ["D1", "LED emisor IR", "940 nm", "Del par IR, punto rojo."],
-    ["Q2", "Fototransistor", "940 nm", "Del par IR, punto transparente."],
-    ["U1", "Comparador", "LM311 DIP-8", "Siempre en socket DIP-8."],
-    ["—", "Socket DIP-8", "", "Se suelda; el chip se inserta al final."],
-    ["D2", "LED", "Verde 5 mm", "Indicador TX."],
-    ["D3", "LED", "Rojo 5 mm", "Indicador RX."],
-    ["SW1", "Pulsador", "", "Botón de pánico."],
-    ["—", "Placa perforada", "5×7 cm", "Una por Faro."],
-    ["—", "Cables dupont H-H", "8", "J1 → header de la Raspberry."]
+    ["D1", "LED IR 940 nm (vista lateral: LTE-302, LTE-4206 o IR26-21C)", "", "1", "150", "O el emisor del par IR. Al borde de la placa."],
+    ["Q2", "Fototransistor IR (vista lateral: LTR-301 o LTR-4206)", "", "1", "300", "O el detector del par IR. Con tubito negro."],
+    ["Q1", "Transistor NPN", "2N2222A", "1", "150", "Verificar C-B-E."],
+    ["R1", "Resistencia 1/4 W", "100 Ω", "1", "125 (las 5)", "LED IR."],
+    ["R2", "Resistencia 1/4 W", "1 kΩ", "1", "", "Base de Q1."],
+    ["R3", "Resistencia 1/4 W", "10 kΩ", "1", "", "Tener a mano 4.7 k, 22 k y 47 k."],
+    ["R4, R5", "Resistencia 1/4 W", "330 Ω", "2", "", "LEDs indicadores."],
+    ["D2, D3", "LED 5 mm", "verde y rojo", "2", "200", "Indicadores TX y RX."],
+    ["SW1", "Pulsador de 4 patas", "", "1", "150", "Usar patas en diagonal."],
+    ["J1", "Header macho 2.54 mm", "1×7", "1", "150", "Se corta de una tira de 40."],
+    ["—", "Placa perforada pequeña", "", "1", "1000", ""],
+    ["—", "Cables dupont hembra-hembra", "", "7", "700", "J1 → header de la Raspberry."],
+    ["", "Total aproximado por Faro", "", "", "≈ 2900", ""]
   ];
 
-  // ---------- Estado y voltajes ----------
-  var S = { tx: true, rx: false, sw: false, tp: true };
+  // ---------- Estado ----------
+  var S = { tx: true, rx: false, sw: false, tp: true, r3: 10000 };
+  var I_LUZ = 0.25e-3, I_AMB = 0.02e-3, V_MAX = 3.1;
+
+  function vRx() { return Math.min(((S.rx ? I_LUZ : 0) + I_AMB) * S.r3, V_MAX); }
+  function lectura(v) { return v <= 0.9 ? "lee 0" : (v >= 1.6 ? "lee 1" : "indefinido"); }
+  function rTxt(r) { return (r / 1000).toString().replace(".", ".") + " kΩ"; }
+
   function tps() {
     return [
-      ["TP1", "Riel 5V (R1, pin 8 de U1)", "≈ 5.0 V (4.8–5.2)"],
-      ["TP2", "Riel 3V3 (R3, R4, RV1)", "≈ 3.3 V (3.2–3.4)"],
-      ["TP3", "GND", "0 V (referencia)"],
-      ["TP4", "Base de Q1", S.tx ? "≈ 0.7 V" : "0 V"],
-      ["TP5", "Colector de Q1 (cátodo de D1)", S.tx ? "≈ 0.1–0.2 V (LED encendido)" : "≈ 3.5–5 V (LED apagado)"],
-      ["TP6", "Colector de Q2 (entrada − de U1)", S.rx ? "≈ 0.1–0.5 V (le llega luz)" : "≈ 3.0–3.3 V (oscuro)"],
-      ["TP7", "Cursor de RV1 (entrada + de U1)", "Ajustable; empezar en ≈ 1.6 V"],
-      ["TP8", "Salida de U1 / GPIO15", S.rx ? "≈ 3.3 V (lee 1)" : "≈ 0.1–0.3 V (lee 0)"],
-      ["TP9", "GPIO17 (botón)", S.sw ? "0 V (presionado)" : "≈ 3.3 V (suelto)"]
+      ["TP1", "Riel 3V3 (arriba de R1, colector de Q2)", "≈ 3.3 V (3.2–3.4)"],
+      ["TP2", "GND", "0 V (referencia)"],
+      ["TP3", "Base de Q1", S.tx ? "≈ 0.7 V" : "0 V"],
+      ["TP4", "Colector de Q1 (cátodo de D1)", S.tx ? "≈ 0.1–0.2 V (LED encendido)" : "≈ 2–3.3 V (LED apagado)"],
+      ["TP5", "RXD: emisor de Q2 / arriba de R3 / GPIO15", S.rx ? "≥ 2 V (lee 1)" : "≤ 0.5 V (lee 0)"],
+      ["TP6", "GPIO17 (botón)", S.sw ? "0 V (presionado)" : "≈ 3.3 V (suelto)"]
     ];
   }
 
   // ---------- DOM ----------
   var info = document.getElementById("info");
   var esq = document.getElementById("esq");
-
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
+  function clearSel() {
+    esq.querySelectorAll(".on").forEach(function (e) { e.classList.remove("on", "hov"); });
+    esq.querySelectorAll(".sel").forEach(function (e) { e.classList.remove("sel"); });
+  }
   function showComp(id) {
     var c = COMP[id]; if (!c) return;
     clearSel();
@@ -508,11 +500,7 @@
   function showTp(id) {
     var r = tps().filter(function (x) { return x[0] === id; })[0]; if (!r) return;
     clearSel();
-    info.innerHTML = "<h3>" + r[0] + "</h3><table><tr><td>Dónde</td><td>" + esc(r[1]) + "</td></tr><tr><td>Esperado ahora</td><td>" + esc(r[2]) + "</td></tr><tr><td>Punta negra</td><td>GND (TP3)</td></tr></table>";
-  }
-  function clearSel() {
-    esq.querySelectorAll(".on").forEach(function (e) { e.classList.remove("on"); });
-    esq.querySelectorAll(".sel").forEach(function (e) { e.classList.remove("sel"); });
+    info.innerHTML = "<h3>" + r[0] + "</h3><table><tr><td>Dónde</td><td>" + esc(r[1]) + "</td></tr><tr><td>Esperado ahora</td><td>" + esc(r[2]) + "</td></tr><tr><td>Punta negra</td><td>GND (TP2)</td></tr></table>";
   }
 
   esq.addEventListener("click", function (ev) {
@@ -531,9 +519,9 @@
     }
   });
 
-  // pines de J1 dibujados
+  // pines de J1
   (function () {
-    var g = document.getElementById("j1pins"), ns = "http://www.w3.org/2000/svg", html = "";
+    var html = "";
     J1.forEach(function (r, i) {
       var y = 470 + i * 25;
       html += '<g data-net="' + r[1] + '"><path class="w" d="M146,' + y + ' h70"/><path class="hit" d="M146,' + y + ' h70"/>' +
@@ -542,32 +530,41 @@
         '<text class="lbl s" x="296" y="' + (y + 4) + '">RPi pin ' + r[2] + '</text></g>' +
         '<text class="lbl s" x="104" y="' + (y + 4) + '" text-anchor="end">' + r[0] + '</text>';
     });
-    g.innerHTML = html;
+    document.getElementById("j1pins").innerHTML = html;
   })();
 
   function render() {
-    // LEDs y rayos
     document.getElementById("d1-fill").style.opacity = S.tx ? 1 : 0;
     document.getElementById("d1-rays").style.opacity = S.tx ? 1 : .15;
     document.getElementById("q2-rays").style.opacity = S.rx ? 1 : .15;
-    document.getElementById("d2-fill").style.opacity = (S.tx || S.sw) ? 1 : 0;
-    document.getElementById("d3-fill").style.opacity = (S.rx || S.sw) ? 1 : 0;
+    document.getElementById("d2-fill").style.opacity = S.sw ? 1 : 0;
+    document.getElementById("d3-fill").style.opacity = S.sw ? 1 : 0;
     document.getElementById("sw-lever").setAttribute("d", S.sw ? "M880,529 v40" : "M880,529 l18,38");
     document.getElementById("board").classList.toggle("show-tp", S.tp);
-    // tabla
+    document.getElementById("r3-lbl").textContent = rTxt(S.r3);
+    var v = vRx(), y = 368 - (v / 3.3) * 284;
+    document.getElementById("meter-mk").setAttribute("transform", "translate(0," + y.toFixed(1) + ")");
+    document.getElementById("meter-v").textContent = v.toFixed(2) + " V · " + lectura(v);
+
     var tb = document.querySelector("#tp-table tbody"), h = "";
     tps().forEach(function (r) { h += "<tr><td><b>" + r[0] + "</b></td><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td></tr>"; });
     tb.innerHTML = h;
-    [["b-tx", S.tx, "TX: emitiendo luz", "TX: LED apagado"], ["b-rx", S.rx, "RX: recibe luz IR", "RX: a oscuras"],
-     ["b-sw", S.sw, "Botón de pánico presionado", "Botón de pánico suelto"], ["b-tp", S.tp, "Mostrar puntos de prueba", "Mostrar puntos de prueba"]]
+    [["b-tx", S.tx, "TX: LED IR encendido", "TX: LED IR apagado"],
+     ["b-rx", S.rx, "RX: le llega luz del otro Faro", "RX: a oscuras (solo luz ambiente)"],
+     ["b-sw", S.sw, "Botón presionado", "Botón suelto"],
+     ["b-tp", S.tp, "Puntos de prueba", "Puntos de prueba"]]
       .forEach(function (b) { var el = document.getElementById(b[0]); el.setAttribute("aria-pressed", b[1]); el.textContent = b[1] ? b[2] : b[3]; });
+    document.querySelectorAll(".r3").forEach(function (b) { b.setAttribute("aria-pressed", Number(b.getAttribute("data-r")) === S.r3); });
   }
   document.getElementById("b-tx").onclick = function () { S.tx = !S.tx; render(); };
   document.getElementById("b-rx").onclick = function () { S.rx = !S.rx; render(); };
   document.getElementById("b-sw").onclick = function () { S.sw = !S.sw; render(); };
   document.getElementById("b-tp").onclick = function () { S.tp = !S.tp; render(); };
+  document.querySelectorAll(".r3").forEach(function (b) {
+    b.onclick = function () { S.r3 = Number(b.getAttribute("data-r")); render(); showComp("R3"); };
+  });
 
-  // ---------- Header 40 pines ----------
+  // ---------- Header de 40 pines y tablas ----------
   (function () {
     var names = {1:"3.3V",2:"5V",3:"GPIO2",4:"5V",5:"GPIO3",6:"GND",7:"GPIO4",8:"GPIO14 TXD",9:"GND",10:"GPIO15 RXD",
       11:"GPIO17",12:"GPIO18",13:"GPIO27",14:"GND",15:"GPIO22",16:"GPIO23",17:"3.3V",18:"GPIO24",19:"GPIO10",20:"GND",
@@ -577,31 +574,34 @@
     var h = '<text class="lbl b" x="20" y="24">Header de 40 pines (vista desde arriba, pin 1 arriba a la izquierda)</text>';
     for (var p = 1; p <= 40; p++) {
       var row = Math.floor((p - 1) / 2), col = (p - 1) % 2;
-      var x = col === 0 ? 200 : 290, y = 44 + row * 25;
-      var u = used[p];
+      var x = col === 0 ? 200 : 290, y = 44 + row * 25, u = used[p];
       h += '<g class="pin' + (u ? ' used' : '') + '"><rect x="' + x + '" y="' + y + '" width="70" height="20" rx="3"/>' +
            '<text x="' + (x + 35) + '" y="' + (y + 14) + '" text-anchor="middle">' + p + '</text></g>';
       var tx = col === 0 ? x - 8 : x + 78, anchor = col === 0 ? "end" : "start";
-      h += '<text class="lbl s" x="' + tx + '" y="' + (y + 14) + '" text-anchor="' + anchor + '">' + names[p] + (u ? " ← " + u : "") + '</text>';
+      var warn = (p === 2 || p === 4) ? " (NO usar)" : "";
+      h += '<text class="lbl s" x="' + tx + '" y="' + (y + 14) + '" text-anchor="' + anchor + '">' + names[p] + (u ? " ← " + u : warn) + '</text>';
     }
     document.getElementById("hdr").innerHTML = h;
-    var tb = document.querySelector("#map-table tbody"), s = "";
+    var s = "";
     J1.forEach(function (r) { s += "<tr><td>" + r[0] + "</td><td><b>" + r[1] + "</b></td><td>" + r[2] + "</td><td>" + r[3] + "</td><td>" + esc(r[4]) + "</td></tr>"; });
-    tb.innerHTML = s;
-    var bt = document.querySelector("#bom-table tbody"), b = "";
-    BOM.forEach(function (r) { b += "<tr><td><b>" + r[0] + "</b></td><td>" + r[1] + "</td><td>" + r[2] + "</td><td>" + r[3] + "</td></tr>"; });
-    bt.innerHTML = b;
+    document.querySelector("#map-table tbody").innerHTML = s;
+    var b = "";
+    BOM.forEach(function (r) {
+      var bold = r[1].indexOf("Total") === 0;
+      b += "<tr>" + r.map(function (c, i) { return "<td>" + ((i === 0 || bold) && c ? "<b>" + esc(c) + "</b>" : esc(c)) + "</td>"; }).join("") + "</tr>";
+    });
+    document.querySelector("#bom-table tbody").innerHTML = b;
   })();
 
   // ---------- Pestañas ----------
   document.querySelectorAll(".tabs button").forEach(function (b) {
     b.onclick = function () {
       document.querySelectorAll(".tabs button").forEach(function (o) { o.setAttribute("aria-selected", o === b); });
-      ["esq", "rpi", "bom"].forEach(function (t) { document.getElementById("tab-" + t).classList.toggle("hidden", t !== b.getAttribute("data-tab")); });
+      ["esq", "rpi", "bom", "aju"].forEach(function (t) { document.getElementById("tab-" + t).classList.toggle("hidden", t !== b.getAttribute("data-tab")); });
     };
   });
 
-  info.innerHTML = "<h3>Tocá un componente</h3><p>Cada pieza muestra su valor, para qué sirve, cómo va orientada y qué medir. Tocá un cable para ver a qué pin de la Raspberry llega. Los puntos azules (TP) son los puntos de prueba de la bitácora.</p>";
+  info.innerHTML = "<h3>Toca un componente</h3><p>Cada pieza muestra su valor, para qué sirve, cómo va orientada y qué medir. Toca un cable para ver a qué pin de la Raspberry llega. Los puntos azules (TP) son los de la bitácora.</p><p class='k'>Prueba el botón RX y los valores de R3 para ver cómo cambia lo que lee el GPIO15.</p>";
   render();
 })();
 </script>
