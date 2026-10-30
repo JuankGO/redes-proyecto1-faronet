@@ -70,6 +70,12 @@ En una PC (Windows, Linux o Mac) basta con:
 
 Primero las mediciones con multímetro de la bitácora. Después, con los dos Faros apuntándose:
 
+Prueba con un solo Faro: dobla el LED IR para que apunte a su propio fototransistor, a unos centímetros, y corre:
+
+1. `python3 -m faro.medir loopback --uart /dev/ttyAMA0 --tramas 20`
+
+Cada trama debe salir "OK". Si dice "no llego", revisa el LED con la cámara del celular y que RXD suba a 2 V o más con luz.
+
 Prueba rápida de texto. La Pi B imprime su dirección física y la Pi A le manda un mensaje confirmado con ACK (`ffffffff` lo manda a difusión, sin ACK):
 
 1. `python3 -m faro.demo_recibir --uart /dev/ttyAMA0`
