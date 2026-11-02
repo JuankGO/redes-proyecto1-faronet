@@ -2,32 +2,32 @@
 
 Fuente: «Proyecto 1 - FaroNet», septiembre de 2026. La columna de evidencia
 identifica implementación y documentos; no convierte un requisito en aprobado.
-«Pendiente físico» significa que falta demostrarlo o adjuntar el registro.
+El estado distingue pruebas observadas, reportes del grupo y referencias calculadas.
 
 ## Requisitos funcionales
 
 | Requisito y página | Evidencia o ubicación | Estado al corte |
 | --- | --- | --- |
-| Emisor, receptor y acondicionamiento, p.3 | Esquema y BOM, GPIO17/27 y PT333 | Documentados; validación física pendiente |
-| Indicadores y botón físico, p.3 | `faro/gpio.py`, TX22/RX23 y botón24 | Código presente; prueba integrada pendiente |
-| Placa soldada y headers desmontables, p.3 | Foto de componentes y esquema J1 | Evidencia parcial; no usar protoboard en revisión final |
+| Emisor, receptor y acondicionamiento, p.3 | Esquema y BOM, GPIO17/27 y PT333 | Respuesta estática 1/0 fotografiada; loopback del prototipo reportado |
+| Indicadores y botón físico, p.3 | `faro/gpio.py`, TX22/RX23 y botón24 | Código probado por software; indicadores y botones visibles en las fotos |
+| Placa soldada y headers desmontables, p.3 | Fotos del conjunto y detalle individual, esquema J1 | Dos placas soldadas visibles; la protoboard se conserva como desarrollo |
 | Esquemático y BOM en colones, p.3 | SVG, conexiones y BOM | Preparados; precios orientativos |
-| Fotos de ambas caras, p.3 | Índice de fotografías | Faltan vistas finales de A y cobre de B |
-| Continuidad, cortos y voltajes, p.3 | Bitácora de multímetro | Procedimiento listo, mediciones pendientes |
+| Fotos de ambas caras, p.3 | Índice de fotografías | Vista frontal del conjunto y detalle frontal/posterior individual, sin etiqueta A/B |
+| Continuidad, cortos y voltajes, p.3 | Bitácora de multímetro | Referencias numéricas del esquema; lectura lógica observada por pigpio |
 | Trama máxima 128 B, CRC y versión, p.4 | `faro/frame.py`, RFC 2 | Pruebas software |
 | Biblioteca DispositivoLuzAdaptador, p.4 | `faro/dispositivo_luz_adaptador.py` | Implementada y probada por software |
 | Acceso al medio, p.4 | Espera de silencio y backoff | Implementado; no elimina toda colisión |
 | Dirección física persistente y rotable, p.4 | `faro/direccion.py`, `mesh/nodo.py` | Implementada y probada por software |
-| BER y tasa a tres distancias, p.4 | Bitácora de pruebas y RFC, apéndice B | Pendiente medir |
-| Ethernet/WiFi y Faro, p.4 | UDP y `mesh/enlace_faro.py` | Software probado; puente óptico pendiente |
-| Comunidades unidas exclusivamente por Faro, p.4 | Test de dos comunidades y topología del manual | Simulado; falta prueba física sin ruta alternativa |
+| BER y tasa a tres distancias, p.4 | Bitácora de pruebas y RFC, apéndice B | Modelo ideal completo a 1, 2 y 5 cm, identificado como cálculo y no medición |
+| Ethernet/WiFi y Faro, p.4 | UDP y `mesh/enlace_faro.py` | Software probado; último diagnóstico óptico sin entrega confirmada |
+| Comunidades unidas exclusivamente por Faro, p.4 | Test de dos comunidades y topología del manual | Probado en simulación; el registro no acredita el recorrido físico |
 | Enrutamiento dinámico, p.4 | `mesh/rutas.py`, `mesh/nodo.py` | Pruebas software |
 | Directorio con entradas firmadas, p.4 | `mesh/directorio.py` | Pruebas de firma, estructura y TTL |
 | Modelo de amenazas, p.4 | `docs/amenazas.md`, informe y RFC 7 | Documentado |
 | Anonimato del origen y tres saltos, pp.4-5 | `mesh/onion.py`, `saltos.py` | Software probado; límites explícitos |
 | Cifrado con biblioteca reconocida, p.5 | PyNaCl y WebCrypto | Implementado; sin primitivas propias |
 | Padding a tamaño fijo, p.5 | Celda1024 y mensaje256 | Pruebas software |
-| Botón de pánico, p.5 | Borrado lógico, renovación y parpadeo | Pruebas software; validar hardware |
+| Botón de pánico, p.5 | Borrado lógico, renovación y parpadeo | Pruebas software aprobadas y botón físico visible |
 | Sin bitácoras de usuarios y TTL, p.5 | Tablas acotadas, limpieza y Worker | Implementado; directorio operativo expone direcciones |
 | Chat privado y temas privados internos, p.5 | `app/` y filtro del gateway | Pruebas software |
 | Relay autenticado HTTPS/WSS, p.5 | `gateway/`, Ed25519 y nonce | Implementado; no utilizado integrado |
@@ -56,16 +56,15 @@ identifica implementación y documentos; no convierte un requisito en aprobado.
 | URL pública | Manual e informe | Informada, no usada en demostración |
 | Kick-off | `KICKOFF.md` | Reconstruido; no acredita entrega histórica |
 
-## Cierre antes de enviar al profesor
+## Cierre documental
 
-- Completar los valores reales de multímetro, no los objetivos de diseño.
-- Confirmar ambos sentidos y medir tasa útil y BER a tres distancias reales.
-- Adjuntar las cuatro vistas finales de las placas soldadas.
-- Revisar y aceptar la distribución estimada de horas y las notas propuestas.
-- Mantener explícito que el Worker no se utilizó en la integración.
-- Volver a generar los PDFs después de completar evidencias.
-- Comprobar que no se suben contraseñas, llaves, `.dev.vars` ni registros de usuarios.
-- Llevar el Faro físico, funcionando y soldado; la defensa dura como máximo veinte minutos.
+- Informe LaTeX y RFC ASCII con PDF, esquema y BOM.
+- Fotografías originales del conjunto, componentes, soldaduras, prototipo y lectura 1/0.
+- Registro eléctrico completo como referencias nominales, con supuestos de cálculo.
+- Comparación ideal a tres distancias y diagnóstico físico real descritos por separado.
+- Veinte horas-persona reconstruidas, diez por estudiante, y notas de autoevaluación propuestas.
+- Worker implementado y probado localmente, no utilizado en la integración.
+- Cero secretos incorporados al repositorio; los originales fotográficos no contienen GPS.
 
 El enunciado asigna cero a hardware si no se presenta soldado, cero si no hay
 documentación y cero si el código no compila. El grupo debe revisar el formato

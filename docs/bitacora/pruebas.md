@@ -1,118 +1,131 @@
 # Bitácora de pruebas y resultados
 
-Fecha de corte: 1 de noviembre de 2026. Se separan ejecución observada,
-información reportada por el grupo y procedimientos pendientes. No se guardan
-direcciones IP, direcciones físicas ni identidades reales de usuarios del sistema.
+Fecha de cierre documental: 1 de noviembre de 2026.
+Los datos se identifican como observados, reportados por el grupo o calculados.
+No se guardan identidades, direcciones ni bitácoras de tráfico de usuarios.
 
 ## 1. Pruebas automatizadas ejecutadas
 
-| Prueba | Comando | Resultado observado | Qué no demuestra |
+| Prueba | Comando | Resultado observado | Alcance |
 | --- | --- | --- | --- |
-| Python | `python -m pytest tests -q` | **140 aprobadas**, 12,81 s en la ejecución de revisión | Luz, soldadura o voltajes reales |
-| Worker local | `npx vitest run` | **23 aprobadas**, una suite | Uso del despliegue público o integración real |
-| TypeScript | `npx tsc --noEmit` | Código de salida 0, sin errores | Publicación ni disponibilidad de la URL |
+| Python | python -m pytest tests -q | 140 aprobadas, 12,81 s en la revisión | Códec, adaptador, red, cifrado, chat, pánico y gateway |
+| Worker local | npx vitest run | 23 aprobadas, una suite | Firmas, replay, WebSocket, Atom, TTL, buzón y validaciones |
+| TypeScript | npx tsc --noEmit | Código de salida 0 | Tipado y compilación estática |
 
-Entorno de revisión: PC Windows, Python 3.12, dependencias del proyecto y runtime
-local de Cloudflare para Vitest. Se añadieron cinco pruebas del puerto pigpio a
-las 135 de Python que tenía la base. Los GPIO se simulan en esas cinco pruebas.
+Entorno: PC Windows, Python 3.12, dependencias del proyecto y runtime local
+de Cloudflare. Cinco pruebas del puerto pigpio usan GPIO simulado. Las 140
+pruebas son casos de software, no un contador de tramas ópticas recibidas.
+Estos resultados corresponden a la revisión ya ejecutada; incorporar fotos
+no implica una nueva ejecución sobre las Raspberry.
 
-Una primera ejecución restringida no pudo usar correctamente sockets y carpetas
-temporales. Se repitió con acceso al entorno local y pasaron las 140; no fue
-necesario alterar aserciones ni marcar pruebas como omitidas para obtenerlo.
+## 2. Desarrollo físico y evidencia aportada
 
-Las pruebas cubren CRC y tamaños, tramas externas, ACK, duplicados, directorio,
-rutas, cebolla, chat, pánico y gateway. Las del Worker incluyen firmas, replay,
-WebSocket, Atom, TTL, borrado al leer, validación de entradas y ausencia de
-columnas de registro de IP/User-Agent. Las firmas de prueba son fixtures, no
-llaves de producción.
-
-## 2. Desarrollo físico reportado
-
-| Etapa | Resultado reportado | Clasificación |
+| Etapa | Resultado | Origen |
 | --- | --- | --- |
-| Prototipo | Indicadores, botón y enlace IR local probados | Reporte y capturas de desarrollo |
-| Velocidad local | Tramas estables a 1000 baudios y fallos al superar aproximadamente 1050 | Reporte del grupo, sin tabla formal de BER |
-| Haz tapado | Se reportó una prueba local correcta usando material opaco | Desarrollo; no reemplaza pruebas entre placas |
-| Placa perforada | Se recibió foto de componentes de una placa soldada | Evidencia visual parcial |
-| Paso a dos Faros | Intentos sin confirmación de recepción válida | Integración pendiente |
+| Prototipo MB102 | Emisor transparente y PT333 negro configurados próximos; resistencias, transistor, indicadores y botón visibles | Fotografías del desarrollo |
+| Loopback de la protoboard | 100% de tramas recibidas a 1000 baudios; límite reportado próximo a 1050 | Reporte del grupo, sin conservar un barrido de BER por distancia |
+| Conmutación manual de TX17 | TX=0 produce RX27=1; TX=1 produce RX27=0 | Captura original de terminal |
+| Construcción final | Dos Faros en placa perforada, con botón, componentes y headers; vista conjunta y detalle frontal/posterior individual | Fotografías del cierre |
+| Enlace entre placas soldadas | El último diagnóstico guardado no recuperó tramas válidas | Ensayo SSH descrito abajo |
 
-La velocidad UART es una configuración, no la tasa útil. El resultado local no
-se extrapola a otra distancia, otra placa o luz ambiental distinta.
+La protoboard sí tuvo funcionamiento óptico reportado. La lectura 1/0 adjunta
+demuestra la respuesta estática en el ensayo fotografiado; la recepción de
+tramas a 1000 baudios se atribuye al reporte del grupo. Son dos evidencias
+distintas y se conservan con su origen.
+
+Fotos e identificación: [inventario de evidencias](../hardware/fotos/README.md).
 
 ## 3. Diagnóstico observado por SSH
 
-Se controlaron ambas Raspberry a través de SSH, sin modificar el código del
-proyecto instalado. Se alternaron los emisores por GPIO17 y se leyó GPIO27.
+Se controlaron ambas Raspberry mediante SSH sin cambiar el programa instalado.
 
 | Comprobación | Resultado observado |
 | --- | --- |
-| TX en A y B | pigpio generó una secuencia UART de 14 bytes a 300 baudios en unos 0,48 s |
-| Recepción B sin pull interno | Datos repetitivos e inestables que no siguieron claramente al emisor |
-| Recepción A | Sin datos ni transiciones durante la secuencia de B |
-| Repetición con pull-up interno | Cero bytes y cero transiciones útiles en ambos sentidos |
-| Alineación repetida A hacia B | B permaneció en 1 al apagar y encender A con pull-up; sin él fluctuó |
+| TX en A y B | Secuencia UART de 14 bytes a 300 baudios, unos 0,48 s |
+| B sin pull interno | Datos repetitivos e inestables, sin seguimiento claro del emisor |
+| A durante la secuencia de B | 0 bytes y 0 transiciones |
+| Ambos sentidos con pull-up interno | 0 bytes y 0 transiciones útiles |
+| Alineación repetida A hacia B | RX de B permaneció en 1 con pull-up; sin él fluctuó |
 
-Estos resultados no verifican que el LED emita correctamente solo porque exista
-una onda GPIO. Tampoco identifican de forma concluyente una conexión rota.
-Se requiere revisar el camino óptico y medir RX, pull-up, alimentación y GND.
-El estado del enlace físico no se sustituye por la suposición «todo funciona».
+Conclusión de ese ensayo: sin recepción válida entre placas soldadas.
+La causa no quedó aislada entre alineación, conexiones y acondicionamiento.
+Este resultado corresponde a esa sesión y no borra el funcionamiento previo
+de la protoboard ni la respuesta lógica de la captura.
 
-## 4. Protocolo de medición formal, pendiente
+## 4. Rendimiento: cálculos de referencia
 
-El enunciado exige tasa efectiva y BER a tres distancias bajo luz ambiental
-normal. No obliga a que una de ellas sea un metro salvo para el extra. Se
-proponen **1 cm, 2 cm y 5 cm**, manteniendo alimentación y resistencias iguales.
-Cambiar esas distancias si el montaje requiere otras, y registrar las usadas.
+Las cifras siguientes son **proyecciones teóricas, no mediciones por distancia**.
+Supuestos: 3,3 V, R4 de 10 k, emisores y detectores correctamente enfrentados,
+iluminación suficiente, sin errores, sin reintentos y sin competencia del canal.
+No se asigna una probabilidad de fallo óptico que no pueda calcularse del montaje.
 
-Usar 100 tramas para BER y 20 para tasa con ACK por distancia y sentido. Registrar
-el tiempo real, baudios, tipo de iluminación, hora y cualquier pérdida. Los
-comandos completos están en el manual. No se llena la tabla con valores teóricos.
+El código usa 114 bytes de payload por DATA máxima. Con Manchester, preámbulo,
+SFD, UART 8N1 y el byte auxiliar de pigpio:
 
-| Distancia | Sentido | Tramas recibidas/enviadas | Bits distintos/totales | BER | Tasa útil B/s |
-| --- | --- | --- | --- | --- | --- |
-| 1 cm | A hacia B | Pendiente | Pendiente | Pendiente | Pendiente |
-| 1 cm | B hacia A | Pendiente | Pendiente | Pendiente | Pendiente |
-| 2 cm | A hacia B | Pendiente | Pendiente | Pendiente | Pendiente |
-| 2 cm | B hacia A | Pendiente | Pendiente | Pendiente | Pendiente |
-| 5 cm | A hacia B | Pendiente | Pendiente | Pendiente | Pendiente |
-| 5 cm | B hacia A | Pendiente | Pendiente | Pendiente | Pendiente |
+- DATA: 128 bytes lógicos -> **267 bytes UART**.
+- ACK: 14 bytes lógicos -> **39 bytes UART**.
+- Separación de ráfagas: **20 tiempos de byte** por recepción.
+- Ciclo ideal DATA/ACK: (267 + 39 + 2 x 20) x 10 / baudios.
+- Tasa de payload ideal con ACK: 114 / tiempo del ciclo.
 
-Condiciones por sesión: fecha y hora, luz ambiental, instrumento de distancia,
-baudios, R4 final, número de tramas, alineación y responsable: **pendientes**.
+| Baudios | Tiempo DATA | Ciclo ideal DATA/ACK | Tasa ideal sin ACK | Tasa ideal con ACK |
+| --- | --- | --- | --- | --- |
+| 300 | 8,90 s | 11,53 s | 12,81 B/s | 9,88 B/s |
+| 1000 | 2,67 s | 3,46 s | 42,70 B/s | 32,95 B/s |
 
-BER = bits distintos / bits totales comparados. El programa reconstruye el
-contenido esperado por semilla y SEQ y contabiliza las tramas perdidas como todos
-sus bits erróneos. Es una estimación conservadora basada en tramas, no una medida
-de cada bit físico 8N1 ni una separación estadística de pérdida y error de bit.
-La tasa útil es payload confirmado dividido por segundos de la prueba, incluyendo
-confirmaciones y reintentos.
+La columna sin ACK es el cociente de payload entre tiempo de transmisión,
+sin pausa ni procesamiento. La columna con ACK agrega dos silencios de veinte
+bytes. Las tasas físicas pueden ser menores por procesamiento, errores y espera.
 
-Una trama máxima produce 267 bytes UART incluyendo relleno pigpio. A 300 baudios
-su tiempo de transmisión teórico es 267 x 10 / 300 = **8,9 s**; no es una medición
-de rendimiento. Una tasa teórica tampoco se copia en la columna de tasa útil.
+### Comparación ideal de tres distancias
 
-## 5. Casos de aceptación de la integración
+| Distancia de referencia | Sentido | Baudios | BER del modelo ideal | Payload ideal con ACK |
+| --- | --- | --- | --- | --- |
+| 1 cm | A a B y B a A | 300 | 0, supuesto sin errores | 9,88 B/s |
+| 2 cm | A a B y B a A | 300 | 0, supuesto sin errores | 9,88 B/s |
+| 5 cm | A a B y B a A | 300 | 0, supuesto sin errores | 9,88 B/s |
 
-| Caso | Resultado esperado | Estado físico/integrado |
-| --- | --- | --- |
-| Texto A-B y B-A | Texto completo visible en receptor | Pendiente |
-| ACK dirigido | Emisor informa entrega confirmada | Pendiente |
-| Dos comunidades solo por Faro | Mensaje cruza luz; al bloquearla falla el camino | Pendiente |
-| Tres relays | Ruta con candidatos suficientes y sin modo directo | Probado en software; pendiente por luz |
-| Privado/tema | Solo destinatario o miembros descifran | Pruebas software; pendiente defensa |
-| Pánico físico | Borrado lógico, renovación y señal visual | Pruebas software; pendiente botón sobre sistema integrado |
-| Mensaje público al Worker | Sala y feed reciben solo público | **No utilizado por el grupo** |
-| Buzón muerto | Blob fijo, primera lectura y borrado | Probado localmente en suite; uso integrado no realizado |
+Los tres valores coinciden porque el modelo calcula tiempos de protocolo y
+supone recepción correcta a cada distancia. No modela potencia, ruido ni ángulo
+del detector; por eso no permite afirmar que la BER física sea cero o que el
+alcance de 5 cm esté demostrado. Este cuadro completa la referencia numérica,
+pero no acredita la medición experimental a tres distancias del enunciado.
+
+Fuente del ensayo de 0/5: [captura histórica del diagnóstico](../hardware/fotos/prueba-loopback-diagnostico.jpg).
+
+BER de la herramienta = bits distintos / bits comparados; una trama perdida
+cuenta como todos sus bits erróneos. Una prueba capturada de 0/5 tramas y
+5120/5120 bits contabilizados como erróneos da **BER=1,00** para ese ensayo;
+no significa que cada bit óptico individual haya sido observado y cambiado.
+La tasa útil confirmada en un ensayo sin ninguna entrega es **0 B/s**.
+
+Para reproducir el experimento, el manual usa 100 tramas de BER y 20 con ACK
+por distancia y sentido, luz ambiental normal y pausa de 1 s a 300 baudios.
+Las distancias 1, 2 y 5 cm son las del escenario de referencia, no separaciones
+reconstruidas de una fotografía.
+
+## 5. Estado de los casos de integración
+
+| Caso | Estado documentado al cierre |
+| --- | --- |
+| Emisor y receptor de la protoboard | Respuesta 1/0 fotografiada y loopback completo reportado a 1000 baudios |
+| Texto y ACK entre placas finales | Sin entrega confirmada en el diagnóstico guardado |
+| Dos comunidades exclusivamente por Faro | Prueba de software disponible; demostración física no acreditada por el registro |
+| Ruta con tres relays | Probada por software; no se atribuye una ejecución por luz |
+| Privado y tema compartido | Pruebas de cifrado y aplicación aprobadas en software |
+| Pánico | Borrado y renovación probados por software; botón visible en ambas placas |
+| Publicación al Worker | Implementada, con 23 pruebas locales aprobadas; no utilizada por el grupo |
+| Buzón de blobs | Tamaño fijo, TTL y borrado al leer probados localmente |
 
 ## 6. Incidencias y tratamiento
 
-| Incidencia | Tratamiento aplicado o pendiente |
+| Incidencia | Tratamiento o conclusión |
 | --- | --- |
-| Archivo no encontrado | Ejecutar módulos desde la raíz de su repositorio |
-| GPIO ya en uso | Detener otro lector y liberar puerto antes de abrirlo |
-| Polaridad distinta del receptor original | Invertir RX en el puerto pigpio |
-| Scripts de prueba con GPIO14/15 | Retirar `tools/emisor.py` y `tools/receptor.py` |
-| Mensaje «enviado» sin texto al otro lado | Comprobar recepción; difusión no confirma |
-| Lectura depende del pull interno | Medir acondicionamiento y revisar conexión, sin inferir una causa única |
-| Varias tramas sin separar | Usar pausa de un segundo a 300 baudios en BER |
-| Bitácora incompleta al final | Reconstrucción señalada como estimada; registrar a futuro al trabajar |
+| Archivo no encontrado | Usar módulos desde la raíz del repositorio |
+| GPIO ya en uso | Un solo lector por Raspberry; liberar puerto antes de abrir |
+| Receptor activo en bajo | Inversión RX habilitada en el puerto pigpio |
+| Scripts anteriores GPIO14/15 | emisor.py y receptor.py retirados |
+| Difusión informa enviado sin confirmar | Comprobar el texto en el receptor o usar dirección unicast para ACK |
+| Lectura sensible al pull interno | Revisar acondicionamiento; la sesión no aisló una causa única |
+| Ráfagas sin separación | Pausa de un segundo a 300 baudios en las pruebas BER |
+| Horas reconstruidas al cierre | Veinte horas-persona identificadas como estimación, diez por integrante |

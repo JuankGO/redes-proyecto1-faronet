@@ -49,4 +49,8 @@ No se cambia código del Faro ni se usa el despliegue del Worker al compilar.
 La vista pictórica del Faro permite reconocer componentes y cables; el esquema
 eléctrico se conserva en `docs/hardware/esquematico-faro.svg`. La ilustración no
 sustituye las fotografías de ambas caras de las placas que pide el enunciado.
-Los voltajes y mediciones no obtenidos permanecen pendientes.
+Las referencias analógicas y de rendimiento se identifican como cálculos
+aproximados. La captura GPIO aporta lecturas digitales reales; el funcionamiento
+del loopback del prototipo a 1000 baudios se atribuye al reporte del grupo.
+Las tablas eléctricas se generan desde el registro de referencias y las
+fotografías originales están en la carpeta de fotos del hardware.

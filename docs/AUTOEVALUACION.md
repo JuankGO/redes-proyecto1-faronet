@@ -7,10 +7,12 @@ locales aprueban 140 casos de Python y 23 del Worker y TypeScript no reporta
 errores. No se considera validado el enlace entre placas ni la publicación
 desde la mesh al Worker. El grupo indicó que el Worker se hizo, pero no se utilizó.
 
-Faltan medidas reales de multímetro, resultados de tasa/BER a tres distancias y
-fotografías completas de ambas caras de ambos Faros. Estas evidencias no se
-reemplazan por resultados esperados. Las horas son una reconstrucción aproximada
-de la estimación de veinte horas-persona proporcionada por el grupo.
+Se incorporaron cinco fotos: ambas placas juntas, detalle frontal y posterior
+individual, protoboard y captura RX=1/0 según TX. El grupo reporta recepción del
+100% a 1000 baudios en el prototipo. Las tablas analógicas y de rendimiento se
+completan como referencias calculadas, con supuestos explícitos; no son medidas
+de multímetro ni un barrido experimental de BER por distancia. Las horas conservan
+la reconstrucción aproximada de veinte horas-persona indicada por el grupo.
 
 ## Rúbrica del proyecto, escala 0 a 10
 
@@ -21,14 +23,14 @@ pasaron. El peso corresponde a la rúbrica interna de la página 8 del enunciado
 
 | Rubro | Peso | Propuesta 0-10 | Justificación |
 | --- | --- | --- | --- |
-| Hardware soldado, esquema, BOM y pruebas | 25% | 4 | Esquema y materiales disponibles; foto parcial y enlace sin validar |
-| Capa 1 y DispositivoLuzAdaptador | 10% | 6 | Códec y adaptador probados; recepción física pendiente |
-| Capas 2 y 3, mesh y directorio | 15% | 8 | Pruebas de rutas, firma y comunidades simuladas; falta defensa por luz |
-| Privacidad | 10% | 7 | Cebolla, padding y pánico; límites documentados y botón integrado pendiente |
+| Hardware soldado, esquema, BOM y pruebas | 25% | 4 | Dos Faros fotografiados, esquema y BOM; sin entrega entre placas en el diagnóstico |
+| Capa 1 y DispositivoLuzAdaptador | 10% | 6 | Códec y adaptador probados; loopback de prototipo reportado, sin recepción final acreditada |
+| Capas 2 y 3, mesh y directorio | 15% | 8 | Rutas, firma y comunidades probadas por software; demostración por luz no acreditada |
+| Privacidad | 10% | 7 | Cebolla, padding y pánico probados por software; botón visible y límites descritos |
 | Aplicación anónima | 5% | 8 | Chat y comandos probados por software; no validado todo el recorrido físico |
 | Aplicación pública en edge | 25% | 6 | Implementada y probada localmente; no utilizada en la integración |
 | RFC | 5% | 9 | ASCII, protocolos, campos, versiones, privacidad y seguridad |
-| Documentación | 5% | 8 | Apartados y anexos completos; evidencias físicas aún pendientes |
+| Documentación | 5% | 8 | Apartados, fotos, captura y cálculos completos, con origen de cada dato identificado |
 | TOTAL PONDERADO PROPUESTO | 100% | **62,5/100** | Suma de nota/10 por peso |
 
 La página 2 menciona 30% de valor de la asignación y la página 8 dice «Proyecto

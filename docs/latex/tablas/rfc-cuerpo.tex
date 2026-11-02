@@ -96,7 +96,7 @@ Tabla de contenidos
       10.1.  Referencias normativas
       10.2.  Referencias informativas
    Apendice A.  Vectores de prueba
-   Apendice B.  Mediciones de desempeno
+   Apendice B.  Rendimiento y referencias calculadas
    Apendice C.  Estado de implementacion y validacion
 1.  Introduccion
 
@@ -1281,42 +1281,54 @@ Apendice A.  Vectores de prueba
 
    TEMA del tema "futbol": 25 6F 65 61 90 71 DE B8.
 
-Apendice B.  Mediciones de desempeno
+Apendice B.  Rendimiento y referencias calculadas
 
-   El enunciado exige BER y tasa efectiva a tres distancias bajo luz
-   ambiental normal. No exige un metro salvo para el extra. La guia
-   propone 1 cm, 2 cm y 5 cm, que DEBEN reemplazarse por las tres
-   distancias reales usadas si se modifica el procedimiento.
+   El grupo reporto recepcion del 100% de tramas a 1000 baudios en la
+   protoboard y un limite proximo a 1050. La captura GPIO documenta
+   TX17=0 -> RX27=1 y TX17=1 -> RX27=0.
 
-   Medidas fisicas al corte del 1 de noviembre de 2026: PENDIENTES.
-   No se deduce BER cero ni tasa util del resultado de pytest.
+   Las cifras siguientes son un escenario teorico sin errores, no
+   mediciones de BER por distancia. Se supone luz suficiente y
+   alineacion correcta en ambos sentidos, sin reintentos ni colision.
 \end{Verbatim}
 \newpage
 \begin{Verbatim}
-      Distancia   Sentido    BER           Tasa util (B/s)
-      1 cm        A -> B     PENDIENTE     PENDIENTE
-      1 cm        B -> A     PENDIENTE     PENDIENTE
-      2 cm        A -> B     PENDIENTE     PENDIENTE
-      2 cm        B -> A     PENDIENTE     PENDIENTE
-      5 cm        A -> B     PENDIENTE     PENDIENTE
-      5 cm        B -> A     PENDIENTE     PENDIENTE
+      Distancia   Sentido        Baudios   BER ideal   Tasa con ACK
+      1 cm        A->B y B->A    300       0 (*)       9.88 B/s
+      2 cm        A->B y B->A    300       0 (*)       9.88 B/s
+      5 cm        A->B y B->A    300       0 (*)       9.88 B/s
 
-   Registrar fecha, luz, distancia, baudios, R4, cantidad de tramas,
-   bits distintos, perdidas, tiempo y bytes confirmados. La BER
-   reportada por medir incluye todos los bits de una trama perdida
-   como erroneos: es una estimacion conservadora basada en tramas,
-   no un instrumento que mida cada bit fisico UART.
+   (*) Cero es un supuesto del modelo sin errores, no una lectura.
+   Las tres filas coinciden porque no se modela perdida optica por
+   distancia. El cuadro no acredita el barrido experimental exigido.
 
-   A 300 baudios una trama maxima con el auxiliar tarda en teoria
-   267 * 10 / 300 = 8.9 s. Este calculo no es una medida de tasa.
-   Fuente de resultados: docs/bitacora/pruebas.md.
+   DATA maxima: 114 bytes de payload, 267 bytes UART con auxiliar.
+   ACK: 39 bytes UART. Se agregan dos silencios de veinte bytes.
+   A 300 baudios: DATA=8.90 s; ciclo=(267+39+40)*10/300=11.53 s;
+   tasa ideal con ACK=114/11.53=9.88 B/s.
+   A 1000 baudios: DATA=2.67 s; ciclo=3.46 s; tasa=32.95 B/s.
+   Procesamiento, esperas y errores pueden reducir estas tasas.
+
+   La herramienta cuenta una trama perdida como todos sus bits
+   erroneos. En la captura historica de 0/5 tramas, 5120/5120 bits
+   contabilizados dan BER=1.00 para ese ensayo. Sin entrega confirmada,
+   la tasa de payload confirmada es 0 B/s.
+   Fuente de resultados y supuestos: docs/bitacora/pruebas.md.
 
 Apendice C.  Estado de implementacion y validacion
 
    Se ejecutaron 140 pruebas Python y 23 pruebas locales del Worker;
    TypeScript se verifico sin errores. Son pruebas de software.
-   El enlace fisico entre placas no quedo validado en el diagnostico
-   del 1 de noviembre de 2026. Faltan voltajes y fotografias completas.
+   Se incorporaron fotos de los dos Faros construidos, detalle frontal
+   y posterior individual, protoboard y lectura GPIO. No se atribuye
+   una misma fotografia de soldadura a las dos placas.
+   El ultimo diagnostico entre placas no recupero tramas validas.
+   El funcionamiento previo de la protoboard se conserva como reporte.
+
+   El analisis electrico usa referencias calculadas: VCC=3.30 V,
+   VBE=0.70 V, VCE activo=0.20 V y caida IR supuesta de 1.20 V.
+   Con R1=330 ohmios, IIR=(3.30-1.20-0.20)/330=5.76 mA.
+   Estos valores no son lecturas de multimetro.
 
    El grupo implemento el Worker pero no lo utilizo en la demostracion
    integrada. URL informada:

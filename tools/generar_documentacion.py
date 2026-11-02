@@ -59,6 +59,10 @@ def preparar_tablas(actualizar_commits=False):
         (TABLES/f'horas-{label}.tex').write_text(longtable('P{2.1cm} P{10.8cm} r',
             ['Fecha estimada','Actividad','Horas'],table[1:]),encoding='utf-8')
 
+    electricas=tablas_md(ROOT/'docs/hardware/bitacora-pruebas-multimetro.md')[4]
+    (TABLES/'electricas.tex').write_text(longtable('P{8cm} P{2.6cm} P{2.6cm}',
+        electricas[0],electricas[1:]),encoding='utf-8')
+
     target=TABLES/'commits.tex'
     if actualizar_commits or not target.exists():
         log=subprocess.check_output(['git','log','--all','--date=short',

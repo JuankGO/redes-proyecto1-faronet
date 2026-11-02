@@ -48,7 +48,7 @@ un encapsulado transparente no demuestra por sí solo su longitud de onda.
 | MB102 y jumpers | 1 o más | Solo prototipado; no sustituyen placas soldadas |
 | PC, teclado, pantalla y cables Ethernet | Según montaje | Equipo de desarrollo reutilizado |
 | Cautín, base, pinzas y cortador | Un juego | Herramientas, no componentes de cada Faro |
-| Multímetro | 1 | Necesario para las mediciones exigidas; modelo y evidencia pendientes |
+| Multímetro | 1 | Instrumento de comprobación; registro eléctrico con referencias nominales calculadas |
 
 Si se necesitan fuentes nuevas, el presupuesto histórico contemplaba alrededor
 de CRC 5593 por las dos. El valor de circuitos más esas fuentes sería cercano a

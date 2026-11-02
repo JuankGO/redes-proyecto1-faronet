@@ -73,7 +73,7 @@ de una placa de islas no comparten conexión por filas. Usar headers soldados,
 evitar puentes accidentales y dejar acceso óptico al borde. El detector se aísla
 del LED propio mediante separación y material opaco.
 
-La foto del Faro B muestra la cara de componentes de una placa soldada. Faltan
-evidencias completas de ambas caras de A y B. No se certifica continuidad ni
-calidad del cobre mediante una imagen de componentes. Registrar la comprobación
-en la bitácora de multímetro.
+Las fotos finales muestran las dos placas por componentes y un detalle individual
+frontal y posterior. El índice de fotos identifica cada original sin atribuir una
+misma cara de soldadura a dos unidades. La captura 1/0 documenta respuesta óptica;
+el registro eléctrico aporta referencias calculadas de tensión y corriente.

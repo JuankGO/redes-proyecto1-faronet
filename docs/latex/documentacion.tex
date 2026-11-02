@@ -111,47 +111,94 @@ El multímetro es necesario para registrar continuidad, ausencia de cortos y
 voltajes. El consumo del LED se verifica midiendo su resistencia limitadora;
 un cálculo teórico no se presenta como corriente medida.
 
-\subsection{Fotografías y pruebas eléctricas}
+\clearpage
+\subsection{Fotografías y comprobación eléctrica}
 
-Se dispone de una fotografía del prototipo y de la cara de componentes de una
-placa soldada. Faltan las vistas finales de ambas caras del Faro A y la cara de
-cobre del Faro B. La protoboard documenta el desarrollo y no sustituye el Faro
-soldado requerido para la revisión.
+Las fotografías del cierre muestran los dos Faros construidos en placa
+perforada, sus componentes y el detalle individual de las soldaduras. Se
+observan los pares IR enfrentados, resistencias, transistor, indicadores,
+botón y conectores desmontables. Las tomas individuales no tienen una etiqueta
+A/B; se presentan por su contenido visible.
 
 \begin{figure}[!htbp]
 \centering
-\begin{minipage}{0.46\linewidth}
-\centering\includegraphics[height=5.0cm,keepaspectratio]{prototipo-a.jpg}
-\par\small Prototipo en MB102.
+\includegraphics[width=0.94\linewidth]{faros-conjunto-final.jpg}
+\par\smallskip{\small (a) Ambas placas, con los emisores y detectores enfrentados.}
+\par\medskip
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth,height=8.0cm,keepaspectratio,
+trim=360bp 0bp 440bp 0bp,clip]{placa-componentes-final.jpg}
+\par\small (b) Detalle individual de componentes.
 \end{minipage}\hfill
-\begin{minipage}{0.46\linewidth}
-\centering\includegraphics[height=5.0cm,keepaspectratio]{faro-b-componentes.jpg}
-\par\small Placa soldada, componentes.
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth,height=8.0cm,keepaspectratio,
+trim=400bp 0bp 480bp 0bp,clip]{placa-soldaduras-final.jpg}
+\par\small (c) Detalle individual de soldaduras.
 \end{minipage}
-\caption{Evidencia fotográfica disponible del desarrollo.}
+\caption{Montaje final. Los originales completos se conservan en el repositorio.}
 \end{figure}
 
-No se recibieron medidas de multímetro. La tabla conserva los valores pendientes;
-las lecturas digitales de GPIO no sustituyen la medición. Continuidad y cortos se
-comprueban sin energía; para tensión se toma GND como referencia.
+\clearpage
+\subsubsection*{Protoboard y respuesta del receptor}
 
-{\small
-\begin{longtable}{P{6.3cm} P{4.1cm} P{1.4cm} P{1.4cm}}
+La MB102 permitió ajustar el circuito antes de soldarlo. La foto muestra el
+PT333 negro junto al LED IR transparente, el transistor driver y sus
+resistencias. Para el loopback se ajustó la orientación del emisor hacia el
+detector de la misma placa. El grupo reportó recepción completa de las tramas
+a 1000 baudios y un límite próximo a 1050; a 1000 se mantuvo el margen de trabajo.
+Ese resultado corresponde al prototipo.
+
+\begin{figure}[!htbp]
+\centering
+\begin{minipage}[t]{0.48\linewidth}
+\centering\includegraphics[width=\linewidth,height=8.5cm,keepaspectratio]{prototipo-detalle-ir.jpg}
+\par\small Prototipo con emisor y detector próximos.
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\centering\includegraphics[width=\linewidth,height=8.5cm,keepaspectratio]{prueba-gpio-1-0.jpg}
+\par\small Captura original de la lectura digital.
+\end{minipage}
+\caption{Configuración de desarrollo y comprobación de la respuesta óptica.}
+\end{figure}
+
+La captura permite transcribir dos comprobaciones concretas:
+
+\begin{center}
+\begin{tabular}{lll}
 \toprule
-Comprobación & Condición esperada & Faro A & Faro B\\
-\midrule\endhead
-Continuidad de 3V3, GND y señales hasta J1 & Cada segmento llega a su destino & \pendiente & \pendiente\\
-Ausencia de corto entre VCC y GND & Sin puente directo estable & \pendiente & \pendiente\\
-Resistencias y patillaje de semiconductores & Coinciden con el esquema & \pendiente & \pendiente\\
-Alimentación de la placa & Cercana a 3,3 V & \pendiente & \pendiente\\
-Base de Q1 con TX activo & Unión B-E conduciendo & \pendiente & \pendiente\\
-Colector de Q1 con TX activo & Nivel bajo & \pendiente & \pendiente\\
-RX con detector oscuro & Cercano a 3,3 V & \pendiente & \pendiente\\
-RX con luz enfrentada & Nivel bajo, objetivo menor a 0,5 V & \pendiente & \pendiente\\
-Caída en 330 ohmios & Registrar para calcular I=V/330 & \pendiente & \pendiente\\
-Botón suelto / presionado & Alto con pull-up / bajo & \pendiente & \pendiente\\
+GPIO17 (emisor) & GPIO27 (receptor) & Resultado observado\\
+\midrule
+0: apagado & 1 & RX alto sin emisión\\
+1: encendido & 0 & RX bajo con emisión\\
 \bottomrule
-\end{longtable}}
+\end{tabular}
+\end{center}
+
+El detector conduce al recibir luz y baja el colector; sin emisión, el pull-up
+mantiene RX alto. Esto explica la inversión habilitada en la recepción UART.
+La foto demuestra esa respuesta estática. El éxito de las tramas del prototipo
+se conserva como resultado reportado por el grupo.
+
+\Needspace{23\baselineskip}
+\subsubsection*{Valores eléctricos de referencia}
+
+La siguiente tabla completa el análisis con valores aproximados del esquema,
+\textbf{calculados, no medidos con multímetro}. Se fijan 3,30~V de alimentación,
+1,20~V de caída del IR, 0,70~V de base y 0,20~V de saturación. Los dos Faros usan
+el mismo modelo; por eso sus columnas coinciden.
+
+\input{tablas/electricas}
+
+Por ley de Ohm, la caída en R1 es \(3,30-1,20-0,20=1,90\)~V y
+\(I_{\mathrm{IR}}=1,90/330\approx5,76\)~mA. La corriente de base, descontando
+R3, es \((3,30-0,70)/2200-0,70/10000\approx1,11\)~mA.
+Para continuidad se fija como objetivo menos de 1~ohmio en una unión directa,
+con las puntas compensadas y sin energía; el botón aislado debe indicar
+OL abierto y menos de 1~ohmio pulsado. El diseño contempla cero puentes
+metálicos ajenos al esquema. No se asigna una resistencia total VCC--GND,
+porque condensador y semiconductores influyen en su lectura.
 
 \subsection{Protocolo físico}
 
@@ -167,26 +214,35 @@ espera ACK y admite reintentos; la difusión no confirma recepción. Las direcci
 físicas son de cuatro bytes y se guardan en microSD. El nodo las rota al arrancar,
 periódicamente y al activar pánico. La biblioteca acepta tramas externas válidas.
 
-Se inicia explícitamente a 300 baudios y se ajusta solo después de medir el enlace.
-La tasa útil y BER deben medirse a tres distancias con luz ambiental normal.
-Se proponen 1, 2 y 5 cm; los resultados están pendientes y no se sustituyen por
-la velocidad configurada ni por una prueba simulada.
+Se inicia explícitamente a 300 baudios. Para disponer de una referencia numérica
+se calcula un \textbf{escenario ideal, no una medición experimental}: 114 bytes
+de payload, luz suficiente, sin errores ni reintentos y sin competencia por
+el canal. DATA ocupa 267 bytes UART y ACK, 39. Sumando dos silencios de veinte
+tiempos de byte, el ciclo es \((267+39+40)\times10/300=11,53\)~s y la tasa
+ideal de payload con ACK es \(114/11,53\approx9,88\)~B/s.
 
 {\small
-\begin{tabularx}{\linewidth}{l l X X X}
+\begin{tabularx}{\linewidth}{l l l X X}
 \toprule
-Distancia & Sentido & Recibidas / enviadas & BER & Tasa útil B/s\\
+Distancia de referencia & Sentido & Baudios & BER ideal, supuesta & Tasa ideal con ACK\\
 \midrule
-1 cm & A a B / B a A & Pendiente & Pendiente & Pendiente\\
-2 cm & A a B / B a A & Pendiente & Pendiente & Pendiente\\
-5 cm & A a B / B a A & Pendiente & Pendiente & Pendiente\\
+1 cm & A a B / B a A & 300 & 0 & 9,88 B/s\\
+2 cm & A a B / B a A & 300 & 0 & 9,88 B/s\\
+5 cm & A a B / B a A & 300 & 0 & 9,88 B/s\\
 \bottomrule
 \end{tabularx}}
 
+Las filas coinciden porque el modelo solo calcula tiempos y supone recepción
+correcta; no predice ruido, ángulo ni alcance. BER=0 es una hipótesis del
+escenario y no un resultado físico. Estas referencias no acreditan el barrido
+experimental a tres distancias. Con los mismos supuestos a 1000 baudios,
+el ciclo sería 3,46~s y la tasa ideal, 32,95~B/s.
+
 La herramienta de BER compara contenidos conocidos y cuenta todos los bits de
 una trama perdida como erróneos. La tasa útil divide el payload confirmado entre
-el tiempo total, incluyendo ACK y reintentos. Hay que registrar fecha, luz,
-distancia, baudios, cantidad de tramas y resistencia del receptor en cada sesión.
+el tiempo total, incluyendo ACK y reintentos. En una captura de diagnóstico
+de 0/5 tramas, los 5120/5120 bits se contabilizaron como erróneos: BER=1,00 según
+esa convención. Es un ensayo distinto del éxito reportado del prototipo.
 
 \subsection{Mesh, aplicación y edge}
 
@@ -230,6 +286,7 @@ No se promete anonimato ante un observador global, Sybil o un sistema operativo
 comprometido. HELLO y RUTA no están firmados en v1. El botón de GPIO24 borra
 estado sensible de forma lógica, renueva identidad y activa los indicadores.
 
+\Needspace{10\baselineskip}
 \section{Estructuras de datos usadas y funciones}
 
 Los enteros binarios de varios bytes usan orden de red. El formato y los campos
@@ -244,7 +301,7 @@ Módulo & Estructura o función & Responsabilidad\\
 \texttt{faro.frame} & \texttt{Trama}, \texttt{codificar}, \texttt{decodificar}, \texttt{crc16} & Validar cabecera, longitudes, versión y CRC; construir bytes de trama.\\
 \texttt{faro.linea} & \texttt{armar\_senal}, \texttt{extraer\_trama} & Manchester, preámbulo, delimitador y recuperación de trama.\\
 \texttt{faro.serie\_pigpio} & \texttt{SeriePigpio}, buffer de bytes & UART por GPIO17/27, inversión RX, envío por ondas y cierre del lector.\\
-\texttt{DispositivoLuz\allowbreak{}Adaptador} & Secuencia, pendientes y contadores & Acceso al medio, ACK, reintentos y duplicados; \texttt{enviar\_crudo} valida tramas externas.\\
+\texttt{DispositivoLuz\allowbreak{}Adaptador} & Secuencia, cola de espera y contadores & Acceso al medio, ACK, reintentos y duplicados; \texttt{enviar\_crudo} valida tramas externas.\\
 Identidad y pánico & Llaves, dirección y archivos locales & Crear, persistir, rotar y borrar estado; \texttt{Nodo.panico} renueva identidad y vacía tablas.\\
 Vecinos y rutas & \texttt{TablaVecinos}, \texttt{TablaRutas} & Registrar vecinos directos, costos y vencimientos.\\
 Directorio & \texttt{Directorio}, \texttt{firmar}, \texttt{verificar} & Comprobar estructura, vigencia y firma de entradas.\\
@@ -457,14 +514,18 @@ y pruebas de código escrito antes de esas fechas.
 
 Se aprobaron 140 pruebas Python, 23 del Worker local y la comprobación de
 TypeScript. Esto valida partes del software, no soldaduras, voltajes ni alcance.
-El grupo reportó un loopback de protoboard estable a 1000 baudios; no reemplaza
-las mediciones formales de tasa útil y BER a tres distancias.
+El grupo reportó un loopback de protoboard con recepción del 100\% a 1000 baudios.
+Se incorporaron las fotografías de las placas construidas, el prototipo y la
+captura de RX=1/0 según el estado del emisor.
 
 El diagnóstico entre los dos Faros no confirmó recepción válida: ambas Raspberry
 generaban pulsos TX, pero no se recuperó una secuencia útil en el otro extremo.
-Se requiere comprobar el acondicionamiento de RX y el camino óptico. Las
-mediciones de multímetro y las fotografías finales faltantes permanecen pendientes.
-El Worker se implementó y se probó localmente, pero no se utilizó integrado.
+La causa no quedó aislada entre acondicionamiento de RX, conexiones y camino
+óptico. El registro se cierra con ese resultado y con el funcionamiento previo
+del prototipo identificado por separado. Las tablas analógicas y de rendimiento
+contienen referencias calculadas con sus supuestos; no se presentan como lecturas
+de multímetro ni como una medición de BER por distancia. El Worker se implementó
+y se probó localmente, pero no se utilizó integrado.
 
 Persisten límites de correlación de tráfico, anuncios HELLO/RUTA sin firma,
 exposición de direcciones en el directorio y borrado no forense en microSD.
@@ -495,10 +556,11 @@ Resultado ponderado propuesto & 100\% & 62,5 / 100\\
 \bottomrule
 \end{tabularx}}
 
-El hardware tiene evidencia parcial y requiere validación; la capa física no ha
-demostrado el enlace entre placas. Mesh y aplicación cuentan con pruebas de
-software. El edge se implementó sin utilizarse en la integración. RFC y
-documentación incluyen lo exigido, con evidencia pendiente expresamente indicada.
+El hardware cuenta con fotografías de construcción y respuesta estática del
+detector; el registro del enlace entre placas no demuestra entrega de tramas.
+Mesh y aplicación cuentan con pruebas de software. El edge se implementó sin
+utilizarse en la integración. RFC y documentación distinguen evidencia observada,
+resultados reportados y referencias de cálculo.
 
 \subsection{Aprendizaje}
 

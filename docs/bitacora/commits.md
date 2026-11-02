@@ -1,9 +1,8 @@
 # Reporte de commits de Git
 
-Corte: historial previo al commit de esta entrega, incluyendo la rama que
-contenía las pruebas UART retiradas. Los títulos y autores se conservan como
-aparecen en Git. El hash del commit documental se consulta en GitHub; no se
-intenta incluir un commit dentro de su propio contenido.
+Corte: historial de todas las ramas anterior al commit de esta revisión.
+Se conservan los autores originales. Este reporte no calcula horas ni
+atribuye entregas de hardware por el número de commits.
 
 ## Resumen por autor del historial
 
@@ -11,17 +10,17 @@ intenta incluir un commit dentro de su propio contenido.
 | --- | --- |
 | Jimmy Castillo Guzman | 1 |
 | Jimmy Castillo Guzmán | 3 |
+| JimmyCR | 3 |
 | JimmyCR1 | 1 |
 | JuankGO | 14 |
-
-Los nombres JimmyCR1 y las variantes de Jimmy Castillo corresponden a firmas
-distintas del historial; no se convierten automáticamente en horas. Se incluyen
-merges y commits de código, por lo que los conteos no miden esfuerzo.
 
 ## Detalle
 
 | Commit | Fecha | Autor | Descripción |
 | --- | --- | --- | --- |
+| 6ee9258 | 2026-11-01 | JimmyCR | Pasar documentacion a LaTeX y agregar vista de montaje |
+| c4234a3 | 2026-11-01 | JimmyCR | Conservar PDF y fotografias como archivos binarios |
+| 4da62e1 | 2026-11-01 | JimmyCR | Documentar entrega FaroNet y unificar montaje GPIO17/27 |
 | 891e5eb | 2026-10-30 | Jimmy Castillo Guzmán | test(faro): scripts de prueba cruda de emisor y receptor por UART |
 | c7a3b9b | 2026-10-30 | JuankGO | Merge pull request #4 from JuankGO/faro-simplificado |
 | f4538c1 | 2026-10-30 | Jimmy Castillo Guzmán | feat(faro): modo loopback en faro.medir para probar un solo Faro |
@@ -42,14 +41,5 @@ merges y commits de código, por lo que los conteos no miden esfuerzo.
 | 10139f8 | 2026-10-12 | JuankGO | Estructura inicial del repositorio |
 | b77a1c2 | 2026-09-30 | JuankGO | Initial commit |
 
-## Reproducir el reporte
-
-```bash
-git log --all --date=short --format="%h %ad %an %s"
-git shortlog -s -n --all
-git log --all -- tools/emisor.py tools/receptor.py
-```
-
-La última orden permite revisar el alta y la retirada de los dos scripts.
-Su eliminación no reescribe el historial. Las pruebas oficiales se conservan
-como módulos del paquete faro.
+El corte coincide con la tabla incluida en el informe LaTeX.
+El commit que contiene estos archivos no se incluye dentro de sí mismo.

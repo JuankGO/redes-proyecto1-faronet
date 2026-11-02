@@ -9,6 +9,10 @@ de software y las mediciones físicas se reportan por separado.
 
 ## Entrega
 
+Se incluyen fotografías finales y la captura de lectura óptica 1/0. Las tablas
+analógicas y de rendimiento contienen referencias calculadas identificadas;
+el loopback completo de la protoboard a 1000 baudios es un resultado reportado por el grupo.
+
 - [Informe LaTeX](docs/latex/documentacion.tex) e [instrucciones de compilación](docs/latex/README.md).
 - [Vista de montaje](docs/hardware/montaje-faro.svg), [esquema eléctrico](docs/hardware/esquematico-faro.svg) y [materiales en colones](docs/hardware/BOM.md).
 - [Multímetro](docs/hardware/bitacora-pruebas-multimetro.md), [pruebas](docs/bitacora/pruebas.md), [horas](docs/bitacora/horas.md) y [commits](docs/bitacora/commits.md).
