@@ -52,7 +52,7 @@ identifica implementación y documentos; no convierte un requisito en aprobado.
 | Rúbrica 0-10 y aprendizaje 1-5 | Autoevaluación | Propuesta para revisión del grupo |
 | Lecciones y bibliografía | Informe, secciones 8-9 | Preparado |
 | Código documentado | Docstrings y API | Presente |
-| Markdown/ASCII y PDFs | `docs/` y `output/pdf/` | Generados desde fuentes |
+| LaTeX/ASCII y PDFs | `docs/latex/`, `docs/rfc/` y `output/pdf/` | Generados desde fuentes |
 | URL pública | Manual e informe | Informada, no usada en demostración |
 | Kick-off | `KICKOFF.md` | Reconstruido; no acredita entrega histórica |
 

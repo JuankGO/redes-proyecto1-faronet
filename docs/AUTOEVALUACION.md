@@ -2,7 +2,7 @@
 
 ## Estado de entrega
 
-Se prepararon fuentes, manual, RFC, esquema, BOM, bitácoras y PDFs. Las pruebas
+Se prepararon fuentes LaTeX, manual, RFC, esquema, BOM, bitácoras y PDFs. Las pruebas
 locales aprueban 140 casos de Python y 23 del Worker y TypeScript no reporta
 errores. No se considera validado el enlace entre placas ni la publicación
 desde la mesh al Worker. El grupo indicó que el Worker se hizo, pero no se utilizó.

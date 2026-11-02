@@ -8,3 +8,12 @@ node_modules/
 *.pem
 direccion.bin
 .env
+.latex-build/
+docs/latex/*.aux
+docs/latex/*.log
+docs/latex/*.out
+docs/latex/*.toc
+docs/latex/*.xdv
+docs/latex/*.synctex.gz
+docs/latex/documentacion.pdf
+docs/latex/rfc.pdf

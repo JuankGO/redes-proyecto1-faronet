@@ -1,0 +1,64 @@
+% Formato comun: sin encabezados ni pies decorativos. Solo numero de pagina.
+\usepackage[letterpaper,left=2.3cm,right=2.3cm,top=2.0cm,bottom=2.2cm]{geometry}
+\usepackage{fontspec}
+\ifdefined\XeTeXgenerateactualtext\XeTeXgenerateactualtext=1\fi
+\usepackage[spanish,es-tabla]{babel}
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{\setmainfont{Latin Modern Roman}}
+\IfFontExistsTF{Arial}{\setsansfont{Arial}}{\setsansfont{Latin Modern Sans}}
+\setmonofont{lmmono10-regular.otf}[Ligatures=NoCommon]
+\usepackage{graphicx,longtable,booktabs,array,tabularx,enumitem}
+\usepackage{xcolor,hyperref,fvextra,needspace}
+\usepackage{xurl}
+\hypersetup{hidelinks,pdftitle={FaroNet},pdfauthor={Jimmy Castillo Guzman y Juan Carlos Gomez}}
+\urlstyle{same}
+\pagestyle{plain}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{2em}
+\linespread{1.07}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.13}
+\setlist[itemize]{nosep,leftmargin=*}
+\setlist[enumerate]{nosep,leftmargin=*}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\pendiente}{Pendiente}
+\DefineVerbatimEnvironment{codigo}{Verbatim}{fontsize=\small,breaklines=true,breakanywhere=true,breaksymbolleft={},breaksymbolright={},baselinestretch=1.0}
+\graphicspath{{figuras/}{../hardware/fotos/}}
+
+\newcommand{\portada}[1]{%
+\hypersetup{pageanchor=false}%
+\begin{titlepage}
+\thispagestyle{empty}
+\centering\sffamily\bfseries
+\vspace*{0.4cm}
+Instituto Tecnológico de Costa Rica\par
+\vspace{0.35cm}
+Centro Académico de Alajuela\par
+\vspace{0.5cm}
+\includegraphics[width=4.0cm]{logo-tec.png}\par
+\vspace{0.35cm}
+CURSO\par
+\vspace{0.35cm}
+IC-7602: Redes de Computadoras\par
+\vspace{0.4cm}
+#1\par
+\vspace{1.2cm}
+Estudiantes:\par
+\vspace{0.5cm}
+Jimmy Castillo Guzmán\par
+\vspace{0.3cm}
+Juan Carlos Gómez\par
+\vspace{1.2cm}
+Profesor:\par
+\vspace{0.4cm}
+Kevin Moraga\par
+\vspace{1.2cm}
+Fecha de entrega:\par
+\vspace{0.4cm}
+1 de noviembre de 2026\par
+\vspace{0.7cm}
+II Semestre 2026\par
+\end{titlepage}
+\setcounter{page}{1}
+\hypersetup{pageanchor=true}%
+}

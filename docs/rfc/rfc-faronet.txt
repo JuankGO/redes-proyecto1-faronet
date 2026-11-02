@@ -1,8 +1,3 @@
-Grupo de Trabajo: Redes de Computadoras               J. Castillo Guzman
-Request for Comments: 9999 (ficticio)                        J. C. Gomez
-Categoria: Experimental                                             ITCR
-                                                            Noviembre 2026
-
                 FaroNet: Enlace por Luz (Faro) y Red Mesh Anonima
                                  Version 1
 
@@ -30,12 +25,7 @@ Aviso de derechos
 
    Copyright (c) 2026 los autores.  Se permite copiar y distribuir este
    documento sin modificaciones con fines academicos.
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 1]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
 Tabla de contenidos
 
    1.  Introduccion
@@ -94,12 +84,7 @@ Tabla de contenidos
       8.5.  Ataques de Sybil
       8.6.  Repeticion
       8.7.  Robo del dispositivo
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 2]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
       8.8.  Seguridad del cableado
    9.  Consideraciones IANA
    10.  Referencias
@@ -108,8 +93,6 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    Apendice A.  Vectores de prueba
    Apendice B.  Mediciones de desempeno
    Apendice C.  Estado de implementacion y validacion
-   Agradecimientos
-   Direcciones de los autores
 1.  Introduccion
 
    FaroNet es una red construida desde el cobre hacia arriba.  Cada
@@ -156,12 +139,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
 
    Direccion fisica:  identificador de 4 bytes del Faro, analogo a una
       direccion MAC, almacenado en memoria no volatil y rotable.
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 3]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    Nodo:  programa que participa en la mesh.  Se identifica con una
       llave publica Ed25519 [RFC8032] de 32 bytes.
 
@@ -220,12 +198,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    de GPIO27 con inversion, para recuperar UART 8N1. El reposo
    transmitido es 1 (LED encendido) y el receptor iluminado vale 0
    fisicamente. El perfil conserva asi la polaridad UART logica.
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 4]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    Las dos puntas DEBEN usar los mismos baudios. Las herramientas
    conservan el valor CLI por defecto de 9600; este montaje se
    DEBERIA iniciar explicitamente con --baudios 300 y ajustar solo
@@ -281,12 +254,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    este perfil (266 de senal mas uno auxiliar).
 
 2.3.  Formato de la trama
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 5]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -344,12 +312,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    fisica ni la direccion de difusion.
 
 2.5.  Verificacion de integridad
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 6]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    El CRC es CRC-16/CCITT-FALSE: polinomio 0x1021, valor inicial
    0xFFFF, sin reflexion de entrada ni de salida y sin XOR final.  El
    valor de comprobacion para la cadena ASCII "123456789" es 0x29B1.
@@ -406,12 +369,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
 
    El enlace es half-duplex: los dos Faros comparten el turno de transmision.  El
    acceso al medio es CSMA con espera exponencial aleatoria:
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 7]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    1.  Antes de transmitir, el emisor verifica si el medio esta
        ocupado.  Se considera ocupado si la UART recibio al menos un
        byte en los ultimos 20 tiempos de byte.
@@ -468,12 +426,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
 
    o  enviar_crudo(trama_bytes): transmite una trama externa segun la
       Seccion 2.10.
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 8]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    o  recibir(timeout): devuelve la siguiente trama DATA o BEACON
       dirigida al nodo, o nada si vence el tiempo.
 
@@ -531,12 +484,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    UTF-8.  Todos los mensajes llevan:
 
    t (texto):  tipo de mensaje: "hello", "dir", "ruta" o "celda".
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 9]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    v (entero):  version del formato del mensaje.  Esta especificacion
       define la version 1.  Un receptor DEBE tratar la ausencia de "v"
       como version 1 y DEBE descartar mensajes con "v" mayor al que
@@ -591,12 +539,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    | ttl       | entero  | Segundos de validez, de 1 a 86400.          |
    | rol       | texto   | OPCIONAL.  "gateway" si el nodo es gateway. |
    +-----------+---------+---------------------------------------------+
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 10]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    La forma canonica de una entrada es su JSON con las llaves en orden
    alfabetico, sin espacios (separadores "," y ":") y codificado en
    UTF-8.  La firma es Ed25519 [RFC8032] sobre la forma canonica, con
@@ -649,12 +592,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
 
       {"t":"ruta","v":1,"id":"<64 hex>",
        "tabla":{"<id destino>":2,"<id destino>":3}}
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 11]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    El costo es la cantidad de saltos.  El valor 16 representa infinito
    (como en RIP [RFC2453]).  Al recibir el anuncio de un vecino V con
    costo c hacia D, el nodo acepta la ruta "D por V con costo c + 1" si
@@ -713,12 +651,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    bytes.
 
    Capa del destino:
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 12]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
       sobre_destino = Sellar(llave_destino, 0x00 || MENSAJE)
 
    Capa de cada relay, construida desde adentro hacia afuera:
@@ -776,12 +709,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    o  el primer relay conoce al origen pero no al destino;
 
    o  el tercer relay conoce al destino pero no al origen;
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 13]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    o  el relay del medio no conoce a ninguno de los dos.
 
    Ningun nodo intermedio conoce a la vez el origen y el destino, salvo
@@ -838,12 +766,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
 
    Dos comunidades separadas se conectan con un par de gateways unidos
    exclusivamente por un enlace Faro:
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 14]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    Comunidad A (UDP)                          Comunidad B (UDP)
    +-----+   +-----+   +-----------+    +-----------+   +-----+
    | N1  |---| N2  |---| Gateway A |~~~~| Gateway B |---| N3  |
@@ -899,12 +822,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    esa pista como verificada.
 
 4.3.  Temas privados
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 15]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    Un tema privado tiene una llave simetrica de 32 bytes que conocen
    solo sus miembros.  El mensaje de 256 bytes se cifra con
    crypto_secretbox (XSalsa20-Poly1305) y un nonce aleatorio de 24
@@ -952,12 +870,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    HTTP correspondiente.  Toda la configuracion vive en el archivo
    wrangler.jsonc del repositorio; los secretos se cargan con "wrangler
    secret put" y NO DEBEN subirse al repositorio.
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 16]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    +--------+----------------------+-------------+-------------------+
    | Metodo | Ruta                 | Autentic.   | Uso               |
    +--------+----------------------+-------------+-------------------+
@@ -1013,12 +926,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    que lo reenvia a todos los WebSocket conectados como
    {"id":N,"tema":"...","texto":"...","hora":N}.  Un cuerpo que no sea
    JSON valido recibe 400.
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 17]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    GET /sala/{tema} devuelve una pagina HTML que se conecta por
    WebSocket a /sala/{tema}/ws y muestra los mensajes en tiempo real.
    Al conectarse, el WebSocket recibe primero {"historial":[...]} con
@@ -1072,12 +980,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    para que cualquiera las verifique por su cuenta.
 
 5.7.  Limite de peticiones
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 18]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    El Worker DEBE limitar las peticiones a 60 por minuto por cliente
    en las rutas publicas y responder 429 al excederlo.  El conteo se
    hace en memoria con el servicio de limite de peticiones de
@@ -1120,12 +1023,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    Esta seccion sigue la estructura de [RFC6973].
 
 7.1.  Modelo de amenazas
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 19]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    +-------------------+-------------------------+---------------------+
    | Adversario        | Que puede ver           | Que no puede ver    |
    +-------------------+-------------------------+---------------------+
@@ -1179,12 +1077,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    publicos en el edge, 7 dias; nonces, 120 segundos.
 
 7.5.  Lo que ve el proveedor del edge
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 20]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    Aunque el Worker no guarde encabezados, Cloudflare recibe cada
    conexion en su red antes de ejecutar el codigo.  Por lo tanto ve la
    IP del gateway, la IP y el User-Agent de cada navegador que abre una
@@ -1242,12 +1135,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
    3.7) solo reduce el riesgo en redes pequenas.
 
 8.6.  Repeticion
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 21]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    Las peticiones al Worker tienen marca de tiempo y nonce (Seccion
    5.2).  Dentro de la mesh, un relay malicioso puede reenviar una
    celda dos veces; la aplicacion DEBERIA descartar mensajes repetidos.
@@ -1304,12 +1192,7 @@ RFC 9999                 FaroNet version 1                Noviembre 2026
 
    [RFC6973]  Cooper, A., et al., "Privacy Considerations for Internet
               Protocols", RFC 6973, July 2013.
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 22]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
    [RFC7322]  Flanagan, H. and S. Ginoza, "RFC Style Guide", RFC 7322,
               September 2014.
 
@@ -1362,12 +1245,7 @@ Apendice B.  Mediciones de desempeno
 
    Medidas fisicas al corte del 1 de noviembre de 2026: PENDIENTES.
    No se deduce BER cero ni tasa util del resultado de pytest.
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 23]
 
-RFC 9999                 FaroNet version 1                Noviembre 2026
-
-
       Distancia   Sentido    BER           Tasa util (B/s)
       1 cm        A -> B     PENDIENTE     PENDIENTE
       1 cm        B -> A     PENDIENTE     PENDIENTE
@@ -1402,20 +1280,3 @@ Apendice C.  Estado de implementacion y validacion
    expone metadatos aunque no se creen bitacoras historicas de usuarios.
    El borrado logico en microSD no garantiza eliminacion forense ni de
    todas las copias que puedan existir en memoria.
-
-Agradecimientos
-
-   Al profesor Kevin Moraga por el enunciado del proyecto.
-
-Direcciones de los autores
-
-   Jimmy Castillo Guzman
-   Instituto Tecnologico de Costa Rica
-   Centro Academico de Alajuela
-   Costa Rica
-
-   Juan Carlos Gomez
-   Instituto Tecnologico de Costa Rica
-   Costa Rica
-
-Castillo Guzman & Gomez       Experimental                  [Pagina 24]

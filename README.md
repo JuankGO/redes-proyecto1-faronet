@@ -1,6 +1,6 @@
 # FaroNet
 
-Proyecto 1 de Redes de Computadoras, TEC, II semestre de 2026.
+Proyecto 1 de IC-7602: Redes de Computadoras, TEC, II semestre de 2026.
 Integrantes: Jimmy Castillo Guzmán y Juan Carlos Gómez.
 
 Dos Raspberry Pi 2 controlan Faros infrarrojos. Sobre el enlace se implementan
@@ -9,10 +9,10 @@ de software y las mediciones físicas se reportan por separado.
 
 ## Entrega
 
-- [Informe](docs/INFORME.md), [ejecución](docs/EJECUCION.md) y [funciones](docs/API.md).
-- [Esquema](docs/hardware/esquematico-faro.svg), [conexiones](docs/hardware/esquematico-faro.md) y [materiales en colones](docs/hardware/BOM.md).
+- [Informe LaTeX](docs/latex/documentacion.tex) e [instrucciones de compilación](docs/latex/README.md).
+- [Vista de montaje](docs/hardware/montaje-faro.svg), [esquema eléctrico](docs/hardware/esquematico-faro.svg) y [materiales en colones](docs/hardware/BOM.md).
 - [Multímetro](docs/hardware/bitacora-pruebas-multimetro.md), [pruebas](docs/bitacora/pruebas.md), [horas](docs/bitacora/horas.md) y [commits](docs/bitacora/commits.md).
-- [Autoevaluación](docs/AUTOEVALUACION.md), [lista de requisitos](docs/ENTREGA.md) y [kick-off reconstruido](docs/KICKOFF.md).
+- La autoevaluación y el reporte de commits se incluyen dentro del informe, según el enunciado.
 - [RFC ASCII](docs/rfc/rfc-faronet.txt) y [modelo de amenazas](docs/amenazas.md).
 - [Documentación PDF](output/pdf/FaroNet-documentacion.pdf) y [RFC PDF](output/pdf/FaroNet-RFC.pdf).
 
@@ -65,7 +65,7 @@ los módulos `faro.demo_enviar`, `faro.demo_recibir` y `faro.medir`.
 
 En PC: `python -m pip install -r requirements.txt` y `python -m pytest tests -q`.
 Para reconstruir los PDFs: `python -m pip install -r requirements-docs.txt`
-y `python tools/generar_documentacion.py`.
+y `python tools/generar_documentacion.py --tectonic tectonic`.
 
 **Worker:** https://faronet-worker.faronet-jimmy-juan.workers.dev
 URL informada por el grupo. El Worker se implementó, pero no se utilizó en la
