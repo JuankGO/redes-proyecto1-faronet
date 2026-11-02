@@ -1,4 +1,3 @@
-"""Codificacion de linea Manchester y deteccion del inicio de trama."""
 PREAMBULO = b"\xAA\xAA\xAA\xAA"
 SFD = b"\xD5"
 
@@ -24,7 +23,7 @@ def bits_a_bytes(bits: list) -> bytes:
 
 
 def manchester_codificar(bits: list) -> list:
-    """1 -> [0,1] (sube) ; 0 -> [1,0] (baja)."""
+
     medios = []
     for bit in bits:
         medios += [0, 1] if bit == 1 else [1, 0]
@@ -47,7 +46,7 @@ def manchester_decodificar(medios: list) -> list:
 
 
 def armar_senal(trama_bytes: bytes) -> list:
-    """Preambulo + SFD + trama, todo en Manchester."""
+
     return manchester_codificar(bytes_a_bits(PREAMBULO + SFD + trama_bytes))
 
 
@@ -63,7 +62,7 @@ def _buscar(bits: list, patron: list):
 
 
 def extraer_trama(medios: list) -> bytes:
-    """Devuelve los bytes de la trama (cabecera+payload+CRC) dentro de una senal."""
+
     for desfase in (0, 1):
         util = medios[desfase:]
         util = util[:len(util) - (len(util) % 2)]

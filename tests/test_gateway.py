@@ -1,4 +1,3 @@
-"""Pruebas del gateway: firma de peticiones y publicacion de mensajes publicos."""
 import hashlib
 import json
 import threading
@@ -35,7 +34,7 @@ class _WorkerFalso(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(b"OK")
 
-    def log_message(self, *args):   # sin bitacoras
+    def log_message(self, *args):
         pass
 
 
@@ -67,7 +66,7 @@ def test_mensaje_publico_llega_firmado_al_worker():
         ana = Cliente("ana", nodos[0])
         relays = ana.enviar_publico("noticias", "hola clearnet")
         assert len(relays) == 3
-        # Un privado al gateway NO debe salir a clearnet.
+
         nodos[0].mandar_a(gw_nodo.mi_id, empaquetar_mensaje(PRIVADO, hash_tema("x"), b"secreto"))
 
         limite = time.time() + 10
@@ -83,7 +82,7 @@ def test_mensaje_publico_llega_firmado_al_worker():
         VerifyKey(bytes.fromhex(gw_nodo.mi_id)).verify(mensaje, bytes.fromhex(h["x-faronet-firma"]))
         assert b"secreto" not in b"".join(r[2] for r in _WorkerFalso.recibidas)
         assert gw.ignorados >= 1
-        # El directorio publico tambien se sube firmado.
+
         assert any(r[0] == "/api/directorio" for r in _WorkerFalso.recibidas)
     finally:
         for n in nodos[:6]:

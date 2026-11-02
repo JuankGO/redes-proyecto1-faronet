@@ -1,5 +1,3 @@
-"""Pruebas de la capa 1 sin hardware: MedioUART con un puerto serie falso,
-tramas externas, duplicados, LEDs, boton y medicion de BER."""
 import threading
 import time
 
@@ -15,7 +13,7 @@ A, B = b"\xaa\xaa\xaa\xaa", b"\xbb\xbb\xbb\xbb"
 
 
 class CableSerie:
-    """Dos puertos serie falsos unidos: lo que escribe uno lo lee el otro."""
+
 
     class Punta:
         def __init__(self, cable, lado):
@@ -51,7 +49,7 @@ class CableSerie:
 def test_empaquetar_medios_ida_y_vuelta():
     senal = linea.armar_senal(frame.codificar(frame.Trama(1, A, B, 3, b"hola")))
     assert desempaquetar_medios(empaquetar_medios(senal)) == senal
-    # Una trama de 128 bytes ocupa 266 bytes de UART (RFC, seccion 2.2).
+
     maxima = frame.codificar(frame.Trama(1, A, B, 0, b"x" * frame.MAX_PAYLOAD))
     assert len(empaquetar_medios(linea.armar_senal(maxima))) == 266
 
@@ -69,8 +67,8 @@ def test_envio_confiable_por_uart_simulada():
     assert fa.enviar_confiable(B, b"hola por luz") is True
     hilo.join()
     assert recibido[0].payload == b"hola por luz"
-    assert ind_b.estado["rx"] is True          # el LED RX se encendio
-    assert ind_a.estado["tx"] is False         # y el TX se apago al terminar
+    assert ind_b.estado["rx"] is True
+    assert ind_a.estado["tx"] is False
 
 
 def test_medio_uart_ocupado_mientras_llegan_bytes():
@@ -104,7 +102,7 @@ def test_retransmision_no_se_entrega_dos_veces():
         fa, fb = DispositivoLuzAdaptador(ma, A), DispositivoLuzAdaptador(mb, B)
         t = frame.Trama(frame.TIPO_DATA, B, A, 5, b"una vez")
         fa._transmitir(t)
-        fa._transmitir(t)   # como si el ACK se hubiera perdido
+        fa._transmitir(t)
         assert fb.recibir(1.0).payload == b"una vez"
         assert fb.recibir(0.5) is None
     finally:
@@ -149,7 +147,7 @@ def test_bits_distintos_y_trama_esperada():
 
 
 class _SerieEspejo:
-    """Puerto serie falso donde lo que se escribe vuelve al mismo puerto (loopback)."""
+
 
     def __init__(self):
         self.buf = bytearray()

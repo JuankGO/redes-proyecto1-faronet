@@ -1,9 +1,3 @@
-"""Boton de panico: borra la direccion fisica y todas las llaves, sobrescribiendo con ceros.
-
-Se sobrescribe el archivo antes de borrarlo como medida de borrado logico.
-En microSD y otros medios flash no garantiza eliminacion forense por el
-remapeo de bloques. Tampoco garantiza borrar todas las copias en memoria.
-"""
 import os
 from pathlib import Path
 
@@ -11,7 +5,7 @@ CARPETA = Path.home() / ".faronet"
 
 
 def _sobrescribir_y_borrar(ruta: Path) -> None:
-    """Sobrescribe el archivo con ceros y despues lo borra."""
+
     if not ruta.is_file():
         return
     largo = ruta.stat().st_size
@@ -23,11 +17,7 @@ def _sobrescribir_y_borrar(ruta: Path) -> None:
 
 
 def panico(carpeta: Path = CARPETA) -> list:
-    """Borra todo lo que hay en la carpeta de FaroNet.
 
-    Devuelve la lista de nombres de archivos borrados.
-    Si la carpeta no existe, no falla: devuelve lista vacia.
-    """
     borrados = []
     if not carpeta.exists():
         return borrados
@@ -39,7 +29,7 @@ def panico(carpeta: Path = CARPETA) -> list:
 
 
 if __name__ == "__main__":
-    # Si lo corres directo, te pide confirmacion. Asi no borras tus llaves por accidente.
+
     print("Esto va a borrar TODAS tus llaves y tu direccion fisica.")
     print(f"Carpeta: {CARPETA}")
     respuesta = input("Escribe SI en mayusculas para confirmar: ")

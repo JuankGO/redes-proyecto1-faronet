@@ -1,15 +1,3 @@
-"""LEDs indicadores y boton de panico del Faro (GPIO de la Raspberry Pi).
-
-Pines (numeracion BCM) del Faro cableado a GPIO17/27 (ver faro/serie_pigpio.py):
-    GPIO22  LED TX     (pin 15)
-    GPIO23  LED RX     (pin 16)
-    GPIO24  boton de panico, a GND, con pull-up interno (pin 18)
-El esquema actual esta en docs/hardware/circuito-faro.html.
-
-Si gpiozero no esta disponible (por ejemplo, en una laptop), se usan
-versiones vacias que no hacen nada. Asi el mismo codigo corre en la
-Raspberry y en las pruebas.
-"""
 import threading
 import time
 
@@ -27,7 +15,7 @@ def _gpiozero():
 
 
 class Indicadores:
-    """Controla los LEDs TX y RX."""
+
 
     def __init__(self, pin_tx: int = PIN_LED_TX, pin_rx: int = PIN_LED_RX,
                  usar_gpio: bool = True):
@@ -46,13 +34,13 @@ class Indicadores:
             self._tx.on() if encendido else self._tx.off()
 
     def rx_pulso(self, segundos: float = 0.05) -> None:
-        """Enciende el LED RX un momento sin bloquear al que llama."""
+
         self.estado["rx"] = True
         if self._rx:
             self._rx.blink(on_time=segundos, off_time=0, n=1, background=True)
 
     def parpadear_panico(self, veces: int = 5, hz: float = 5.0) -> None:
-        """Ambos LEDs juntos, 'veces' parpadeos a 'hz'. Bloquea ~1 s."""
+
         medio = 0.5 / hz
         for _ in range(veces):
             self.tx(True); self._set_rx(True)
@@ -67,7 +55,7 @@ class Indicadores:
 
 
 class BotonPanico:
-    """Llama a 'al_presionar' cuando se presiona el boton fisico."""
+
 
     def __init__(self, al_presionar, pin: int = PIN_PANICO, usar_gpio: bool = True):
         self._al_presionar = al_presionar
@@ -83,7 +71,7 @@ class BotonPanico:
         return self._boton is not None
 
     def disparar(self) -> None:
-        """Ejecuta el panico una sola vez aunque el boton rebote."""
+
         if not self._ocupado.acquire(blocking=False):
             return
         try:

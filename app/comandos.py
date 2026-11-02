@@ -1,17 +1,12 @@
-"""Parsing de comandos del chat: /priv, /unirse, /tema, /publico, /nodos,
-/panico, /ayuda, /salir.
-
-Separamos el parsing de la ejecucion para que sea testeable sin red.
-"""
 import argparse
 from dataclasses import dataclass
 
 
 class ComandoError(Exception):
-    """Comando mal formado o desconocido."""
+    pass
 
 
-# Tipos de comando soportados.
+
 CMD_PRIV = "priv"
 CMD_TEMA = "tema"
 CMD_PUBLICO = "publico"
@@ -24,13 +19,13 @@ CMD_PANICO = "panico"
 
 @dataclass
 class Comando:
-    """Un comando del chat ya parseado."""
-    tipo: str                 # "priv", "tema", "publico", "salir", "ayuda"
-    argumentos: dict          # por ejemplo {"destino": "...", "texto": "..."}
+
+    tipo: str
+    argumentos: dict
 
 
 def _parsear_destino_hex(valor: str) -> str:
-    """Valida que sea el inicio del id de un nodo: 8 letras hex."""
+
     v = valor.lower()
     if len(v) != 8:
         raise ComandoError(
@@ -44,11 +39,7 @@ def _parsear_destino_hex(valor: str) -> str:
 
 
 def parsear_comando(linea: str) -> Comando:
-    """Convierte una linea escrita por el usuario en un Comando.
 
-    Lanza ComandoError si el comando es desconocido o esta mal formado.
-    Una linea vacia produce ComandoError.
-    """
     if not isinstance(linea, str):
         raise ComandoError("la linea debe ser un string")
     texto = linea.strip()
@@ -56,7 +47,7 @@ def parsear_comando(linea: str) -> Comando:
         raise ComandoError("linea vacia")
     if not texto.startswith("/"):
         raise ComandoError("los comandos empiezan con /")
-    partes = texto[1:].split(None, 2)   # maximo 3 tokens: cmd + arg1 + resto
+    partes = texto[1:].split(None, 2)
     if not partes:
         raise ComandoError("comando vacio")
     nombre = partes[0].lower()

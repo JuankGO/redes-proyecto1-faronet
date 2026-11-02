@@ -1,8 +1,3 @@
-"""Demo: elegir 3 saltos al azar de un directorio ficticio.
-
-Uso:
-    python -m mesh.demo_saltos
-"""
 from mesh.saltos import SaltosError, elegir_saltos
 
 
@@ -23,8 +18,8 @@ def _directorio_ficticio(n):
 
 def main():
     directorio = _directorio_ficticio(8)
-    mi_id = f"{1:02x}" * 32        # nodo 1
-    destino_id = f"{2:02x}" * 32   # nodo 2
+    mi_id = f"{1:02x}" * 32
+    destino_id = f"{2:02x}" * 32
 
     print(f"Directorio: {len(directorio)} nodos")
     print(f"Yo soy el nodo 1, el destino es el nodo 2")
@@ -38,7 +33,7 @@ def main():
 
     print()
 
-    # Con solo 4 nodos no hay suficiente anonimato.
+
     directorio_chico = _directorio_ficticio(4)
     try:
         elegir_saltos(directorio_chico, mi_id, destino_id)

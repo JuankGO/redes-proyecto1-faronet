@@ -1,7 +1,3 @@
-"""Distribución del Faro en la placa HS-03 y verificación contra el circuito probado.
-
-Coordenadas = las impresas en la placa: letra de columna (primera serie A..Z) + fila 01..48.
-"""
 import json
 import sys
 
@@ -29,7 +25,7 @@ def seg(a, b):
     return out
 
 
-# Componentes: id -> (tipo, valor, {pin: (agujero, red)})
+
 PARTS = {
     'J1': ('header', 'Header 7 pines', {
         '1': ('B16', '3V3'), '2': ('B17', 'GND'), '3': ('B18', 'TX'), '4': ('B19', 'RX'),
@@ -50,7 +46,7 @@ PARTS = {
         'a1': ('N17', 'GND'), 'a2': ('S17', 'GND'), 'b1': ('N19', 'BTN'), 'b2': ('S19', 'BTN')}),
 }
 
-# Pistas de estaño en el lado del cobre: (red, desde, hasta), en línea recta.
+
 TRACKS = [
     ('3V3', 'B02', 'B16'), ('3V3', 'B02', 'S02'), ('3V3', 'I02', 'I04'), ('3V3', 'S02', 'S10'),
     ('GND', 'B17', 'D17'), ('GND', 'D14', 'D17'), ('GND', 'D14', 'S14'),
@@ -66,7 +62,7 @@ TRACKS = [
     ('LTXA', 'G17', 'G18'), ('LRXA', 'K17', 'K18'),
 ]
 
-# Cables aislados por el lado de componentes: (id, red, desde, hasta, color)
+
 WIRES = [
     ('W1', 'TX', 'C18', 'D11', 'naranja'),
     ('W2', 'RX', 'C19', 'O05', 'azul'),
@@ -75,7 +71,7 @@ WIRES = [
     ('W5', 'BTN', 'C22', 'M19', 'blanco'),
 ]
 
-INTERNAL = [('N17', 'S17'), ('N19', 'S19')]  # contactos unidos dentro del botón
+INTERNAL = [('N17', 'S17'), ('N19', 'S19')]
 
 
 def check():
@@ -103,7 +99,7 @@ def check():
                 errors.append(f'{wid}: {h} ya tiene la pata {pins[h]}')
             claim(h, net, wid)
 
-    # Conectividad: cada red debe quedar en una sola pieza.
+
     parent = {}
 
     def find(x):
@@ -131,7 +127,7 @@ def check():
         if len(roots) != 1:
             errors.append(f'Red {net} quedó partida en {len(roots)} pedazos')
 
-    # Medidas físicas.
+
     def dist(a, b):
         (c1, r1), (c2, r2) = p(a), p(b)
         return abs(c1 - c2) + abs(r1 - r2), (c1 == c2 or r1 == r2)
@@ -152,7 +148,7 @@ def check():
     if sw['a2'][0] - sw['a1'][0] != 5 or sw['b1'][1] - sw['a1'][1] != 2:
         errors.append('SW1 debe medir 5 x 2 agujeros (12,7 x 5,1 mm)')
 
-    # Agujeros vecinos con estaño de redes distintas: puntos donde NO debe pasar estaño.
+
     caution = []
     for hole, (net, _) in owner.items():
         c, r = p(hole)

@@ -1,5 +1,3 @@
-"""SeriePigpio sin hardware: un pigpio falso que devuelve por RX lo que sale por TX,
-imitando el defecto real del lector de pigpio en el ultimo byte."""
 from faro import frame, linea
 from faro.medio import MedioUART
 from faro.serie_pigpio import RELLENO, SeriePigpio
@@ -8,7 +6,7 @@ A, B = b"\xaa\xaa\xaa\xaa", b"\xbb\xbb\xbb\xbb"
 
 
 def _perder_unos_finales(byte: int) -> int:
-    """Asi llego el ultimo byte en la Raspberry: d5 -> 15, ff -> 00."""
+
     for bit in range(7, -1, -1):
         if not byte & (1 << bit):
             break

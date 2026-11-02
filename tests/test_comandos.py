@@ -1,4 +1,3 @@
-"""Pruebas del parsing de comandos del chat."""
 import pytest
 
 from app.comandos import (

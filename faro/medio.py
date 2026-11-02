@@ -1,12 +1,3 @@
-"""Medios fisicos del Faro.
-
-Un Medio mueve listas de medios bits (0/1) entre dos Faros. Hay dos:
-
-- MedioUART: puerto serie del Faro. El perfil "pigpio" usa GPIO17 TX y
-  GPIO27 RX invertido; tambien acepta un puerto UART del sistema.
-  Los medios bits se empaquetan de 8 en 8 en bytes y viajan como 8N1.
-- MedioSimUDP: simulacion por UDP para probar sin hardware.
-"""
 import socket
 import time
 from abc import ABC, abstractmethod
@@ -20,10 +11,10 @@ class Medio(ABC):
 
     @abstractmethod
     def recibir(self, timeout: float):
-        """Devuelve una lista de 0/1 o None si vence el tiempo."""
+        pass
 
     def ocupado(self) -> bool:
-        """True si alguien mas esta transmitiendo (el medio real lo mide)."""
+
         return False
 
     def cerrar(self) -> None:
@@ -31,10 +22,7 @@ class Medio(ABC):
 
 
 def empaquetar_medios(medios: list) -> bytes:
-    """Agrupa medios bits de 8 en 8 (el primero en el bit mas alto).
 
-    Si sobran bits, se completa con 1 (nivel de reposo de la linea).
-    """
     resto = len(medios) % 8
     if resto:
         medios = list(medios) + [1] * (8 - resto)
@@ -46,32 +34,27 @@ def desempaquetar_medios(datos: bytes) -> list:
 
 
 class MedioUART(Medio):
-    """Faro real sobre la UART de la Raspberry Pi.
 
-    La UART en reposo queda en 1, asi que el LED IR queda encendido entre
-    tramas. El receptor da por terminada una senal cuando pasan
-    'silencio_bytes' tiempos de byte sin recibir nada.
-    """
 
     def __init__(self, puerto: str = "/dev/ttyAMA0", baudios: int = 9600,
                  silencio_bytes: int = 20, serial_obj=None):
         if serial_obj is None and puerto == "pigpio":
-            from faro.serie_pigpio import SeriePigpio  # Faro en GPIO17/27
+            from faro.serie_pigpio import SeriePigpio
             serial_obj = SeriePigpio(baudios)
         if serial_obj is None:
-            import serial  # pyserial; solo se necesita en la Raspberry
+            import serial
             serial_obj = serial.Serial(puerto, baudios, bytesize=8,
                                        parity="N", stopbits=1, timeout=0)
         self.ser = serial_obj
         self.baudios = baudios
-        # 10 bits por byte en 8N1
+
         self.tiempo_byte = 10.0 / baudios
         self.silencio = max(0.005, silencio_bytes * self.tiempo_byte)
         self._ultimo_rx = 0.0
 
     def enviar(self, medios: list) -> None:
         self.ser.write(empaquetar_medios(medios))
-        self.ser.flush()   # espera a que salga el ultimo byte
+        self.ser.flush()
 
     def recibir(self, timeout: float):
         limite = time.monotonic() + timeout

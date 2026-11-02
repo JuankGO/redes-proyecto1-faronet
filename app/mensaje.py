@@ -1,20 +1,3 @@
-"""Formato del mensaje de la app: 256 bytes fijos con padding aleatorio.
-
-El tamano fijo evita que un observador deduzca cuanto se dijo por el
-tamano del paquete. El TEMA se guarda como hash (8 bytes), no como
-nombre en claro, para que quien vea la celda no sepa de que se habla.
-
-Formato (256 bytes):
-    | VER 1B | VISIBILIDAD 1B | TEMA 8B | HORA 4B | LARGO 2B | TEXTO ... | RELLENO |
-
-Los mensajes viven poco: al recibirse se comprueba que no hayan vencido
-segun TTL_POR_DEFECTO (y que no vengan del futuro). Se guardan solo en
-memoria.
-
-Mensajes publicos (VIS = 1, RFC seccion 4.4): el TEXTO empieza con el
-nombre del tema, porque el gateway lo necesita para publicarlo:
-    | N 1B | NOMBRE N bytes | texto |
-"""
 import re
 import hashlib
 import os
@@ -23,26 +6,26 @@ import time
 
 VERSION = 1
 TAMANO_MENSAJE = 256
-LARGO_CABECERA = 16          # 1+1+8+4+2
-MAX_TEXTO = TAMANO_MENSAJE - LARGO_CABECERA   # 240
+LARGO_CABECERA = 16
+MAX_TEXTO = TAMANO_MENSAJE - LARGO_CABECERA
 
 PRIVADO = 0
 PUBLICO = 1
 
-TTL_POR_DEFECTO = 3600       # 1 hora
-TOLERANCIA_RELOJ = 300       # segundos que se acepta HORA en el futuro
+TTL_POR_DEFECTO = 3600
+TOLERANCIA_RELOJ = 300
 MAX_NOMBRE_TEMA = 32
-# Igual que el Worker: letras, numeros, _ y -, hasta 32 bytes (RFC 4.4).
+
 _NOMBRE_TEMA = re.compile(r"[\w-]+")
-FORMATO_CABECERA = ">BB8sIH"  # ver, visibilidad, tema, hora, largo
+FORMATO_CABECERA = ">BB8sIH"
 
 
 class MensajeError(Exception):
-    """El mensaje esta mal formado, vencido o tiene una version desconocida."""
+    pass
 
 
 def hash_tema(nombre: str) -> bytes:
-    """Devuelve 8 bytes de hash del nombre del tema."""
+
     if not isinstance(nombre, str) or not nombre:
         raise MensajeError("el nombre del tema no puede estar vacio")
     return hashlib.blake2b(nombre.encode("utf-8"), digest_size=8).digest()
@@ -50,7 +33,7 @@ def hash_tema(nombre: str) -> bytes:
 
 def empaquetar_mensaje(visibilidad: int, tema: bytes, texto: bytes,
                        hora: int = None) -> bytes:
-    """Arma un mensaje de 256 bytes con padding aleatorio."""
+
     if visibilidad not in (PRIVADO, PUBLICO):
         raise MensajeError(f"visibilidad invalida: {visibilidad}")
     if len(tema) != 8:
@@ -68,7 +51,7 @@ def empaquetar_mensaje(visibilidad: int, tema: bytes, texto: bytes,
 
 
 def desempaquetar_mensaje(datos: bytes, ahora: float = None) -> dict:
-    """Lee un mensaje. Lanza MensajeError si algo no cuadra."""
+
     if len(datos) != TAMANO_MENSAJE:
         raise MensajeError(
             f"el mensaje debe medir {TAMANO_MENSAJE}B, mide {len(datos)}"
@@ -98,13 +81,13 @@ def desempaquetar_mensaje(datos: bytes, ahora: float = None) -> dict:
     }
 
 def nombre_tema_valido(nombre) -> bool:
-    """Nombre de tema publico aceptable para la mesh y para el Worker."""
+
     return (isinstance(nombre, str) and 1 <= len(nombre.encode("utf-8")) <= MAX_NOMBRE_TEMA
             and _NOMBRE_TEMA.fullmatch(nombre) is not None)
 
 
 def empaquetar_publico(nombre: str, texto: str, hora: int = None) -> bytes:
-    """Arma un mensaje publico: TEXTO = N | NOMBRE | texto."""
+
     if not nombre_tema_valido(nombre):
         raise MensajeError(f"el nombre del tema debe tener 1-{MAX_NOMBRE_TEMA} bytes "
                            "de letras, numeros, _ o -")
@@ -117,10 +100,7 @@ def empaquetar_publico(nombre: str, texto: str, hora: int = None) -> bytes:
 
 
 def leer_publico(d: dict):
-    """Devuelve (nombre, texto) de un mensaje publico ya desempaquetado.
 
-    Verifica que TEMA sea el hash del nombre. Lanza MensajeError si no.
-    """
     if d.get("visibilidad") != PUBLICO:
         raise MensajeError("no es un mensaje publico")
     cuerpo = d["texto"]

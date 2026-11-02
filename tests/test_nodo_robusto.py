@@ -1,5 +1,3 @@
-"""Pruebas de los arreglos del nodo: robustez, propagacion, anonimato, panico
-y el enlace Faro entre dos comunidades (simulado por UDP)."""
 import json
 import socket
 import time
@@ -84,7 +82,7 @@ def test_directorio_se_propaga_mas_alla_del_vecino():
                 n.enviar_ahora()
             return c.mi_id in a.directorio and a.mi_id in c.directorio
         assert _esperar(ronda, timeout=5.0, paso=0.3)
-        # A y C no son vecinos directos: la ruta pasa por B.
+
         assert a.vecinos.obtener(c.mi_id) is None
         assert _esperar(lambda: (ronda() or True) and a.rutas.ruta_hacia(c.mi_id) is not None,
                         timeout=5.0, paso=0.3)
@@ -104,7 +102,7 @@ def test_sin_relays_suficientes_no_manda_sin_anonimato():
         assert _esperar(lambda: b.mi_id in a.directorio)
         with pytest.raises(SaltosError, match="relays posibles"):
             a.mandar_a(b.mi_id, b"hola")
-        # En modo de prueba explicito si se permite.
+
         assert a.mandar_a(b.mi_id, b"hola", permitir_directo=True) == []
         assert _esperar(lambda: b.recibidos == [b"hola"])
     finally:
@@ -129,11 +127,7 @@ def test_panico_borra_estado_y_cambia_identidad(tmp_path):
 
 
 def test_dos_comunidades_unidas_por_faro():
-    """Comunidad A (5 nodos + gateway) y comunidad B (gateway + 1 nodo).
 
-    Los gateways solo se hablan por el Faro (simulado por UDP). Un nodo de
-    A manda a un nodo de B por una cebolla de 3 relays.
-    """
     base = 9300
     medio_a = MedioSimUDP(base + 90, [("127.0.0.1", base + 91)])
     medio_b = MedioSimUDP(base + 91, [("127.0.0.1", base + 90)])
@@ -158,7 +152,7 @@ def test_dos_comunidades_unidas_por_faro():
                 n.enviar_ahora()
             return destino.mi_id in origen.directorio and origen.rutas.ruta_hacia(destino.mi_id)
         assert _esperar(listo, timeout=40.0, paso=1.0), "la ruta entre comunidades no se formo"
-        # El destino esta del otro lado del Faro: la ruta pasa por el gateway A.
+
         assert origen.rutas.ruta_hacia(destino.mi_id)["siguiente"] == gw_a.mi_id
 
         relays = origen.mandar_a(destino.mi_id, b"hola desde la comunidad A")
@@ -186,12 +180,12 @@ def test_direccion_faro_rota_cada_24_horas(tmp_path):
     n = _nodo(9690, enlace_faro=enlace, carpeta=tmp_path)
     try:
         n._mantenimiento(time.time())
-        assert enlace.direcciones == []            # todavia no toca
+        assert enlace.direcciones == []
         n._ultima_rotacion -= INTERVALO_ROTACION + 1
         n._mantenimiento(time.time())
         assert len(enlace.direcciones) == 1
         assert (tmp_path / "direccion.bin").read_bytes() == enlace.direcciones[0]
         n._mantenimiento(time.time())
-        assert len(enlace.direcciones) == 1        # no rota dos veces seguidas
+        assert len(enlace.direcciones) == 1
     finally:
         n.sock.close()

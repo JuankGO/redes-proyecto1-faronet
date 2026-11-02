@@ -1,4 +1,3 @@
-"""Pruebas del directorio: firma valida, firma falsa, TTL, manipulacion."""
 import time
 
 import pytest
@@ -26,7 +25,7 @@ def _entrada_valida(ttl=600):
 def test_entrada_valida_pasa_validacion():
     entrada, firma_hex, _ = _entrada_valida()
     assert verificar(entrada, firma_hex) is True
-    validar(entrada, firma_hex)  # no lanza
+    validar(entrada, firma_hex)
 
 
 def test_firma_falsa_se_rechaza():
@@ -56,14 +55,14 @@ def test_entrada_vencida_se_rechaza():
 def test_version_futura_se_rechaza():
     entrada, firma_hex, firma = _entrada_valida()
     entrada["v"] = 99
-    firma_hex = firmar(entrada, firma)   # refirmamos con la nueva version
+    firma_hex = firmar(entrada, firma)
     with pytest.raises(DirectorioError, match="version"):
         validar(entrada, firma_hex)
 
 
 def test_bytes_canonicos_son_estables():
     entrada, _, _ = _entrada_valida()
-    # Mismo dict, orden de claves distinto -> mismos bytes.
+
     reordenada = {k: entrada[k] for k in sorted(entrada, reverse=True)}
     assert a_bytes(entrada) == a_bytes(reordenada)
 

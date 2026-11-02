@@ -1,4 +1,3 @@
-"""Pruebas de la tabla de vecinos: registro, actualizacion y olvido."""
 import pytest
 
 from mesh.vecinos import (
@@ -31,7 +30,7 @@ def test_hello_mal_formado_se_rechaza():
     with pytest.raises(VecinoError):
         parsear_hello(b"esto no es json")
     with pytest.raises(VecinoError):
-        parsear_hello(b'{"t":"hello"}')      # faltan campos
+        parsear_hello(b'{"t":"hello"}')
     with pytest.raises(VecinoError):
         parsear_hello(b'{"t":"otro","id":"aa","canal":"udp","dir":"x","ts":1}')
 
@@ -55,7 +54,7 @@ def test_registrar_repetido_no_es_nuevo():
     hello = crear_hello(ID_A, "udp", "10.0.0.1:6001")
     assert tabla.registrar(parsear_hello(hello), ahora=100.0) is True
     assert tabla.registrar(parsear_hello(hello), ahora=105.0) is False
-    # El "visto" se actualiza.
+
     assert tabla.obtener(ID_A)["visto"] == 105.0
 
 
@@ -64,7 +63,7 @@ def test_olvidar_vencidos():
     tabla.registrar(parsear_hello(crear_hello(ID_A, "udp", "10.0.0.1:6001")), ahora=100.0)
     tabla.registrar(parsear_hello(crear_hello(ID_B, "faro", "deadbeef")), ahora=120.0)
 
-    # A los 135s: A lleva 35s sin senal (vencido), B solo 15s (vivo).
+
     vencidos = tabla.olvidar_vencidos(ahora=135.0)
     assert vencidos == [ID_A]
     assert len(tabla) == 1

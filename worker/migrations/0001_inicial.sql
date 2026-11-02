@@ -1,4 +1,3 @@
--- Migration number: 0001 	 2026-10-17T02:34:45.749Z
 CREATE TABLE mensajes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tema TEXT NOT NULL,

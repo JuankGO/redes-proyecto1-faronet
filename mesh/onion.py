@@ -1,17 +1,3 @@
-"""Cebolla de N saltos: capas con SealedBox y cabecera de siguiente salto (RFC 3.6).
-
-- Capa del destino: SealedBox(0x00 || mensaje).
-- Capa de cada relay: SealedBox(0x01 || cabecera(9B) || capa_interna).
-- Cada capa de relay agrega 1 + 9 + 48 = 58 bytes.
-
-La cabecera dice por que canal y a que direccion va la capa interna:
-    CANAL 1B (0 = UDP, 1 = Faro) | SIGUIENTE 6B | LARGO 2B
-SIGUIENTE es IPv4 (4B) + puerto (2B) para UDP, o direccion fisica (4B) +
-0x0000 para Faro.
-
-El relleno a 1024 bytes despues de quitar cada capa lo hace mesh/celda.py
-y la fragmentacion para el Faro, mesh/enlace_faro.py.
-"""
 import struct
 
 from nacl.public import PrivateKey, PublicKey, SealedBox
@@ -19,17 +5,17 @@ from nacl.public import PrivateKey, PublicKey, SealedBox
 CANAL_UDP = 0
 CANAL_FARO = 1
 
-FORMATO_CABECERA = ">B6sH"          # canal, direccion, largo del contenido
-LARGO_CABECERA = struct.calcsize(FORMATO_CABECERA)   # 9 bytes
-LARGO_SOBRE = 48                    # overhead de SealedBox
+FORMATO_CABECERA = ">B6sH"
+LARGO_CABECERA = struct.calcsize(FORMATO_CABECERA)
+LARGO_SOBRE = 48
 
 
 class OnionError(Exception):
-    """La celda esta mal formada o no se puede descifrar."""
+    pass
 
 
 def direccion_udp(ip: str, puerto: int) -> bytes:
-    """Empaqueta una IP y un puerto en 6 bytes: 4 de IP + 2 de puerto."""
+
     partes = ip.split(".")
     if len(partes) != 4:
         raise OnionError(f"IP invalida: {ip}")
@@ -41,14 +27,14 @@ def direccion_udp(ip: str, puerto: int) -> bytes:
 
 
 def direccion_faro(mac: bytes) -> bytes:
-    """Empaqueta una direccion fisica de 4 bytes en los 6 de la cabecera."""
+
     if len(mac) != 4:
         raise OnionError("la direccion fisica debe medir 4 bytes")
     return mac + b"\x00\x00"
 
 
 def direccion_de_entrada(canal: str, direccion: str):
-    """Convierte (canal, direccion) del directorio en (CANAL, 6 bytes)."""
+
     if canal == "udp":
         ip, puerto = direccion.rsplit(":", 1)
         return CANAL_UDP, direccion_udp(ip, int(puerto))
@@ -58,7 +44,7 @@ def direccion_de_entrada(canal: str, direccion: str):
 
 
 def direccion_a_texto(canal: int, dirs_6B: bytes):
-    """Inverso de direccion_de_entrada: devuelve ('udp'|'faro', texto)."""
+
     if canal == CANAL_UDP:
         ip, puerto = leer_direccion_udp(dirs_6B)
         return "udp", f"{ip}:{puerto}"
@@ -68,7 +54,7 @@ def direccion_a_texto(canal: int, dirs_6B: bytes):
 
 
 def leer_direccion_udp(dirs_6B: bytes):
-    """Desempaqueta los 6 bytes en (ip, puerto)."""
+
     if len(dirs_6B) != 6:
         raise OnionError("la direccion debe medir 6 bytes")
     ip = ".".join(str(b) for b in dirs_6B[:4])
@@ -96,14 +82,11 @@ def _desempaquetar(plaintext: bytes):
 
 
 def construir_cebolla(destino_pubkey: PublicKey, saltos: list, mensaje: bytes) -> bytes:
-    """Construye una cebolla de N saltos.
 
-    Marca: 0x00 = capa del destino, 0x01 = capa de relay.
-    """
-    # Capa del destino.
+
     contenido_destino = b"\x00" + mensaje
     cell = SealedBox(destino_pubkey).encrypt(contenido_destino)
-    # Capas de los relays, de adentro hacia afuera.
+
     for pubkey, canal, direccion in reversed(saltos):
         plaintext = b"\x01" + _empaquetar(canal, direccion, cell)
         cell = SealedBox(pubkey).encrypt(plaintext)
@@ -111,7 +94,7 @@ def construir_cebolla(destino_pubkey: PublicKey, saltos: list, mensaje: bytes) -
 
 
 def abrir_como_relay(cell: bytes, mi_privkey: PrivateKey):
-    """Un relay abre su capa. Devuelve (canal, dir_siguiente, contenido_interno)."""
+
     try:
         plaintext = SealedBox(mi_privkey).decrypt(cell)
     except Exception as e:
@@ -122,7 +105,7 @@ def abrir_como_relay(cell: bytes, mi_privkey: PrivateKey):
 
 
 def abrir_como_destino(cell: bytes, mi_privkey: PrivateKey) -> bytes:
-    """El destinatario abre la capa final. Devuelve el mensaje."""
+
     try:
         plaintext = SealedBox(mi_privkey).decrypt(cell)
     except Exception as e:

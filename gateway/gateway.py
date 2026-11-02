@@ -1,24 +1,3 @@
-"""Gateway de FaroNet (RFC, secciones 3.10, 4.4 y 5).
-
-El gateway es un nodo de la mesh con rol "gateway" que ademas:
-
-1. Publica en el Worker los mensajes publicos que le llegan por cebolla.
-   Solo los mensajes con VIS = 1 salen a clearnet; los privados se ignoran.
-   El gateway no sabe quien origino el mensaje (lo recibe por 3 relays).
-2. Sube cada 60 s el directorio de nodos al Worker (directorio publico).
-3. Si se le da --uart, une su comunidad con otra por el Faro: las rutas que
-   aprende por la luz las anuncia por UDP y al reves.
-
-Todas las peticiones van firmadas con la llave Ed25519 del gateway
-(gateway/firma.py). La llave publica se configura en el Worker con:
-    npx wrangler secret put GATEWAY_PUB
-
-Uso en la Raspberry del Faro B:
-    python3 -m gateway.gateway --puerto 6000 --ip-publica 192.168.1.30 \\
-        --uart /dev/ttyAMA0 --worker https://faronet-worker.SUBDOMINIO.workers.dev
-
-El gateway no guarda bitacoras: no imprime IPs, direcciones fisicas ni ids.
-"""
 import argparse
 import json
 import queue
@@ -36,7 +15,7 @@ TIMEOUT_HTTP = 10.0
 
 
 class ClienteWorker:
-    """Hace las peticiones firmadas al Worker."""
+
 
     def __init__(self, url_base: str, llave_firma, abrir=urllib.request.urlopen):
         self.url_base = url_base.rstrip("/")
@@ -75,12 +54,12 @@ class Gateway:
         nodo.al_recibir_mensaje = self._al_recibir
 
     def _al_recibir(self, crudo: bytes) -> None:
-        """Se llama desde el hilo del nodo: solo encola."""
+
         try:
             d = desempaquetar_mensaje(crudo)
             tema, texto = leer_publico(d)
         except MensajeError:
-            self.ignorados += 1       # privados, temas cifrados o basura: no salen
+            self.ignorados += 1
             return
         try:
             self._cola.put_nowait((tema, texto, d["hora"]))
@@ -101,7 +80,7 @@ class Gateway:
                     self.publicados += 1
                     espera = 1.0
                 elif estado in (0, 429) or estado >= 500:
-                    # Worker caido o limite: se reintenta mas tarde.
+
                     try:
                         self._cola.put_nowait((tema, texto, hora))
                     except queue.Full:
@@ -109,7 +88,7 @@ class Gateway:
                     time.sleep(espera)
                     espera = min(espera * 2, 60.0)
                 else:
-                    self.ignorados += 1   # 400/401: no tiene sentido reintentar
+                    self.ignorados += 1
             ahora = time.time()
             if ahora - ultimo_dir >= INTERVALO_DIRECTORIO:
                 ultimo_dir = ahora

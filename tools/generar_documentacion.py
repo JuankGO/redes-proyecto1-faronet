@@ -1,8 +1,3 @@
-"""Genera tablas y compila los documentos LaTeX de FaroNet con Tectonic.
-
-Uso: python tools/generar_documentacion.py --tectonic RUTA_AL_EJECUTABLE
-Las fuentes principales estan en docs/latex; no se publica ni se utiliza GPIO.
-"""
 import argparse
 from pathlib import Path
 import re
@@ -98,7 +93,7 @@ def preparar_rfc():
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__)
+    parser=argparse.ArgumentParser(description='Genera tablas y compila los documentos LaTeX de FaroNet con Tectonic.\n\nUso: python tools/generar_documentacion.py --tectonic RUTA_AL_EJECUTABLE\nLas fuentes principales estan en docs/latex; no se publica ni se utiliza GPIO.\n')
     parser.add_argument('--tectonic',default=shutil.which('tectonic'))
     parser.add_argument('--solo-fuentes',action='store_true',help='No ejecutar el compilador')
     parser.add_argument('--actualizar-commits',action='store_true')

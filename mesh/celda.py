@@ -1,36 +1,22 @@
-"""Celdas de tamano fijo (1024 bytes) con padding, y fragmentacion (RFC 3.5).
-
-Una celda es la unidad que viaja por la red. Todas miden igual (1024 bytes)
-para que el tamano no delate en que salto va una celda ni cuanto se dijo.
-
-Cuando la celda cruza un enlace del Faro (tramas de 128B con 114B de
-payload), se fragmenta en varias tramas y el receptor la reensambla.
-
-Formato de una celda:
-    | LARGO 2B | CONTENIDO ... | PADDING aleatorio hasta 1024B |
-
-LARGO dice cuantos bytes del contenido son reales. El receptor ignora el
-padding. El padding es aleatorio para que no se pueda distinguir de datos.
-"""
 import os
 import struct
 
 TAMANO_CELDA = 1024
-LARGO_PREFIJO = 2                       # 2 bytes para el largo
-MAX_CONTENIDO = TAMANO_CELDA - LARGO_PREFIJO  # 1022 bytes
+LARGO_PREFIJO = 2
+MAX_CONTENIDO = TAMANO_CELDA - LARGO_PREFIJO
 FORMATO_LARGO = ">H"
 
-# Para fragmentacion en el Faro:
-MAX_PAYLOAD_FARO = 114                  # viene de frame.MAX_PAYLOAD
-MAX_FRAGMENTO = MAX_PAYLOAD_FARO - 4    # 2B indice + 2B total    
+
+MAX_PAYLOAD_FARO = 114
+MAX_FRAGMENTO = MAX_PAYLOAD_FARO - 4
 
 
 class CeldaError(Exception):
-    """Celda mal formada o secuencia de fragmentos incompleta."""
+    pass
 
 
 def empaquetar_celda(contenido: bytes) -> bytes:
-    """Mete el contenido en una celda de 1024B con padding aleatorio."""
+
     if len(contenido) > MAX_CONTENIDO:
         raise CeldaError(
             f"contenido de {len(contenido)} bytes; maximo {MAX_CONTENIDO}"
@@ -41,7 +27,7 @@ def empaquetar_celda(contenido: bytes) -> bytes:
 
 
 def desempaquetar_celda(celda: bytes) -> bytes:
-    """Saca el contenido real de una celda, ignorando el padding."""
+
     if len(celda) != TAMANO_CELDA:
         raise CeldaError(f"la celda debe medir {TAMANO_CELDA}B, mide {len(celda)}")
     (largo,) = struct.unpack(FORMATO_LARGO, celda[:LARGO_PREFIJO])
@@ -51,11 +37,7 @@ def desempaquetar_celda(celda: bytes) -> bytes:
 
 
 def fragmentar(celda: bytes, tamano_fragmento: int = MAX_FRAGMENTO) -> list:
-    """Parte una celda en fragmentos con un indice de 2B al inicio.
 
-    Cada fragmento mide a lo sumo (2 + tamano_fragmento) bytes, para que
-    quepa en el payload de una trama del Faro.
-    """
     if tamano_fragmento < 1:
         raise CeldaError("tamano de fragmento invalido")
     if len(celda) == 0:
@@ -72,11 +54,7 @@ def fragmentar(celda: bytes, tamano_fragmento: int = MAX_FRAGMENTO) -> list:
 
 
 def reensamblar(fragmentos: list) -> bytes:
-    """Junta los fragmentos en la celda original.
 
-    Verifica que esten todos y en el orden correcto. Descarta duplicados
-    silenciosamente (UDP puede duplicar).
-    """
     if not fragmentos:
         raise CeldaError("no hay fragmentos")
     piezas = {}

@@ -1,13 +1,12 @@
-"""Trama Faro v1: construir (codificar) y leer (decodificar) tramas de maximo 128 bytes."""
 import struct
 from dataclasses import dataclass
 
 VERSION = 1
 MAX_TRAMA = 128
-FORMATO_CABECERA = ">BB4s4sBB"          # VER, TIPO, DST, SRC, SEQ, LEN
-LARGO_CABECERA = struct.calcsize(FORMATO_CABECERA)   # 12 bytes
+FORMATO_CABECERA = ">BB4s4sBB"
+LARGO_CABECERA = struct.calcsize(FORMATO_CABECERA)
 LARGO_CRC = 2
-MAX_PAYLOAD = MAX_TRAMA - LARGO_CABECERA - LARGO_CRC # 114 bytes
+MAX_PAYLOAD = MAX_TRAMA - LARGO_CABECERA - LARGO_CRC
 BROADCAST = b"\xff\xff\xff\xff"
 
 TIPO_DATA = 1
@@ -16,11 +15,11 @@ TIPO_BEACON = 3
 
 
 class TramaError(Exception):
-    """La trama esta mal formada, danada o es de una version desconocida."""
+    pass
 
 
 def crc16(datos: bytes) -> int:
-    """CRC-16/CCITT-FALSE (polinomio 0x1021, valor inicial 0xFFFF)."""
+
     crc = 0xFFFF
     for byte in datos:
         crc ^= byte << 8

@@ -1,4 +1,3 @@
-"""Pruebas del cliente de chat: envio, recepcion, temas."""
 import pytest
 
 from app.cliente import Cliente, ClienteError, clave_de_tema
@@ -15,11 +14,11 @@ FRASE = "frase secreta del grupo"
 
 
 class FakeNodo:
-    """Nodo de mentira: guarda lo enviado y lo que debe entregar."""
+
     def __init__(self, mi_id="aa" * 32, gateways=()):
         self.mi_id = mi_id
-        self.enviados = []      # [(destino, mensaje)]
-        self.recibidos = []     # mensajes que el cliente va a decodificar
+        self.enviados = []
+        self.recibidos = []
         self.directorio = {}
         self._gateways = list(gateways)
 
@@ -46,7 +45,7 @@ def test_clave_de_tema_vacia_se_rechaza():
 
 
 def test_adivinar_el_nombre_no_alcanza_para_leer():
-    """El bug original: la llave salia solo del nombre del tema."""
+
     from nacl.exceptions import CryptoError
     from nacl.secret import SecretBox
     import hashlib
@@ -105,10 +104,10 @@ def test_enviar_tema_cifra_con_secretbox():
     assert n == 1
     destino, cifrado = nodo.enviados[0]
     assert destino == "bb" * 32
-    # El cifrado es mas grande que 256B y NO contiene el texto en claro.
+
     assert len(cifrado) > TAMANO_MENSAJE
     assert b"nos vemos" not in cifrado
-    # Al descifrar con la clave del tema, se recupera el mensaje.
+
     from nacl.secret import SecretBox
     box = SecretBox(clave_de_tema("amigos", FRASE))
     plano = box.decrypt(cifrado)
@@ -121,7 +120,7 @@ def test_enviar_tema_excluye_al_emisor():
     c = Cliente("ana", nodo)
     c.unirse_a_tema("amigos", FRASE)
     n = c.enviar_tema("amigos", "hola", ["aa" * 32, "bb" * 32])
-    assert n == 1     # solo bb, no aa (yo mismo)
+    assert n == 1
     assert nodo.enviados[0][0] == "bb" * 32
 
 
@@ -140,7 +139,7 @@ def test_recibir_mensaje_de_tema():
     nodo = FakeNodo()
     c = Cliente("ana", nodo)
     c.unirse_a_tema("amigos", FRASE)
-    # Alguien cifra un mensaje con la clave del tema y lo deja en recibidos.
+
     msj = empaquetar_mensaje(PRIVADO, hash_tema("amigos"), b"hola grupo")
     from nacl.secret import SecretBox
     box = SecretBox(clave_de_tema("amigos", FRASE))
@@ -158,11 +157,11 @@ def test_recibir_no_duplica():
     msj = empaquetar_mensaje(PRIVADO, hash_tema("directo"), b"hola")
     nodo.recibidos.append(msj)
     assert len(c.recibir_pendientes()) == 1
-    assert len(c.recibir_pendientes()) == 0     # ya leido
+    assert len(c.recibir_pendientes()) == 0
     nodo.recibidos.append(msj)
-    assert len(c.recibir_pendientes()) == 0     # repeticion (RFC 8.6): se descarta
+    assert len(c.recibir_pendientes()) == 0
     nodo.recibidos.append(empaquetar_mensaje(PRIVADO, hash_tema("directo"), b"hola"))
-    assert len(c.recibir_pendientes()) == 1     # otro mensaje, aunque diga lo mismo
+    assert len(c.recibir_pendientes()) == 1
 
 
 def test_mensaje_no_descifrable_se_ignora():

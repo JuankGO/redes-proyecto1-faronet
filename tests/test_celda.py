@@ -1,4 +1,3 @@
-"""Pruebas de celda: tamano fijo, padding, fragmentacion, reensamblado."""
 import pytest
 
 from mesh.celda import (
@@ -22,9 +21,9 @@ def test_celda_siempre_mide_1024():
 def test_padding_es_aleatorio():
     a = empaquetar_celda(b"hola")
     b = empaquetar_celda(b"hola")
-    # Mismo contenido, padding distinto -> celdas distintas.
+
     assert a != b
-    # Pero ambas desempaquetan al mismo contenido.
+
     assert desempaquetar_celda(a) == b"hola"
     assert desempaquetar_celda(b) == b"hola"
 

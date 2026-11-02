@@ -1,24 +1,3 @@
-"""Directorio de nodos: entradas firmadas con Ed25519 y TTL (RFC, seccion 3.3).
-
-Cada nodo publica una entrada que dice quien es, como llegar a el y hasta
-cuando vale. La entrada la firma el propio nodo, asi que nadie puede
-inventar la de otro. El directorio se puede compartir entre vecinos o
-publicar en el Worker sin perder seguridad: la firma se verifica siempre.
-
-Formato de una entrada (dict):
-    v          version del formato (int, empezamos en 1)
-    id         clave publica de firma en hex (str, 64 chars)
-    cifrado    clave publica de cifrado en hex (str, 64 chars)
-    canal      'udp' o 'faro' (str)
-    direccion  'IP:PUERTO' o direccion fisica hex de 8 letras (str)
-    creado     timestamp Unix de creacion (int)
-    ttl        segundos de vida (int, 1 a 86400)
-    rol        OPCIONAL: 'gateway'
-
-El JSON que se firma usa las claves ordenadas, sin espacios y solo ASCII,
-para que los mismos datos produzcan siempre los mismos bytes (en Python y
-en el Worker).
-"""
 import json
 import re
 import time
@@ -28,9 +7,9 @@ from nacl.public import PrivateKey
 from nacl.signing import SigningKey, VerifyKey
 
 VERSION = 1
-TTL_POR_DEFECTO = 3600          # 1 hora
-TTL_MAXIMO = 86400              # 24 horas
-TOLERANCIA_RELOJ = 300          # segundos que se acepta 'creado' en el futuro
+TTL_POR_DEFECTO = 3600
+TTL_MAXIMO = 86400
+TOLERANCIA_RELOJ = 300
 ROLES = ("gateway",)
 CAMPOS = ("v", "id", "cifrado", "canal", "direccion", "creado", "ttl")
 
@@ -41,11 +20,11 @@ _UDP = re.compile(r"^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):(\d{1,5})$")
 
 
 class DirectorioError(Exception):
-    """Entrada mal formada, firma invalida o version no soportada."""
+    pass
 
 
 def a_bytes(entrada: dict) -> bytes:
-    """Serializa una entrada a bytes canonicos (JSON ordenado, compacto y ASCII)."""
+
     return json.dumps(
         entrada, sort_keys=True, separators=(",", ":"), ensure_ascii=True
     ).encode("ascii")
@@ -56,7 +35,7 @@ def es_hex64(valor) -> bool:
 
 
 def direccion_valida(canal: str, direccion) -> bool:
-    """True si la direccion tiene el formato del canal."""
+
     if not isinstance(direccion, str):
         return False
     if canal == "faro":
@@ -74,7 +53,7 @@ def direccion_valida(canal: str, direccion) -> bool:
 def crear_entrada(clave_firma: SigningKey, clave_cifrado: PrivateKey,
                   canal: str, direccion: str,
                   ttl: int = TTL_POR_DEFECTO, rol: str = None) -> dict:
-    """Arma una entrada nueva SIN firmar."""
+
     if canal not in ("udp", "faro"):
         raise DirectorioError(f"canal invalido: {canal}")
     if not isinstance(direccion, str) or not direccion:
@@ -98,7 +77,7 @@ def crear_entrada(clave_firma: SigningKey, clave_cifrado: PrivateKey,
 
 
 def firmar(entrada: dict, clave_firma: SigningKey) -> str:
-    """Firma la entrada. Devuelve la firma en hex."""
+
     if clave_firma.verify_key.encode().hex() != entrada["id"]:
         raise DirectorioError("la clave de firma no corresponde al campo id")
     firma = clave_firma.sign(a_bytes(entrada))
@@ -106,11 +85,7 @@ def firmar(entrada: dict, clave_firma: SigningKey) -> str:
 
 
 def verificar(entrada: dict, firma_hex: str) -> bool:
-    """Verifica la firma de una entrada contra su propio campo id.
 
-    Devuelve True si es valida, False si no. No lanza excepciones: quien
-    llama decide que hacer con las invalidas.
-    """
     try:
         clave = VerifyKey(bytes.fromhex(entrada["id"]))
         clave.verify(a_bytes(entrada), bytes.fromhex(firma_hex))
@@ -120,7 +95,7 @@ def verificar(entrada: dict, firma_hex: str) -> bool:
 
 
 def esta_vigente(entrada: dict, ahora: float = None) -> bool:
-    """True si la entrada no ha vencido segun su TTL."""
+
     if ahora is None:
         ahora = time.time()
     try:
@@ -136,7 +111,7 @@ def _es_entero(valor) -> bool:
 
 
 def validar(entrada: dict, firma_hex: str, ahora: float = None) -> None:
-    """Valida formato, version, firma y vigencia. Lanza DirectorioError si algo falla."""
+
     if ahora is None:
         ahora = time.time()
     if not isinstance(entrada, dict):
@@ -171,21 +146,18 @@ def validar(entrada: dict, firma_hex: str, ahora: float = None) -> None:
 
 
 def serializar_para_transporte(entrada: dict, firma_hex: str) -> dict:
-    """Empaqueta la entrada y su firma para mandarla por la red."""
+
     return {"entrada": entrada, "firma": firma_hex}
 
 
 class Directorio:
-    """Conjunto de entradas validas, indexado por id (thread-safe por GIL)."""
+
 
     def __init__(self):
-        self._entradas = {}    # id -> (entrada, firma)
+        self._entradas = {}
 
     def agregar(self, entrada: dict, firma_hex: str, ahora: float = None) -> bool:
-        """Valida y guarda. Devuelve True si la entrada es nueva o mas reciente.
 
-        Lanza DirectorioError si la entrada no es valida.
-        """
         validar(entrada, firma_hex, ahora)
         actual = self._entradas.get(entrada["id"])
         if actual is not None and actual[0]["creado"] >= entrada["creado"]:
@@ -220,7 +192,7 @@ class Directorio:
     def limpiar(self) -> None:
         self._entradas.clear()
 
-    # Compatibilidad con el uso anterior como dict: directorio[id], keys(), etc.
+
     def __contains__(self, id_hex):
         return id_hex in self._entradas
 

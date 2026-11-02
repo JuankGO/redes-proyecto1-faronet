@@ -1,25 +1,3 @@
-"""Medicion de tasa efectiva y BER del enlace Faro (RFC, seccion 2.12).
-
-Se corre en los dos Faros a la vez: uno con 'recibir' y el otro con
-'enviar' (BER) o 'tasa' (tasa efectiva con ACK).
-
-Con un solo Faro, 'loopback' manda tramas y las lee de vuelta por el mismo
-UART (el LED IR apuntando a su propio fototransistor):
-    python3 -m faro.medir loopback --uart /dev/ttyAMA0 --tramas 20
-
-Ejemplos en la Raspberry (UART real):
-    python3 -m faro.medir recibir --uart /dev/ttyAMA0 --baudios 9600 --tramas 200
-    python3 -m faro.medir enviar  --uart /dev/ttyAMA0 --baudios 9600 --tramas 200
-
-Ejemplos sin hardware (simulacion UDP):
-    python3 -m faro.medir recibir --udp 5001 --vecino 127.0.0.1:5002
-    python3 -m faro.medir enviar  --udp 5002 --vecino 127.0.0.1:5001
-
-BER: el emisor manda tramas DATA a difusion con un payload pseudoaleatorio
-conocido (semilla fija + SEQ). El receptor reconstruye la trama esperada y
-cuenta los bits distintos SIN mirar el CRC. Las tramas que no llegan
-cuentan como todos sus bits erroneos.
-"""
 import argparse
 import random
 import sys
@@ -32,7 +10,7 @@ from faro.medio import MedioSimUDP, MedioUART
 
 SEMILLA = 2026
 LARGO_PAYLOAD = frame.MAX_PAYLOAD
-DIR_EMISOR = b"\x0b\xe0\x00\x01"   # direcciones fijas solo para la prueba
+DIR_EMISOR = b"\x0b\xe0\x00\x01"
 DIR_RECEPTOR = b"\x0b\xe0\x00\x02"
 
 
@@ -94,7 +72,7 @@ def cmd_recibir(a):
         vistas.add(seq)
         recibidas += 1
         errores += bits_distintos(crudo, trama_esperada(seq))
-        limite = time.monotonic() + a.espera   # se reinicia con cada trama
+        limite = time.monotonic() + a.espera
     perdidas = a.tramas - recibidas
     errores += perdidas * largo * 8
     ber = errores / total_bits if total_bits else 0.0
@@ -123,7 +101,7 @@ def cmd_tasa(a):
 
 
 def cmd_eco(a):
-    """Lado receptor de 'tasa': confirma todo lo que llega."""
+
     medio = crear_medio(a)
     adaptador = DispositivoLuzAdaptador(medio, DIR_RECEPTOR)
     print("Confirmando tramas (Ctrl+C para salir)...")
@@ -136,7 +114,7 @@ def cmd_eco(a):
 
 
 def cmd_loopback(a):
-    """Un solo Faro: manda cada trama y la lee de vuelta por su propio receptor."""
+
     medio = crear_medio(a)
     ser = getattr(medio, "ser", None)
     largo = len(trama_esperada(0))
@@ -145,7 +123,7 @@ def cmd_loopback(a):
     for i in range(a.tramas):
         seq = i % 256
         if ser is not None:
-            ser.reset_input_buffer()          # descarta basura vieja
+            ser.reset_input_buffer()
         medio.enviar(linea.armar_senal(trama_esperada(seq)))
         medios = medio.recibir(a.espera_ack)
         try:
@@ -176,7 +154,7 @@ def cmd_loopback(a):
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(prog="faro.medir", description=__doc__.split("\n")[0])
+    p = argparse.ArgumentParser(prog="faro.medir", description='Medicion de tasa efectiva y BER del enlace Faro (RFC, seccion 2.12).')
     p.add_argument("modo", choices=["enviar", "recibir", "tasa", "eco", "loopback"],
                    help="enviar/recibir: BER. tasa/eco: tasa efectiva con ACK. loopback: un solo Faro")
     p.add_argument("--uart", help="puerto serie, por ejemplo /dev/ttyAMA0")

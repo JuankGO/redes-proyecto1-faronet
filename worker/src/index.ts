@@ -1,19 +1,3 @@
-/**
- * Worker de FaroNet: aplicacion publica en el edge (RFC, seccion 5).
- *
- * Rutas:
- *   POST /api/relay          (firma del gateway)  publica un mensaje en una sala
- *   POST /api/directorio     (firma del gateway)  sube entradas del directorio
- *   GET  /directorio                              replica de solo lectura, con firmas
- *   GET  /sala/{tema}                             pagina de la sala en tiempo real
- *   GET  /sala/{tema}/ws                          WebSocket de solo lectura
- *   GET  /feed/{tema}.atom                        feed Atom del tema
- *   PUT  /buzon/{id}  GET /buzon/{id}             buzon muerto (blobs de 1024 B)
- *
- * Politica de no registro: este codigo no guarda ni escribe en bitacoras
- * CF-Connecting-IP, User-Agent ni ningun otro identificador. La IP solo se
- * usa en memoria como clave del limite de peticiones.
- */
 import { DurableObject } from "cloudflare:workers";
 
 export interface Env {
@@ -23,15 +7,15 @@ export interface Env {
 	GATEWAY_PUB?: string;
 }
 
-// ----- Constantes del protocolo -----
 
-const VENTANA_FIRMA = 60; // segundos de tolerancia del reloj del gateway
-const VIDA_NONCE = 120; // segundos que se recuerdan los nonces
-const VIDA_MENSAJE = 7 * 86400; // los mensajes publicos viven 7 dias
-const VIDA_BLOB = 86400; // el buzon guarda 24 horas
-const TAMANO_BLOB = 1024; // tamano fijo de los blobs
-const MAX_TEXTO = 240; // bytes UTF-8 del texto publico
-const MAX_CUERPO = 256 * 1024; // tamano maximo de una peticion del gateway
+
+const VENTANA_FIRMA = 60;
+const VIDA_NONCE = 120;
+const VIDA_MENSAJE = 7 * 86400;
+const VIDA_BLOB = 86400;
+const TAMANO_BLOB = 1024;
+const MAX_TEXTO = 240;
+const MAX_CUERPO = 256 * 1024;
 const MAX_ENTRADAS = 500;
 const TTL_MAXIMO_ENTRADA = 86400;
 const TOLERANCIA_RELOJ = 300;
@@ -41,7 +25,7 @@ const RE_HEX64 = /^[0-9a-f]{64}$/;
 const RE_HEX32 = /^[0-9a-f]{32}$/;
 const RE_HEX128 = /^[0-9a-f]{128}$/;
 
-// ----- Utilidades -----
+
 
 const ahora = () => Math.floor(Date.now() / 1000);
 
@@ -85,12 +69,12 @@ async function verificarEd25519(pubHex: string, firmaHex: string, datos: Uint8Ar
 	}
 }
 
-/** JSON canonico igual al de Python: claves ordenadas, sin espacios, solo ASCII. */
+
 export function jsonCanonico(valor: unknown): string {
 	if (valor === null || typeof valor !== "object") {
 		let salida = "";
 		for (const c of JSON.stringify(valor)) {
-			// Igual que ensure_ascii de Python: todo lo que no es ASCII va como \\uXXXX.
+
 			for (let k = 0; k < c.length; k++) {
 				const codigo = c.charCodeAt(k);
 				salida += codigo < 0x80 ? c[k] : "\\u" + codigo.toString(16).padStart(4, "0");
@@ -103,7 +87,7 @@ export function jsonCanonico(valor: unknown): string {
 	return "{" + Object.keys(obj).sort().map((k) => jsonCanonico(k) + ":" + jsonCanonico(obj[k])).join(",") + "}";
 }
 
-// ----- Limite de peticiones (en memoria) -----
+
 
 async function limitar(env: Env, request: Request, grupo: string): Promise<Response | null> {
 	if (!env.LIMITE) return null;
@@ -112,7 +96,7 @@ async function limitar(env: Env, request: Request, grupo: string): Promise<Respo
 	return success ? null : texto("Demasiadas peticiones", 429, { "retry-after": "60" });
 }
 
-// ----- Autenticacion del gateway -----
+
 
 async function autenticarGateway(env: Env, request: Request, ruta: string, cuerpo: Uint8Array): Promise<string | null> {
 	const pub = (env.GATEWAY_PUB ?? "").trim().toLowerCase();
@@ -125,7 +109,7 @@ async function autenticarGateway(env: Env, request: Request, ruta: string, cuerp
 	const resumen = bytesAHex(await crypto.subtle.digest("SHA-256", cuerpo));
 	const mensaje = new TextEncoder().encode(["FARONET-GW-1", request.method.toUpperCase(), ruta, ts, nonce, resumen].join("\n"));
 	if (!(await verificarEd25519(pub, firma, mensaje))) return "firma invalida";
-	// El nonce se guarda despues de verificar la firma: un atacante no puede llenar la tabla.
+
 	const r = await env.DB.prepare("INSERT INTO nonces (nonce, expira) VALUES (?, ?) ON CONFLICT(nonce) DO NOTHING")
 		.bind(nonce, ahora() + VIDA_NONCE)
 		.run();
@@ -148,7 +132,7 @@ function parsearJson(datos: Uint8Array): any {
 	}
 }
 
-// ----- Validacion de entradas del directorio (RFC 3.3) -----
+
 
 const RE_UDP = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):(\d{1,5})$/;
 
@@ -170,7 +154,7 @@ export function entradaValida(e: any, momento = ahora()): boolean {
 	return true;
 }
 
-// ----- Rutas -----
+
 
 async function apiRelay(request: Request, env: Env): Promise<Response> {
 	const cuerpo = await leerCuerpo(request);
@@ -206,7 +190,7 @@ async function apiDirectorio(request: Request, env: Env): Promise<Response> {
 		const e = item?.entrada;
 		const firma = item?.firma;
 		if (!entradaValida(e, momento) || typeof firma !== "string") continue;
-		// La firma se verifica en el edge: un gateway malicioso no puede inventar entradas.
+
 		if (!(await verificarEd25519(e.id, firma, new TextEncoder().encode(jsonCanonico(e))))) continue;
 		sentencias.push(
 			env.DB.prepare(
@@ -262,7 +246,7 @@ async function buzon(request: Request, id: string, env: Env): Promise<Response> 
 		return texto("Guardado", 201);
 	}
 	if (request.method === "GET") {
-		// Se lee y se borra en la misma operacion.
+
 		const r = await env.DB.prepare("DELETE FROM buzon WHERE id = ? RETURNING blob, expira").bind(id).first();
 		if (!r || Number(r.expira) <= ahora()) return texto("No encontrado", 404);
 		return new Response(new Uint8Array(r.blob as ArrayBuffer), {
@@ -348,7 +332,7 @@ async function enrutar(request: Request, env: Env): Promise<Response> {
 	return texto("No encontrado", 404);
 }
 
-// ----- Sala (Durable Object) -----
+
 
 export class Sala extends DurableObject<Env> {
 	async fetch(request: Request): Promise<Response> {
@@ -369,7 +353,7 @@ export class Sala extends DurableObject<Env> {
 		return new Response(null, { status: 101, webSocket: cliente });
 	}
 
-	/** Lo llama el Worker (RPC) cuando el gateway publica: se reenvia a todos. */
+
 	async publicar(mensaje: { id: unknown; tema: string; texto: string; hora: number }): Promise<number> {
 		const datos = JSON.stringify(mensaje);
 		let enviados = 0;
@@ -384,7 +368,7 @@ export class Sala extends DurableObject<Env> {
 		return enviados;
 	}
 
-	/** Los navegadores son solo de lectura: lo que manden se ignora. */
+
 	async webSocketMessage(_ws: WebSocket, _msg: string | ArrayBuffer): Promise<void> {}
 
 	async webSocketClose(ws: WebSocket, code: number): Promise<void> {
@@ -396,7 +380,7 @@ export class Sala extends DurableObject<Env> {
 	}
 }
 
-// ----- Limpieza de vencidos (cron) -----
+
 
 export async function limpiar(env: Env): Promise<void> {
 	const t = ahora();
@@ -413,7 +397,7 @@ export default {
 		try {
 			return await enrutar(request, env);
 		} catch {
-			// Sin console.log: no se registra nada del cliente.
+
 			return texto("Error interno", 500);
 		}
 	},

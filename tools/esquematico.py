@@ -1,4 +1,3 @@
-"""Esquematico vectorial del montaje 3V3 GPIO17/27; no modifica hardware."""
 from pathlib import Path
 from reportlab.graphics.shapes import Drawing, Line, Rect, Circle, Polygon, String
 from reportlab.graphics import renderSVG

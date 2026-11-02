@@ -1,7 +1,3 @@
-"""Vista pictorica del Faro, a partir de la distribucion electrica comprobada.
-
-Genera SVG y PDF vectorial para el informe LaTeX. No certifica el montaje real.
-"""
 from pathlib import Path
 from reportlab.graphics.shapes import Drawing, Circle, Rect, Line, String, Path as GPath
 from reportlab.graphics import renderSVG, renderPDF
@@ -52,7 +48,7 @@ def crear_montaje():
         text(left+col*pitch-3,646,chr(ord('T')-col),8,colors.white,'Helvetica-Bold')
     text(15,679,'Faro: vista del lado de componentes',16,ink,'Helvetica-Bold')
 
-    # Las pistas pertenecen al cobre inferior: se muestran como trazos finos.
+
     for net,a,b in TRACKS:
         x1,y1=xy(a); x2,y2=xy(b)
         color=colors.HexColor(netcolor.get(net,'#a56235'))
@@ -86,7 +82,7 @@ def crear_montaje():
         if vertical: tag(cx+13,cy-3,ref+' '+values[ref])
         else: tag(cx-29,cy-25 if ref=='R2' else cy+15,ref+' '+values[ref])
 
-    # Opticos: la cupula transparente es D1; el cuerpo negro es Q2.
+
     for ref,clear in [('D1',True),('Q2',False)]:
         pins=PARTS[ref][2]
         coords=[xy(h) for h,_ in pins.values()]
@@ -101,7 +97,7 @@ def crear_montaje():
         for pin,(hole,_) in pins.items():
             x,y=xy(hole); text(x-3,y-15,pin,9,colors.white,'Helvetica-Bold')
 
-    # Transistor TO-92, terminales E/B/C identificados por funcion.
+
     pins=PARTS['Q1'][2]
     coords={k:xy(v[0]) for k,v in pins.items()}
     cx,yy=coords['B']
@@ -135,7 +131,7 @@ def crear_montaje():
     d.add(Circle(cx,cy,26,fillColor=colors.HexColor('#505050'),strokeColor=colors.HexColor('#161616'),strokeWidth=2))
     text(cx-13,cy-4,'SW1',12,colors.white,'Helvetica-Bold')
 
-    # Cables aislados por arriba. Los cruces no son uniones electricas.
+
     wirecolors={'W1':'#e49428','W2':'#24619e','W3':'#32975e','W4':'#d3b322','W5':'#f1f0e7'}
     for i,(ref,net,a,b,_) in enumerate(WIRES):
         x1,y1=xy(a); x2,y2=xy(b)
@@ -155,7 +151,7 @@ def crear_montaje():
         d.add(Rect(x-4,y-4,8,8,fillColor=colors.HexColor('#e1bf55'),strokeColor=None))
         text(x+28,y-3,str(i),9,ink,'Helvetica-Bold')
 
-    # Leyenda breve y conector: se reconoce cada pieza sin simbolos electricos.
+
     lx=520
     text(lx,638,'Componentes',16,ink,'Helvetica-Bold')
     legends=[('D1','LED infrarrojo transparente'),('Q2','Fototransistor PT333 negro'),('Q1','Transistor 2N2222A'),

@@ -1,11 +1,3 @@
-"""Demo automatica de la app de chat: 7 nodos en la misma PC, Ana y Beto conversan.
-
-Hacen falta al menos 5 candidatos a relay para armar la cebolla de 3 saltos,
-por eso se levantan 7 nodos.
-
-Uso:
-    python -m app.demo_chat
-"""
 import time
 
 from nacl.public import PrivateKey
@@ -53,18 +45,18 @@ def main():
         beto = Cliente("beto", nodos["B"])
         print(f"Red lista. Ana ID: {ana.nodo.mi_id[:8]}, Beto ID: {beto.nodo.mi_id[:8]}\n")
 
-        # 1. Mensaje privado por 3 relays.
+
         print("1. Ana manda un mensaje privado a Beto...")
         relays = ana.enviar_privado(beto.nodo.mi_id, "hola beto, esto es privado")
         print(f"   Relays usados: {[r[:8] for r in relays]}")
         assert _esperar(lambda: len(beto.nodo.recibidos) > 0), "El mensaje privado no llego"
         msg = beto.recibir_pendientes()[0]
         print(f"   Beto recibio: tipo={msg['tipo']}, texto='{msg['texto']}'")
-        # La pista del emisor NO esta firmada: cualquiera podria poner la de Ana.
+
         if msg["tema_hex"] == pista_emisor(ana.nodo.mi_id):
             print(f"   Posible emisor: {ana.nodo.mi_id[:8]} (pista sin verificar, ver docs/amenazas.md)\n")
 
-        # 2. Mensaje a un tema protegido con frase.
+
         print("2. Ana y Beto se unen al tema 'amigos' con la misma frase...")
         ana.unirse_a_tema("amigos", FRASE)
         beto.unirse_a_tema("amigos", FRASE)

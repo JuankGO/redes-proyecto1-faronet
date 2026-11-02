@@ -1,15 +1,3 @@
-"""Cliente de chat interactivo de FaroNet.
-
-Uso (una terminal por persona; los parametros vienen de la terminal):
-    python3 -m app.chat --nodo 192.168.1.20:7001 --alias ana
-    python3 -m app.chat --nodo 192.168.1.21:7002 --alias beto --semilla 192.168.1.20:7001
-
-Con el Faro conectado (Raspberry Pi):
-    python3 -m app.chat --nodo 192.168.1.20:7001 --alias ana --uart /dev/ttyAMA0
-
-La identidad se guarda en --carpeta (por defecto ~/.faronet). El boton de
-panico fisico (si hay --uart) y el comando /panico la borran.
-"""
 import threading
 import time
 from pathlib import Path
@@ -32,7 +20,7 @@ def _posible_emisor(cliente: Cliente, tema_hex: str) -> str:
 
 
 def _hilo_recepcion(cliente: Cliente, parar: threading.Event):
-    """Hilo en segundo plano que imprime los mensajes que llegan."""
+
     while not parar.is_set():
         time.sleep(0.5)
         for msg in cliente.recibir_pendientes():
@@ -56,7 +44,7 @@ def _buscar_id(cliente: Cliente, prefijo: str):
 
 
 def ejecutar(cliente: Cliente, cmd, indicadores=None) -> bool:
-    """Ejecuta un comando. Devuelve False si hay que salir."""
+
     if cmd.tipo == CMD_SALIR:
         return False
     if cmd.tipo == CMD_AYUDA:
@@ -94,7 +82,7 @@ def ejecutar(cliente: Cliente, cmd, indicadores=None) -> bool:
 
 
 def bucle_principal(cliente: Cliente, indicadores=None):
-    """Lee lineas de la terminal y ejecuta los comandos."""
+
     print(f"Bienvenido a FaroNet, {cliente.alias}.")
     print(f"Tu ID es: {cliente.nodo.mi_id}")
     print("Escribe /ayuda para ver los comandos.\n")
@@ -112,7 +100,7 @@ def bucle_principal(cliente: Cliente, indicadores=None):
                 break
         except (ComandoError, ClienteError, SaltosError) as e:
             print(f"Error: {e}")
-        except Exception as e:   # nunca se cae el chat por una entrada rara
+        except Exception as e:
             print(f"Error inesperado: {e}")
 
 

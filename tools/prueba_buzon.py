@@ -1,14 +1,3 @@
-"""Prueba manual del buzon muerto contra el Worker (local o desplegado).
-
-Hace lo mismo que haria un cliente real (RFC 5.5):
-    id   = HEX(BLAKE2b-256(clave = secreto_compartido, mensaje = "faronet-buzon-v1"))
-    blob = crypto_secretbox(texto rellenado) -> exactamente 1024 bytes
-
-Uso:
-    cd worker && npx wrangler dev          # en otra terminal
-    python3 tools/prueba_buzon.py                       # usa http://localhost:8787
-    python3 tools/prueba_buzon.py https://faronet-worker.TU-CUENTA.workers.dev
-"""
 import os
 import struct
 import sys
@@ -20,7 +9,7 @@ from nacl.hash import blake2b
 from nacl.secret import SecretBox
 
 TAMANO_BLOB = 1024
-LARGO_PLANO = TAMANO_BLOB - SecretBox.NONCE_SIZE - SecretBox.MACBYTES   # 984
+LARGO_PLANO = TAMANO_BLOB - SecretBox.NONCE_SIZE - SecretBox.MACBYTES
 
 
 def id_buzon(secreto: bytes) -> str:
@@ -28,7 +17,7 @@ def id_buzon(secreto: bytes) -> str:
 
 
 def cerrar(secreto: bytes, texto: bytes) -> bytes:
-    """2 bytes de largo + texto + relleno aleatorio, cifrado: siempre 1024 bytes."""
+
     if len(texto) > LARGO_PLANO - 2:
         raise ValueError("texto demasiado largo para el buzon")
     plano = struct.pack(">H", len(texto)) + texto
@@ -53,7 +42,7 @@ def pedir(metodo, url, datos=None):
 
 def main():
     base = sys.argv[1].rstrip("/") if len(sys.argv) > 1 else "http://localhost:8787"
-    secreto = os.urandom(32)            # lo comparten emisor y receptor por otro canal
+    secreto = os.urandom(32)
     url = f"{base}/buzon/{id_buzon(secreto)}"
     blob = cerrar(secreto, "nos vemos a las 8".encode())
 

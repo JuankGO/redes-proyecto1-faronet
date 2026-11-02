@@ -1,4 +1,3 @@
-"""Pruebas del formato del mensaje: tamano fijo, padding, TTL, validaciones."""
 import time
 
 import pytest
@@ -77,7 +76,7 @@ def test_mensaje_vencido_se_rechaza():
 
 def test_mensaje_recien_creado_no_esta_vencido():
     m = empaquetar_mensaje(PRIVADO, TEMA, b"hola")
-    leido = desempaquetar_mensaje(m)   # ahora por defecto
+    leido = desempaquetar_mensaje(m)
     assert leido["texto"] == b"hola"
 
 

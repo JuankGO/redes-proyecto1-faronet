@@ -1,8 +1,3 @@
-"""Demo del parsing de comandos: validos e invalidos.
-
-Uso:
-    python -m app.demo_comandos
-"""
 from app.comandos import ComandoError, parsear_comando
 
 
@@ -20,10 +15,10 @@ LINEAS_INVALIDAS = [
     "hola sin slash",
     "/",
     "/desconocido x y",
-    "/priv a1b2 hola",                # destino muy corto
-    "/priv zzzzzzzz hola",            # no es hex
-    "/priv a1b2c3d4",                 # falta texto
-    "/tema solo-uno",                 # falta texto
+    "/priv a1b2 hola",
+    "/priv zzzzzzzz hola",
+    "/priv a1b2c3d4",
+    "/tema solo-uno",
     "/salir con argumento",
 ]
 

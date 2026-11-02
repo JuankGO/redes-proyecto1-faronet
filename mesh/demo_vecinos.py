@@ -1,8 +1,3 @@
-"""Demo de la tabla de vecinos: HELLO, registro, olvido por timeout.
-
-Uso:
-    python -m mesh.demo_vecinos
-"""
 import time
 
 from mesh.vecinos import (
@@ -14,7 +9,7 @@ from mesh.vecinos import (
 
 
 def main():
-    # Dos nodos ficticios mandan HELLO.
+
     hello_a = crear_hello("aa" * 32, "udp", "192.168.0.10:6001")
     hello_b = crear_hello("bb" * 32, "faro", "aabbccdd")
 
@@ -41,7 +36,7 @@ def main():
     print("  olvidados:", [v[:16] + "..." for v in vencidos])
     print("  vecinos restantes:", len(tabla))
 
-    # Un HELLO mal formado se rechaza sin romper.
+
     print()
     print("Llega un HELLO corrupto:")
     try:

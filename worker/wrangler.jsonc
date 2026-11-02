@@ -1,11 +1,3 @@
-/**
- * Configuracion del Worker de FaroNet (plan gratuito).
- * Docs: https://developers.cloudflare.com/workers/wrangler/configuration/
- *
- * Secretos (NO van en el repositorio):
- *   npx wrangler secret put GATEWAY_PUB      # llave publica Ed25519 del gateway, 64 hex
- * Para desarrollo local, ponerla en worker/.dev.vars (esta en .gitignore).
- */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "faronet-worker",
@@ -23,10 +15,10 @@
 		"bindings": [{ "name": "SALA", "class_name": "Sala" }]
 	},
 	"migrations": [{ "tag": "v1", "new_sqlite_classes": ["Sala"] }],
-	// Limite de peticiones en memoria: 60 por minuto por cliente (RFC 5.7).
+
 	"ratelimits": [{ "name": "LIMITE", "namespace_id": "1001", "simple": { "limit": 60, "period": 60 } }],
-	// Limpieza de mensajes, blobs, entradas y nonces vencidos cada hora.
+
 	"triggers": { "crons": ["17 * * * *"] },
-	// Politica de no registro (RFC 5.8): sin logs ni trazas.
+
 	"observability": { "enabled": false }
 }

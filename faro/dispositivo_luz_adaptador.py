@@ -1,15 +1,3 @@
-"""DispositivoLuzAdaptador: la biblioteca que usa el nodo para hablar con el Faro.
-
-Ofrece (ver RFC, seccion 2.11):
-    enviar(dst, payload, tipo)  envia una trama sin esperar ACK
-    enviar_confiable(dst, payload)  DATA + espera de ACK con reintentos
-    enviar_crudo(trama_bytes)   transmite una trama armada afuera (Scapy)
-    recibir(timeout)            siguiente DATA o BEACON para este Faro
-    cambiar_direccion(nueva)    usa una direccion fisica nueva y la anuncia
-
-No es seguro usar la misma instancia desde dos hilos a la vez: el nodo
-la maneja desde un solo hilo (mesh/enlace_faro.py).
-"""
 import random
 import time
 from collections import deque
@@ -31,11 +19,11 @@ class DispositivoLuzAdaptador:
         self.indicadores = indicadores
         self._seq = 0
         self._pendientes = deque()
-        self._ultimo_de = {}          # src -> ultimo SEQ entregado (anti duplicados)
+        self._ultimo_de = {}
         self.estadisticas = {"enviadas": 0, "recibidas": 0, "descartadas": 0,
                              "reintentos": 0}
 
-    # ----- transmision -----
+
 
     def _esperar_canal_libre(self) -> None:
         intento = 0
@@ -62,22 +50,18 @@ class DispositivoLuzAdaptador:
         return self._seq
 
     def enviar(self, dst: bytes, payload: bytes, tipo: int = frame.TIPO_DATA) -> int:
-        """Envia una vez, sin esperar confirmacion. Devuelve el SEQ usado."""
+
         seq = self._siguiente_seq()
         self._transmitir(frame.Trama(tipo, dst, self.direccion, seq, payload))
         return seq
 
     def enviar_crudo(self, trama_bytes: bytes) -> None:
-        """Transmite una trama ya construida (por ejemplo con Scapy).
 
-        Se valida antes de enviarla: largo, version y CRC. Lanza
-        frame.TramaError si no cumple el formato.
-        """
         frame.decodificar(bytes(trama_bytes))
         self._transmitir_bytes(bytes(trama_bytes))
 
     def enviar_confiable(self, dst: bytes, payload: bytes) -> bool:
-        """Envia una DATA y espera su ACK; reintenta hasta max_reintentos."""
+
         seq = self._siguiente_seq()
         trama = frame.Trama(frame.TIPO_DATA, dst, self.direccion, seq, payload)
         for intento in range(1 + self.max_reintentos):
@@ -92,14 +76,14 @@ class DispositivoLuzAdaptador:
                 if t.tipo == frame.TIPO_ACK and t.seq == seq and t.src == dst:
                     return True
                 if t.tipo != frame.TIPO_ACK:
-                    # Se confirma de una vez para que el otro no retransmita
-                    # mientras nosotros esperamos nuestro propio ACK.
+
+
                     if self._aceptar(t):
                         self._pendientes.append(t)
         return False
 
     def _aceptar(self, t) -> bool:
-        """Confirma una DATA dirigida a este Faro. Devuelve False si es repetida."""
+
         if t.tipo == frame.TIPO_DATA and t.dst == self.direccion:
             self._transmitir(frame.Trama(frame.TIPO_ACK, t.src, self.direccion, t.seq))
             if self._ultimo_de.get(t.src) == t.seq:
@@ -108,7 +92,7 @@ class DispositivoLuzAdaptador:
         return True
 
     def cambiar_direccion(self, nueva: bytes) -> None:
-        """Usa una direccion fisica nueva y la anuncia con un BEACON."""
+
         if len(nueva) != 4 or nueva in (b"\x00" * 4, frame.BROADCAST):
             raise ValueError("direccion fisica invalida")
         self.direccion = nueva
@@ -116,7 +100,7 @@ class DispositivoLuzAdaptador:
         self._pendientes.clear()
         self.enviar(frame.BROADCAST, b"", frame.TIPO_BEACON)
 
-    # ----- recepcion -----
+
 
     def _leer_una(self, timeout: float):
         medios = self.medio.recibir(timeout)
@@ -128,7 +112,7 @@ class DispositivoLuzAdaptador:
             self.estadisticas["descartadas"] += 1
             return None
         if trama.src == self.direccion:
-            # Eco de nuestra propia luz (reflejo): se ignora.
+
             return None
         if trama.dst not in (self.direccion, frame.BROADCAST):
             return None
@@ -140,15 +124,11 @@ class DispositivoLuzAdaptador:
         return trama
 
     def recibir(self, timeout: float = 1.0):
-        """Devuelve la siguiente trama DATA/BEACON para este nodo (o None).
 
-        Confirma toda DATA dirigida a este Faro (aunque sea repetida) y
-        no entrega dos veces la misma (SRC, SEQ) seguida.
-        """
         limite = time.monotonic() + timeout
         while True:
             if self._pendientes:
-                return self._pendientes.popleft()   # ya confirmadas
+                return self._pendientes.popleft()
             restante = limite - time.monotonic()
             if restante <= 0:
                 return None
@@ -158,5 +138,5 @@ class DispositivoLuzAdaptador:
             if t.tipo == frame.TIPO_ACK:
                 continue
             if not self._aceptar(t):
-                continue   # retransmision de algo ya entregado
+                continue
             return t

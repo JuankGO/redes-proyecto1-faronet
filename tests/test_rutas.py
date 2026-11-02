@@ -1,4 +1,3 @@
-"""Pruebas de la tabla de rutas: aprendizaje, convergencia, olvido."""
 import pytest
 
 from mesh.rutas import INFINITO, RutaError, TablaRutas
@@ -20,7 +19,7 @@ def test_nodo_no_es_vecino_de_si_mismo():
 def test_aprender_ruta_de_vecino():
     t = TablaRutas("A")
     t.aprender_vecino_directo("B", ahora=0)
-    # B me dice que llega a C en 1.
+
     cambios = t.actualizar_desde("B", {"C": 1}, ahora=1)
     assert cambios == [("C", 2, "B")]
     assert t.ruta_hacia("C")["saltos"] == 2
@@ -31,7 +30,7 @@ def test_no_acepta_costo_infinito():
     t = TablaRutas("A")
     t.aprender_vecino_directo("B", ahora=0)
     cambios = t.actualizar_desde("B", {"X": INFINITO - 1}, ahora=1)
-    # INFINITO - 1 + 1 = INFINITO -> no se acepta.
+
     assert cambios == []
     assert t.ruta_hacia("X") is None
 
@@ -40,10 +39,10 @@ def test_prefiere_ruta_mas_corta():
     t = TablaRutas("A")
     t.aprender_vecino_directo("B", ahora=0)
     t.aprender_vecino_directo("C", ahora=0)
-    # B dice: llego a X en 5.
+
     t.actualizar_desde("B", {"X": 5}, ahora=1)
     assert t.ruta_hacia("X")["saltos"] == 6
-    # C dice: llego a X en 2. Mejor, cambio.
+
     t.actualizar_desde("C", {"X": 2}, ahora=2)
     assert t.ruta_hacia("X")["saltos"] == 3
     assert t.ruta_hacia("X")["siguiente"] == "C"
@@ -53,8 +52,8 @@ def test_no_empeora_ruta_existente():
     t = TablaRutas("A")
     t.aprender_vecino_directo("B", ahora=0)
     t.aprender_vecino_directo("C", ahora=0)
-    t.actualizar_desde("C", {"X": 2}, ahora=1)      # X en 3 via C
-    # B anuncia X en 5: peor, no cambio.
+    t.actualizar_desde("C", {"X": 2}, ahora=1)
+
     cambios = t.actualizar_desde("B", {"X": 5}, ahora=2)
     assert cambios == []
     assert t.ruta_hacia("X")["saltos"] == 3
@@ -65,7 +64,7 @@ def test_refresca_ruta_del_mismo_siguiente():
     t = TablaRutas("A")
     t.aprender_vecino_directo("B", ahora=0)
     t.actualizar_desde("B", {"X": 3}, ahora=1)
-    # B anuncia lo mismo otra vez: no es cambio, pero refresca el timestamp.
+
     cambios = t.actualizar_desde("B", {"X": 3}, ahora=10)
     assert cambios == []
     assert t.ruta_hacia("X")["actualizado"] == 10
@@ -74,7 +73,7 @@ def test_refresca_ruta_del_mismo_siguiente():
 def test_ignora_su_propio_id_en_el_anuncio():
     t = TablaRutas("A")
     t.aprender_vecino_directo("B", ahora=0)
-    # B dice que llega a A en 1 (lo cual es cierto, pero yo soy A).
+
     cambios = t.actualizar_desde("B", {"A": 1}, ahora=1)
     assert cambios == []
     assert t.ruta_hacia("A") is None
@@ -98,7 +97,7 @@ def test_olvidar_rutas_vencidas():
 
 
 def test_convergencia_lineal():
-    """Aprender en cadena: A -- B -- C -- D. Tras 3 rondas A llega a D en 3."""
+
     nodos = ["A", "B", "C", "D"]
     enlaces = [("A", "B"), ("B", "C"), ("C", "D")]
     tablas = {n: TablaRutas(n) for n in nodos}

@@ -2,7 +2,7 @@ import { SELF, env, createScheduledController, createExecutionContext, waitOnExe
 import { describe, it, expect, beforeAll } from "vitest";
 import worker, { entradaValida, escaparXml, jsonCanonico } from "../src/index";
 
-// Llave privada de prueba del gateway (semilla 00 01 ... 1f). Su publica esta en vitest.config.mts.
+
 const JWK_GATEWAY = {
 	kty: "OKP",
 	crv: "Ed25519",
@@ -10,8 +10,8 @@ const JWK_GATEWAY = {
 	x: "A6EHv_POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg",
 };
 
-// Entrada firmada por Python (mesh/directorio.py) para comprobar que ambos lados
-// producen el mismo JSON canonico y verifican la misma firma.
+
+
 const ENTRADA_PY = {
 	v: 1,
 	id: "29acbae141bccaf0b22e1a94d34d0bc7361e526d0bfe12c89794bc9322966dd7",
@@ -154,7 +154,7 @@ describe("salas publicas", () => {
 		};
 		await esperar(() => llegados.length >= 1);
 		expect(llegados[0].historial[0].texto).toBe("antes de conectar");
-		// Lo que manda el navegador se ignora (sala de solo lectura).
+
 		ws.send(JSON.stringify({ texto: "intento de escribir" }));
 		await postFirmado("/api/relay", { tema: "envivo", texto: "en vivo" });
 		await esperar(() => llegados.length >= 2);

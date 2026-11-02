@@ -35,5 +35,5 @@ def test_manchester_y_sincronizacion():
     crudo = frame.codificar(frame.Trama(1, b"\x01" * 4, b"\x02" * 4, 1, b"hola mundo"))
     senal = linea.armar_senal(crudo)
     assert linea.extraer_trama(senal) == crudo
-    assert linea.extraer_trama([0, 0, 1] + senal) == crudo   # ruido al inicio
-    assert linea.extraer_trama([1] + senal) == crudo         # desfase de medio bit
+    assert linea.extraer_trama([0, 0, 1] + senal) == crudo
+    assert linea.extraer_trama([1] + senal) == crudo

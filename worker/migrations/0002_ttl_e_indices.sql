@@ -1,5 +1,3 @@
--- Migration number: 0002 	 2026-10-26
--- Tiempo de vida de los mensajes publicos (RFC 5.4) e indices para las consultas.
 ALTER TABLE mensajes ADD COLUMN expira INTEGER NOT NULL DEFAULT 0;
 
 CREATE INDEX IF NOT EXISTS idx_mensajes_tema ON mensajes (tema, creado);

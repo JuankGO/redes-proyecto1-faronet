@@ -1,4 +1,3 @@
-"""Pruebas de la eleccion de saltos: filtros, minimo de nodos, aleatoriedad."""
 import pytest
 
 from mesh.saltos import MINIMO_NODOS, SaltosError, elegir_saltos
@@ -37,7 +36,7 @@ def test_no_incluye_mi_id_ni_el_destino():
     d = _directorio(10)
     mi_id = _entrada(1)["id"]
     destino_id = _entrada(2)["id"]
-    for _ in range(20):   # varias veces para reducir la chance de falso negativo
+    for _ in range(20):
         saltos = elegir_saltos(d, mi_id, destino_id)
         ids = [s["id"] for s in saltos]
         assert mi_id not in ids
@@ -45,13 +44,13 @@ def test_no_incluye_mi_id_ni_el_destino():
 
 
 def test_falla_si_hay_pocos_nodos():
-    d = _directorio(4)   # 2 utiles despues de quitar mi id y el destino
+    d = _directorio(4)
     with pytest.raises(SaltosError, match="anonimato"):
         elegir_saltos(d, _entrada(1)["id"], _entrada(2)["id"])
 
 
 def test_ignora_duplicados_en_el_directorio():
-    d = _directorio(8) + _directorio(8)   # todo duplicado
+    d = _directorio(8) + _directorio(8)
     saltos = elegir_saltos(d, _entrada(1)["id"], _entrada(2)["id"])
     ids = [s["id"] for s in saltos]
     assert len(set(ids)) == 3
@@ -64,6 +63,6 @@ def test_cantidad_invalida():
 
 
 def test_entradas_sin_id_se_ignoran():
-    d = _directorio(10) + [{"canal": "udp", "direccion": "x"}]   # sin id
+    d = _directorio(10) + [{"canal": "udp", "direccion": "x"}]
     saltos = elegir_saltos(d, _entrada(1)["id"], _entrada(2)["id"])
     assert len(saltos) == 3

@@ -1,22 +1,3 @@
-"""Nodo de FaroNet: junta medio, directorio, vecinos, rutas, cebolla y celdas.
-
-Un nodo es un programa autonomo que:
-- Se identifica con un par Ed25519 + X25519 (guardado en su carpeta).
-- Publica su entrada al directorio (firmada) y la renueva antes de que venza.
-- Manda HELLO cada 10 s a semillas y vecinos; olvida vecinos a los 30 s.
-- Propaga TODAS las entradas validas del directorio que conoce.
-- Intercambia tablas de rutas con sus vecinos.
-- Reenvia celdas por la tabla de rutas hacia el siguiente salto de la
-  cebolla, o abre la cebolla si la celda es para el.
-- Puede tener un enlace Faro ademas de UDP (los gateways).
-
-Mensajes (RFC, seccion 3): JSON con "t" y "v". Todo mensaje mal formado
-se descarta en silencio; nunca detiene al nodo. El nodo no imprime ni
-guarda direcciones de los saltos que reenvia.
-
-Uso:
-    python3 -m mesh.nodo --puerto 6001 --semilla 192.168.1.20:6002
-"""
 import argparse
 import base64
 import json
@@ -53,15 +34,15 @@ from mesh.vecinos import TablaVecinos, VecinoError, validar_hello
 
 VERSION = 1
 INTERVALO_PERIODICO = 10.0
-INTERVALO_DIR_FARO = 60.0          # el directorio completo por luz cuesta caro
-INTERVALO_ROTACION = 86400.0       # la direccion fisica se rota al menos cada 24 h (RFC 2.7)
+INTERVALO_DIR_FARO = 60.0
+INTERVALO_ROTACION = 86400.0
 TAMANO_DATAGRAMA = 65535
-TTL_RECIBIDO = 3600                # los mensajes recibidos viven 1 hora en memoria
+TTL_RECIBIDO = 3600
 MAX_RECIBIDOS = 1000
 
 
 class Nodo:
-    """Un nodo de FaroNet."""
+
 
     def __init__(self, puerto: int, firma: SigningKey, cifrado: PrivateKey,
                  semillas: list = None, canal: str = "udp",
@@ -89,8 +70,8 @@ class Nodo:
         self.vecinos = TablaVecinos()
         self.recibidos = []
         self._horas_recibidos = deque()
-        self.al_recibir_mensaje = None    # callback opcional(bytes)
-        self.al_panico = None             # callback opcional()
+        self.al_recibir_mensaje = None
+        self.al_panico = None
         self.descartados = 0
         self._dir_enviado_faro = 0.0
         self._huella_dir_faro = frozenset()
@@ -100,7 +81,7 @@ class Nodo:
         self._corriendo = False
         self._hilo = None
 
-    # ----- Identidad y entrada del directorio -----
+
 
     def _usar_identidad(self, firma: SigningKey, cifrado: PrivateKey) -> None:
         self.firma = firma
@@ -115,7 +96,7 @@ class Nodo:
         self.firma_entrada = firmar(self.entrada, self.firma)
         self.directorio[self.mi_id] = (self.entrada, self.firma_entrada)
 
-    # ----- Ciclo de vida -----
+
 
     def arrancar(self) -> None:
         self.sock.bind(("0.0.0.0", self.puerto))
@@ -156,7 +137,7 @@ class Nodo:
                     break
                 continue
             except Exception:
-                self.descartados += 1      # nunca se cae el hilo
+                self.descartados += 1
             ahora = time.time()
             if ahora - ultimo_periodico >= INTERVALO_PERIODICO:
                 try:
@@ -182,7 +163,7 @@ class Nodo:
             self.rotar_direccion_faro()
 
     def rotar_direccion_faro(self) -> None:
-        """Cambia la direccion fisica del Faro y la anuncia (RFC 2.7)."""
+
         if self.enlace is None:
             return
         from faro import direccion as dirmod
@@ -190,7 +171,7 @@ class Nodo:
         self.enlace.rotar_direccion(dirmod.rotar(ruta) if ruta else dirmod.nueva())
         self._ultima_rotacion = time.time()
 
-    # ----- Envio periodico -----
+
 
     def _mensajes_periodicos(self, canal: str, direccion: str) -> list:
         hello = {"t": "hello", "v": VERSION, "id": self.mi_id, "canal": canal,
@@ -206,7 +187,7 @@ class Nodo:
         for destino in destinos:
             for m in mensajes:
                 self._mandar_udp(m, destino)
-            time.sleep(0.002)   # respiro para no saturar el buffer del receptor
+            time.sleep(0.002)
         if self.enlace is not None:
             self._periodico_faro()
 
@@ -217,7 +198,7 @@ class Nodo:
         dst = vecinos_faro[0] if len(vecinos_faro) == 1 else None
         self.enlace.enviar(self._codificar(hello), None)
         self.enlace.enviar(self._codificar(ruta_msg), dst)
-        # El directorio completo por luz es caro: se manda si cambio o cada 60 s.
+
         huella = frozenset((e["id"], e["creado"]) for e in self.directorio.entradas())
         ahora = time.time()
         if huella != self._huella_dir_faro or ahora - self._dir_enviado_faro >= INTERVALO_DIR_FARO:
@@ -246,16 +227,16 @@ class Nodo:
             pass
 
     def enviar_ahora(self) -> None:
-        """Fuerza un envio periodico inmediato (util para demos y pruebas)."""
+
         self._periodico()
 
-    # ----- Recepcion -----
+
 
     def _al_recibir_faro(self, datos: bytes, mac: bytes) -> None:
         self._procesar(datos, ("faro", mac))
 
     def _procesar(self, datos: bytes, origen) -> None:
-        """Procesa un datagrama. Cualquier error lo descarta en silencio."""
+
         try:
             mensaje = json.loads(datos.decode("utf-8"))
             if not isinstance(mensaje, dict):
@@ -290,7 +271,7 @@ class Nodo:
             return
         canal_origen = origen[0]
         if mensaje["canal"] != canal_origen:
-            return   # un HELLO de udp no puede llegar por luz ni al reves
+            return
         self.vecinos.registrar(mensaje)
         self.rutas.aprender_vecino_directo(mensaje["id"])
 
@@ -320,7 +301,7 @@ class Nodo:
             self.descartados += 1
             return
         if vecino_id == self.mi_id or self.vecinos.obtener(vecino_id) is None:
-            return   # solo se aprende de vecinos directos
+            return
         self.rutas.actualizar_desde(vecino_id, tabla)
 
     def _on_celda(self, mensaje: dict) -> None:
@@ -330,7 +311,7 @@ class Nodo:
             self.descartados += 1
             return
         if hacia != self.mi_id:
-            # Solo reenvio: no se abre ni se registra nada.
+
             self._entregar(hacia, mensaje)
             return
         frags = [base64.b64decode(f, validate=True) for f in frags_b64]
@@ -375,7 +356,7 @@ class Nodo:
             return
         self._mandar_celda(entrada["id"], interno)
 
-    # ----- Entrega por la red -----
+
 
     def _mandar_celda(self, hacia: str, contenido: bytes) -> None:
         frags = fragmentar(empaquetar_celda(contenido))
@@ -387,7 +368,7 @@ class Nodo:
             self._entregar(hacia, mensaje)
 
     def _entregar(self, hacia: str, mensaje: dict) -> bool:
-        """Manda un mensaje hacia un nodo: vecino directo, ruta, o UDP directo."""
+
         with self._lock:
             siguiente = hacia
             vecino = self.vecinos.obtener(hacia)
@@ -399,7 +380,7 @@ class Nodo:
             if vecino is not None:
                 canal, direccion = vecino["canal"], vecino["dir"]
             else:
-                # Misma comunidad sin ruta aun: se usa la direccion del directorio.
+
                 e = self.directorio.get(hacia)
                 if e is None or e[0]["canal"] != "udp":
                     return False
@@ -412,7 +393,7 @@ class Nodo:
             return self.enlace.enviar(self._codificar(mensaje), bytes.fromhex(direccion))
         return False
 
-    # ----- API publica -----
+
 
     def candidatos_relay(self, destino_id: str) -> list:
         return [e for e in self.directorio.entradas()
@@ -420,12 +401,7 @@ class Nodo:
 
     def mandar_a(self, destino_id: str, mensaje: bytes,
                  permitir_directo: bool = None) -> list:
-        """Arma una cebolla de 3 relays y la manda al destino.
 
-        Si hay menos de MINIMO_NODOS candidatos lanza SaltosError, salvo que
-        se permita el modo directo (solo para pruebas), que manda sin relays.
-        Devuelve la lista de ids de los relays elegidos.
-        """
         if permitir_directo is None:
             permitir_directo = self.permitir_directo
         with self._lock:
@@ -458,13 +434,7 @@ class Nodo:
             return [e["id"] for e in self.directorio.gateways() if e["id"] != self.mi_id]
 
     def panico(self, indicadores=None) -> list:
-        """Boton de panico (RFC, seccion 6).
 
-        Sobrescribe con ceros y borra llaves y direccion fisica del disco,
-        borra el estado en memoria, genera una identidad y una direccion
-        fisica nuevas e indica el borrado con los LEDs. Devuelve los
-        archivos borrados.
-        """
         borrados = borrar_archivos(self.carpeta) if self.carpeta else []
         with self._lock:
             self.directorio.limpiar()
@@ -488,7 +458,7 @@ class Nodo:
 
 
 def crear_nodo_desde_args(a) -> Nodo:
-    """Arma un nodo a partir de los argumentos comunes de la terminal."""
+
     semillas = []
     for s in a.semilla:
         ip, puerto = s.rsplit(":", 1)
@@ -502,7 +472,7 @@ def crear_nodo_desde_args(a) -> Nodo:
         from faro.gpio import Indicadores
         from faro.medio import MedioUART
         from mesh.enlace_faro import EnlaceFaro
-        mac = dirmod.rotar(carpeta / "direccion.bin")   # rota en cada arranque
+        mac = dirmod.rotar(carpeta / "direccion.bin")
         adaptador = DispositivoLuzAdaptador(MedioUART(a.uart, a.baudios), mac,
                                             indicadores=Indicadores())
         enlace = EnlaceFaro(adaptador)

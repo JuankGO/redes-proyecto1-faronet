@@ -1,14 +1,3 @@
-"""Demo: 8 nodos en threads, A manda un mensaje privado a H via 3 relays.
-
-Uso:
-    python -m mesh.demo_nodo
-
-Notas:
-- Se espera a que TODOS los nodos abran su socket antes de forzar el primer
-  anuncio (enviar_ahora). Sin esto, el primer HELLO/DIR/RUTA se pierde
-  porque los demas nodos todavia no estaban escuchando.
-- Se da mas tiempo antes de detener, para que la cadena de relays complete.
-"""
 import time
 
 from nacl.public import PrivateKey
@@ -37,14 +26,14 @@ def main():
     for n in nodos.values():
         n.arrancar()
 
-    # Damos tiempo a que todos abran el socket.
+
     time.sleep(0.5)
 
-    # Forzamos un anuncio inmediato para que todos se conozcan ya.
+
     for n in nodos.values():
         n.enviar_ahora()
 
-    # Damos tiempo a que lleguen los DIR/RUTA cruzados.
+
     time.sleep(1.5)
 
     a = nodos["A"]
@@ -58,7 +47,7 @@ def main():
     print("Relays elegidos:", [r[:6] + "..." for r in relays])
     print()
 
-    # Esperar a que el mensaje recorra la cadena de relays.
+
     limite = time.time() + 5
     while time.time() < limite and not h.recibidos:
         time.sleep(0.1)

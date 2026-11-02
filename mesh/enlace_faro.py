@@ -1,18 +1,3 @@
-"""Enlace Faro para la mesh (RFC, seccion 3.9).
-
-Lleva los mismos mensajes JSON de la mesh por el Faro. Como un mensaje
-puede medir mas que el payload de una trama (114 bytes), se parte en
-fragmentos:
-
-    | INDICE 2B | TOTAL 2B | DATOS hasta 110B |
-
-Cada fragmento viaja en una trama DATA. Si se conoce la direccion fisica
-del vecino se usa entrega confiable (ACK); si no (HELLO inicial), se
-manda a difusion sin ACK.
-
-Un solo hilo usa el DispositivoLuzAdaptador, porque la biblioteca no se
-puede usar desde dos hilos a la vez. Los demas hilos solo encolan.
-"""
 import queue
 import struct
 import threading
@@ -27,11 +12,11 @@ MAX_MENSAJE = 64 * 1024
 
 class EnlaceFaro:
     def __init__(self, adaptador, al_recibir=None):
-        """al_recibir(datos: bytes, mac_origen: bytes) se llama al completar un mensaje."""
+
         self.adaptador = adaptador
         self.al_recibir = al_recibir
         self._salida = queue.Queue(maxsize=256)
-        self._parcial = {}      # mac -> {"total", "piezas", "visto"}
+        self._parcial = {}
         self._corriendo = False
         self._hilo = None
         self.perdidos = 0
@@ -40,7 +25,7 @@ class EnlaceFaro:
     def direccion(self) -> bytes:
         return self.adaptador.direccion
 
-    # ----- API -----
+
 
     def arrancar(self) -> None:
         self._corriendo = True
@@ -53,7 +38,7 @@ class EnlaceFaro:
             self._hilo.join(timeout=3.0)
 
     def enviar(self, datos: bytes, dst: bytes = None) -> bool:
-        """Encola un mensaje. dst = direccion fisica del vecino o None (difusion)."""
+
         if len(datos) > MAX_MENSAJE:
             return False
         try:
@@ -64,10 +49,10 @@ class EnlaceFaro:
             return False
 
     def rotar_direccion(self, nueva: bytes) -> None:
-        """Cambia la direccion fisica desde el hilo del enlace."""
+
         self._salida.put(("rotar", nueva, None))
 
-    # ----- hilo del enlace -----
+
 
     @staticmethod
     def fragmentar(datos: bytes) -> list:
@@ -81,7 +66,7 @@ class EnlaceFaro:
                 self.adaptador.enviar(frame.BROADCAST, frag)
             elif not self.adaptador.enviar_confiable(dst, frag):
                 self.perdidos += 1
-                return   # el receptor descarta el mensaje incompleto
+                return
 
     def _recibir_fragmento(self, mac: bytes, frag: bytes) -> None:
         if len(frag) < 4:
@@ -103,7 +88,7 @@ class EnlaceFaro:
                 try:
                     self.al_recibir(datos, mac)
                 except Exception:
-                    pass   # un mensaje malo no debe tumbar el enlace
+                    pass
 
     def _purgar(self) -> None:
         ahora = time.monotonic()
@@ -130,4 +115,4 @@ class EnlaceFaro:
                     t = self.adaptador.recibir(0.0) if self.adaptador._pendientes else None
                 self._purgar()
             except Exception:
-                time.sleep(0.05)   # error del medio: se sigue intentando
+                time.sleep(0.05)

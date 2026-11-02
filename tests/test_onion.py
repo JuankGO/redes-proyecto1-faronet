@@ -1,4 +1,3 @@
-"""Pruebas de la cebolla: cada relay abre solo su capa, el destino recibe intacto."""
 import pytest
 from nacl.public import PrivateKey
 
@@ -14,15 +13,15 @@ from mesh.onion import (
 
 
 def _escenario():
-    """Genera 3 relays y un destino, devuelve todo listo para usar."""
+
     r1, r2, r3, d = (PrivateKey.generate() for _ in range(4))
     dir_r2 = direccion_udp("192.168.0.12", 6002)
     dir_r3 = direccion_udp("192.168.0.13", 6003)
     dir_d = direccion_udp("192.168.0.14", 6004)
     saltos = [
-        (r1.public_key, CANAL_UDP, dir_r2),   # R1 -> R2
-        (r2.public_key, CANAL_UDP, dir_r3),   # R2 -> R3
-        (r3.public_key, CANAL_UDP, dir_d),    # R3 -> D
+        (r1.public_key, CANAL_UDP, dir_r2),
+        (r2.public_key, CANAL_UDP, dir_r3),
+        (r3.public_key, CANAL_UDP, dir_d),
     ]
     return r1, r2, r3, d, saltos, dir_r2, dir_r3, dir_d
 
@@ -38,7 +37,7 @@ def test_cebolla_llega_al_destino():
 
 
 def test_relay_no_ve_el_mensaje():
-    """R1 no debe poder leer el contenido que le pasa a R2."""
+
     r1, r2, r3, d, saltos, _, _, _ = _escenario()
     celda = construir_cebolla(d.public_key, saltos, b"secreto muy privado")
     _, _, contenido = abrir_como_relay(celda, r1)
@@ -48,7 +47,7 @@ def test_relay_no_ve_el_mensaje():
 
 
 def test_relay_ve_solo_su_siguiente_salto():
-    """R1 solo ve la direccion de R2, no la de R3 ni la del destino."""
+
     r1, r2, r3, d, saltos, dir_r2, dir_r3, dir_d = _escenario()
     celda = construir_cebolla(d.public_key, saltos, b"hola")
     _, dir_sig_r1, _ = abrir_como_relay(celda, r1)
