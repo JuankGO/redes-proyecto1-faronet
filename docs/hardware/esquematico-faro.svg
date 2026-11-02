@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="900" height="650" preserveAspectRatio="xMinYMin meet" viewBox="0 0 900 650" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="900" height="650"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-650)" style="clip-path: url(#clip)">
+		<g transform="">
+			<text x="30" y="615" style="font-family: Helvetica; font-size: 22px;fill: rgb(7%,42%,50%); stroke:none;" transform="translate(0,1230) scale(1,-1)">FaroNet | Faro 3V3 | GPIO17 / GPIO27</text>
+			<text x="30" y="590" style="font-family: Helvetica; font-size: 12px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,1180) scale(1,-1)">Raspberry Pi 2 + LED IR + PT333. Redes por funcion, no por orientacion de patillas.</text>
+			<path d="M 30,575 L 870,575 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="40" y="551" style="font-family: Helvetica; font-size: 16px;fill: rgb(7%,42%,50%); stroke:none;" transform="translate(0,1102) scale(1,-1)">EMISOR</text>
+			<text x="600" y="551" style="font-family: Helvetica; font-size: 16px;fill: rgb(7%,42%,50%); stroke:none;" transform="translate(0,1102) scale(1,-1)">RECEPTOR INVERTIDO</text>
+			<text x="331" y="531" style="font-family: Helvetica; font-size: 14px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,1062) scale(1,-1)">3V3</text>
+			<path d="M 360,520 L 360,504 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<rect x="353" y="476.0" width="14" height="28.0" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<path d="M 360,476 L 360,460 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="379" y="486.0" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,972) scale(1,-1)">R1 330 ohm</text>
+			<path d="M 360,460 L 360,440 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 360,440 L 360,429 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="351 429, 369 429, 360 413" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<path d="M 350,411 L 370,411 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 360,411 L 360,399 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 373,426 L 391,442 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="391 442, 383.3042 439.815, 387.9278 434.6134" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(8%,18%,25%); fill-rule: evenodd;"/>
+			<path d="M 378,416 L 396,432 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="396 432, 388.3042 429.815, 392.9278 424.6134" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(8%,18%,25%); fill-rule: evenodd;"/>
+			<text x="404" y="417" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,834) scale(1,-1)">D1 LED IR</text>
+			<path d="M 360,399 L 360,380 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<circle cx="345" cy="355" r="27" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8; fill: none; fill-rule: evenodd;"/>
+			<path d="M 332,340 L 332,370 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 332,363 L 360,380 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 332,347 L 360,330 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 343,340 L 356,332 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="356 332, 351.6887 338.7389, 348.0413 332.8118" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(8%,18%,25%); fill-rule: evenodd;"/>
+			<path d="M 302,355 L 332,355 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="388" y="352" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,704) scale(1,-1)">Q1 2N2222A</text>
+			<text x="369" y="381" style="font-family: Helvetica; font-size: 11px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,762) scale(1,-1)">C</text>
+			<text x="369" y="323" style="font-family: Helvetica; font-size: 11px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,646) scale(1,-1)">E</text>
+			<text x="36" y="350" style="font-family: Helvetica; font-size: 14px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,700) scale(1,-1)">GPIO17</text>
+			<path d="M 100,355 L 125,355 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 125,355 L 154,355 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<rect x="154.0" y="348" width="42.0" height="14" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<path d="M 196,355 L 225,355 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="146.0" y="375" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,750) scale(1,-1)">R2 2k2</text>
+			<path d="M 225,355 L 302,355 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<circle cx="270" cy="355" r="3" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(8%,18%,25%); fill-rule: evenodd;"/>
+			<path d="M 270,355 L 270,335 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<rect x="263" y="307.0" width="14" height="28.0" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<path d="M 270,307 L 270,287 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="289" y="317.0" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,634) scale(1,-1)">R3 10k</text>
+			<path d="M 360,330 L 360,287 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 270,287 L 360,287 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 360,287 L 360,280 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 348,280 L 372,280 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 352,275 L 368,275 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 356,270 L 364,270 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="307" y="364" style="font-family: Helvetica; font-size: 11px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,728) scale(1,-1)">B</text>
+			<text x="59" y="531" style="font-family: Helvetica; font-size: 14px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,1062) scale(1,-1)">3V3</text>
+			<path d="M 80,520 L 80,491 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 66,491 L 94,491 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 66,480 L 94,480 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 80,480 L 80,450 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 80,450 L 80,443 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 68,443 L 92,443 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 72,438 L 88,438 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 76,433 L 84,433 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="108" y="480" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,960) scale(1,-1)">C1 100 nF</text>
+			<text x="685" y="531" style="font-family: Helvetica; font-size: 14px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,1062) scale(1,-1)">3V3</text>
+			<path d="M 715,520 L 715,504 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<rect x="708" y="476.0" width="14" height="28.0" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<path d="M 715,476 L 715,460 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="734" y="486.0" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,972) scale(1,-1)">R4 10k</text>
+			<path d="M 715,460 L 715,440 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<circle cx="715" cy="440" r="3" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(8%,18%,25%); fill-rule: evenodd;"/>
+			<path d="M 715,440 L 845,440 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="756" y="454" style="font-family: Helvetica; font-size: 14px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,908) scale(1,-1)">GPIO27 RX</text>
+			<path d="M 715,440 L 715,380 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<circle cx="700" cy="355" r="27" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8; fill: none; fill-rule: evenodd;"/>
+			<path d="M 687,340 L 687,370 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 687,363 L 715,380 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 687,347 L 715,330 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 698,340 L 711,332 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="711 332, 706.6887 338.7389, 703.0413 332.8118" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(8%,18%,25%); fill-rule: evenodd;"/>
+			<path d="M 643,385 L 673,367 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="673 367, 668.6133 373.69, 665.0327 367.7224" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(8%,18%,25%); fill-rule: evenodd;"/>
+			<path d="M 638,372 L 668,354 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="668 354, 663.6133 360.69, 660.0327 354.7224" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(8%,18%,25%); fill-rule: evenodd;"/>
+			<text x="743" y="352" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,704) scale(1,-1)">Q2 PT333</text>
+			<text x="724" y="381" style="font-family: Helvetica; font-size: 11px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,762) scale(1,-1)">C</text>
+			<text x="724" y="323" style="font-family: Helvetica; font-size: 11px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,646) scale(1,-1)">E</text>
+			<path d="M 715,330 L 715,287 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 715,287 L 715,280 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 703,280 L 727,280 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 707,275 L 723,275 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 711,270 L 719,270 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="600" y="262" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,524) scale(1,-1)">Sin luz: RX=1. Con luz: RX=0.</text>
+			<text x="600" y="244" style="font-family: Helvetica; font-size: 12px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,488) scale(1,-1)">La lectura UART se invierte en pigpio.</text>
+			<path d="M 30,226 L 870,226 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="40" y="200" style="font-family: Helvetica; font-size: 15px;fill: rgb(7%,42%,50%); stroke:none;" transform="translate(0,400) scale(1,-1)">INDICADORES</text>
+			<text x="35" y="162" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,324) scale(1,-1)">GPIO22</text>
+			<path d="M 100,166 L 125,166 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 125,166 L 154,166 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<rect x="154.0" y="159" width="42.0" height="14" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<path d="M 196,166 L 225,166 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="146.0" y="186" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,372) scale(1,-1)">R5 1k</text>
+			<path d="M 225,166 L 280,166 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 280,166 L 291,166 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="291 157, 291 175, 307 166" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<path d="M 309,156 L 309,176 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 309,166 L 320,166 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 296,181 L 310,195 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="310 195, 302.4458 192.3668, 307.3668 187.4458" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(8%,18%,25%); fill-rule: evenodd;"/>
+			<path d="M 305,183 L 319,197 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="319 197, 311.4458 194.3668, 316.3668 189.4458" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(8%,18%,25%); fill-rule: evenodd;"/>
+			<text x="285" y="137" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,274) scale(1,-1)">D2 TX</text>
+			<path d="M 320,166 L 415,166 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 415,166 L 415,159 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 403,159 L 427,159 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 407,154 L 423,154 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 411,149 L 419,149 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="35" y="102" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,204) scale(1,-1)">GPIO23</text>
+			<path d="M 100,106 L 125,106 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 125,106 L 154,106 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<rect x="154.0" y="99" width="42.0" height="14" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<path d="M 196,106 L 225,106 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="146.0" y="126" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,252) scale(1,-1)">R6 1k</text>
+			<path d="M 225,106 L 280,106 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 280,106 L 291,106 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="291 97, 291 115, 307 106" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<path d="M 309,96 L 309,116 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 309,106 L 320,106 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 296,121 L 310,135 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="310 135, 302.4458 132.3668, 307.3668 127.4458" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(8%,18%,25%); fill-rule: evenodd;"/>
+			<path d="M 305,123 L 319,137 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<polygon points="319 137, 311.4458 134.3668, 316.3668 129.4458" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(8%,18%,25%); fill-rule: evenodd;"/>
+			<text x="285" y="77" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,154) scale(1,-1)">D3 RX</text>
+			<path d="M 320,106 L 415,106 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 415,106 L 415,99 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 403,99 L 427,99 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 407,94 L 423,94 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 411,89 L 419,89 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="600" y="200" style="font-family: Helvetica; font-size: 15px;fill: rgb(7%,42%,50%); stroke:none;" transform="translate(0,400) scale(1,-1)">BOTON DE PANICO</text>
+			<text x="600" y="174" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,348) scale(1,-1)">GPIO24 (pull-up interno)</text>
+			<path d="M 600,150 L 700,150 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<circle cx="700" cy="150" r="3" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<path d="M 700,150 L 742,165 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<circle cx="750" cy="150" r="3" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<path d="M 750,150 L 835,150 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 835,150 L 835,143 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 823,143 L 847,143 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 827,138 L 843,138 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<path d="M 831,133 L 839,133 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="650" y="115" style="font-family: Helvetica; font-size: 13px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,230) scale(1,-1)">SW1 normalmente abierto</text>
+			<path d="M 30,65 L 870,65 Z" style="stroke: rgb(8%,18%,25%); stroke-linecap: butt; stroke-width: 1.8;"/>
+			<text x="30" y="44" style="font-family: Helvetica; font-size: 12px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,88) scale(1,-1)">J1: 1=3V3   2=GND   3=TX17   4=RX27   5=LED22   6=LED23   7=BOTON24</text>
+			<text x="30" y="24" style="font-family: Helvetica; font-size: 12px;fill: rgb(8%,18%,25%); stroke:none;" transform="translate(0,48) scale(1,-1)">Pines fisicos RPi: 1, 6, 11, 13, 15, 16, 18. Confirmar B/C/E de cada encapsulado.</text>
+		</g>
+	</g>
+</svg>

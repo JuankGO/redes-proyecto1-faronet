@@ -1,9 +1,13 @@
 # Modelo de amenazas de FaroNet
 
-**Autor:** [Jimmy Castillo, Juan Carlos Gomez]
+**Autor:** Jimmy Castillo Guzmán y Juan Carlos Gómez
 **Curso:** Redes de Computadoras — Proyecto 1
-**Fecha:** [12/10/2026]
-**Versión:** 1.1 (ajustada al código final)
+**Base:** 12/10/2026. **Revisión documental:** 01/11/2026.
+**Versión:** 1.2 (GPIO17/27, botón GPIO24 y límites de validación).
+
+El Worker está implementado, pero el grupo indicó que no se utilizó en la
+demostración integrada. Las defensas siguientes describen diseño y código;
+no certifican que las pruebas físicas o el despliegue integrado hayan pasado.
 
 ## 1. Propósito
 
@@ -46,7 +50,7 @@ el relay que recibe nuestra celda.
 | | |
 | --- | --- |
 | **Qué puede ver** | Quién le pasó la celda, a quién debe pasársela, la hora y el tamaño del mensaje. |
-| **Qué NO puede ver** | El contenido del mensaje. El origen y el destino final **a la vez**, salvo que los tres nodos del circuito sean suyos. |
+| **Qué NO puede ver** | No abre las demás capas ni el mensaje final. Una sola capa no identifica ambos extremos; observar entradas y salidas o coludir con otros participantes puede permitir correlación. |
 | **Defensa** | Cebolla de 3 saltos: cada relay abre solo su capa y ve únicamente el siguiente salto. Cifrado con claves públicas. Celdas de tamaño fijo (1024 bytes) para que el tamaño no delate cuánto se dijo: cada relay vuelve a rellenar la celda con bytes aleatorios hasta 1024 antes de reenviarla. Solo se arma la cebolla si hay al menos 5 candidatos a relay (si no, `SaltosError`). Paquetes mal formados se descartan sin tumbar el nodo. |
 
 ### 3.2 Observador del medio físico
@@ -95,7 +99,7 @@ debilidades, el documento no sirve.
   sí las ve en su propia infraestructura antes de que el código las reciba.
   El usuario debe asumir que el proveedor del edge conoce la IP del gateway.
 - **Robo físico del Faro.** Si alguien se lleva una Raspberry, puede leer las
-  llaves guardadas en disco. El botón de pánico (GPIO17 o `/panico`) sobrescribe
+  llaves guardadas en disco. El botón de pánico (GPIO24 o `/panico`) sobrescribe
   con ceros y borra las llaves, crea una identidad y una dirección nuevas y
   vacía las tablas en memoria, pero solo ayuda si el dueño lo activa **antes**
   de perder el control del dispositivo. Además, en una microSD la
@@ -131,9 +135,9 @@ debilidades, el documento no sirve.
   y de **borrar** sus llaves al final de su vida útil con el botón de pánico.
 - El directorio de nodos se publica con **firmas verificables** en un sitio
   no confiable (el edge), pero su integridad se comprueba siempre.
-- La red subyacente (UDP dentro de la mesh, HTTPS hacia Cloudflare) ofrece
-  al menos integridad, aunque no confidencialidad. La confidencialidad la
-  aporta nuestra capa cebolla.
+- UDP no aporta confidencialidad ni integridad frente a un adversario activo.
+  Las capas cifradas y las firmas aportan las verificaciones indicadas; HTTPS
+  protege el transporte entre gateway y edge. HELLO y RUTA siguen sin firma.
 - Ningún algoritmo criptográfico es inventado por nosotros: usamos PyNaCl
   (libsodium) y la API WebCrypto del Worker, que son bibliotecas
   reconocidas.

@@ -2,9 +2,9 @@
 
 Un Medio mueve listas de medios bits (0/1) entre dos Faros. Hay dos:
 
-- MedioUART: el Faro real. Usa la UART de hardware de la Raspberry Pi
-  (GPIO14 TXD -> LED IR, GPIO15 RXD <- fototransistor). Los medios bits se
-  empaquetan de 8 en 8 en bytes y viajan como 8N1.
+- MedioUART: puerto serie del Faro. El perfil "pigpio" usa GPIO17 TX y
+  GPIO27 RX invertido; tambien acepta un puerto UART del sistema.
+  Los medios bits se empaquetan de 8 en 8 en bytes y viajan como 8N1.
 - MedioSimUDP: simulacion por UDP para probar sin hardware.
 """
 import socket
@@ -55,6 +55,9 @@ class MedioUART(Medio):
 
     def __init__(self, puerto: str = "/dev/ttyAMA0", baudios: int = 9600,
                  silencio_bytes: int = 20, serial_obj=None):
+        if serial_obj is None and puerto == "pigpio":
+            from faro.serie_pigpio import SeriePigpio  # Faro en GPIO17/27
+            serial_obj = SeriePigpio(baudios)
         if serial_obj is None:
             import serial  # pyserial; solo se necesita en la Raspberry
             serial_obj = serial.Serial(puerto, baudios, bytesize=8,

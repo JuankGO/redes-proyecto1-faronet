@@ -3,7 +3,7 @@
 El destino es la direccion que imprime demo_recibir en el otro Faro.
 Con --destino ffffffff se manda a difusion, sin esperar ACK.
 
-Faro real:   python3 -m faro.demo_enviar --uart /dev/ttyAMA0 --destino 0a0b0c0d
+Faro real:   python3 -m faro.demo_enviar --uart pigpio --baudios 300 --destino 0a0b0c0d
 Simulacion:  python3 -m faro.demo_enviar --puerto 5001 --vecino 127.0.0.1:5000 --destino 0a0b0c0d
 """
 import argparse

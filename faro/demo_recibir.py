@@ -1,6 +1,6 @@
 """Muestra lo que llega por el Faro.
 
-Faro real:   python3 -m faro.demo_recibir --uart /dev/ttyAMA0
+Faro real:   python3 -m faro.demo_recibir --uart pigpio --baudios 300
 Simulacion:  python3 -m faro.demo_recibir --puerto 5000 --vecino 127.0.0.1:5001
 """
 import argparse

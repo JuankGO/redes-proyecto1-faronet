@@ -1,9 +1,10 @@
 """LEDs indicadores y boton de panico del Faro (GPIO de la Raspberry Pi).
 
-Pines (numeracion BCM), iguales a docs/hardware/circuito-faro.html:
-    GPIO23  LED verde  (TX)
-    GPIO24  LED rojo   (RX)
-    GPIO17  boton de panico, a GND, con pull-up interno
+Pines (numeracion BCM) del Faro cableado a GPIO17/27 (ver faro/serie_pigpio.py):
+    GPIO22  LED TX     (pin 15)
+    GPIO23  LED RX     (pin 16)
+    GPIO24  boton de panico, a GND, con pull-up interno (pin 18)
+El esquema actual esta en docs/hardware/circuito-faro.html.
 
 Si gpiozero no esta disponible (por ejemplo, en una laptop), se usan
 versiones vacias que no hacen nada. Asi el mismo codigo corre en la
@@ -12,9 +13,9 @@ Raspberry y en las pruebas.
 import threading
 import time
 
-PIN_LED_TX = 23
-PIN_LED_RX = 24
-PIN_PANICO = 17
+PIN_LED_TX = 22
+PIN_LED_RX = 23
+PIN_PANICO = 24
 
 
 def _gpiozero():

@@ -1,8 +1,8 @@
 """Boton de panico: borra la direccion fisica y todas las llaves, sobrescribiendo con ceros.
 
-La idea: si solo se borra el archivo, los bytes siguen en el disco hasta que
-se reutilice el espacio. Sobrescribir con ceros primero hace que no queden
-recuperables. Es parte del protocolo de panico.
+Se sobrescribe el archivo antes de borrarlo como medida de borrado logico.
+En microSD y otros medios flash no garantiza eliminacion forense por el
+remapeo de bloques. Tampoco garantiza borrar todas las copias en memoria.
 """
 import os
 from pathlib import Path
